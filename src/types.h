@@ -3,10 +3,9 @@
 
 #include <time.h>
 
-typedef unsigned long int id_t;
+#include "settings.h"
 
-#define USERNAME_BUFFER_SIZE 32
-#define PASSWORD_HASH_BUFFER_SIZE 130
+typedef unsigned long int id_t;
 
 typedef struct {
   id_t id;
@@ -17,12 +16,6 @@ typedef struct {
 typedef unsigned char staff_role_t;
 #define TRAINER 0
 #define BRANCH_MANAGER 1
-
-#define FULL_NAME_BUFFER_SIZE 64
-#define EMAIL_BUFFER_SIZE 64
-#define PHONE_BUFFER_SIZE 11        // phone number pattern: 01XXXXXXXXX
-#define BRANCH_NAME_BUFFER_SIZE 128 // should allow detailed location names
-#define BRANCH_COUNT_MAX 32
 
 typedef struct {
   id_t id;
@@ -72,8 +65,6 @@ typedef unsigned char payment_status_t;
 #define FAILED 2
 #define INVALID 3
 
-#define TRANSACTION_ID_BUFFER_SIZE 64
-
 typedef struct {
   id_t id;
   unsigned int amount;
@@ -101,8 +92,6 @@ typedef unsigned char request_status_t;
 #define REQUESTED 0
 #define APPROVED 1
 #define REJECTED 2
-
-#define REASON_BUFFER_SIZE 128
 
 typedef struct {
   id_t request_id;
@@ -150,8 +139,6 @@ typedef struct {
   time_t suspension_date;
   time_t unsuspension_date;
 } suspension_record_t;
-
-#define DESCRIPTION_BUFFER_SIZE 256
 
 typedef struct {
   id_t id;

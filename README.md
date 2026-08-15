@@ -33,8 +33,7 @@ Work tracked per item; commit each with a Conventional Commit message (`feat:`, 
 
 ### Scaffold
 - [x] Add shared `src/types.h` defining every record struct plus `session_t` (fixed-size `char` arrays for strings), the `typedef unsigned char` enum aliases (`user_role_t` included) with `#define` constants, and the `BRANCH_COUNT_MAX` cap (already created) - `chore:`
-- [ ] Add `run.sh` and `run.bat` build scripts that compile `src/` with `-std=c11 -Wall -Wextra -pedantic -g` into `build/`, plus a `.gitignore` ignoring `data/` and `build/` so generated artifacts are never tracked - `chore:`
-- [ ] Commit the project docs (`README.md`, `AGENTS.md`, `docs/PLAN.md`) so the repo carries its onboarding, coding standards, and implementation plan - `docs:`
+- [x] Add `run.sh` and `run.bat` build scripts that compile `src/` with `-std=c11 -Wall -Wextra -pedantic -g` into `build/`, plus a `.gitignore` ignoring `data/` and `build/` so generated artifacts are never tracked - `chore:`
 
 ### Utils
 - [ ] String helpers that trim whitespace, split on a delimiter, parse numbers safely, and normalize case so every module handles raw text predictably - `feat:`

@@ -37,9 +37,9 @@ Work tracked per item; commit each with a Conventional Commit message (`feat:`, 
 
 ### Utils
 - [x] String helpers that trim whitespace, split on a delimiter, parse numbers safely, and normalize case so every module handles raw text predictably - `feat:`
-- [ ] File helpers that read/write one record per line with control characters stripped, so persisted data stays clean and round-trips reliably - `feat:`
-- [ ] Unit tests covering trim/split/parse/case behavior and file read/write round-trip - `test:`
-- [ ] Input wrappers around `fgets()` and `scanf()` that validate and cap input, so no buffer overflow or malformed value reaches the logic - `feat:`
+- [x] File helpers that read/write one record per line with control characters stripped, so persisted data stays clean and round-trips reliably - `feat:`
+- [x] Unit tests covering trim/split/parse/case behavior and file read/write round-trip - `test:`
+- [x] Input wrappers around `fgets()` and `scanf()` that validate and cap input, so no buffer overflow or malformed value reaches the logic - `feat:`
 - [ ] SHA-256 password hashing with a per-password random salt, so credentials are never stored in plaintext and identical passwords differ on disk - `feat:`
 - [ ] Unit tests using known SHA-256 vectors, plus salt generation and verify-password round-trips - `test:`
 - [ ] Date helpers that convert `time_t` to `yyyy-mm-dd` and back (day-normalized), with `add_months()` handling month-end, so due dates and suspensions compute correctly - `feat:`

@@ -31,6 +31,7 @@ The name of the project is `Gymtrac` which is a gym management system, a `group 
 - If a function takes struct as an argument and it is not being modified, add `_payload` suffix to the argument name.
 - Use of `global variables` is highly discouraged, although not a hard requirement.
 - Use short and self explanatory comments for each typedefs and statements. Avoid writing comments for trivial code. Use comments to explain the purpose of a struct, or typedef, not how it works. Use docstring comments for functions, explaining the purpose of the function, its parameters, and return values. Use it to explain the purpose of a function, not how it works.
+- Use _2 spaces_ for indentation in comments, not 4 spaces.
 
 ## Directory Structure
 ```

@@ -37,15 +37,21 @@ static void test_trim(void) {
 }
 
 /**
- * Verifies that string_split copies each field into its own row of parts.
+ * Verifies that string_split copies each field into its own part buffer.
  */
 static void test_split(void) {
   char buffer[64];
-  char parts[8][SPLIT_PART_BUFFER_SIZE];
+  char fields[8][64];
+  char *parts[8];
+  int part_index;
   int part_count;
 
+  for (part_index = 0; part_index < 8; part_index++) {
+    parts[part_index] = fields[part_index];
+  }
+
   strcpy(buffer, "alpha|beta|gamma");
-  part_count = string_split(buffer, '|', parts, 8);
+  part_count = string_split(buffer, '|', parts, 8, 64);
   assert(part_count == 3);
   assert(strcmp(parts[0], "alpha") == 0);
   assert(strcmp(parts[1], "beta") == 0);
@@ -53,37 +59,45 @@ static void test_split(void) {
   assert(strcmp(buffer, "alpha|beta|gamma") == 0);
 
   strcpy(buffer, "a||c");
-  part_count = string_split(buffer, '|', parts, 8);
+  part_count = string_split(buffer, '|', parts, 8, 64);
   assert(part_count == 3);
   assert(strcmp(parts[0], "a") == 0);
   assert(strcmp(parts[1], "") == 0);
   assert(strcmp(parts[2], "c") == 0);
 
   strcpy(buffer, "a|b|c|d");
-  part_count = string_split(buffer, '|', parts, 2);
+  part_count = string_split(buffer, '|', parts, 2, 64);
   assert(part_count == 2);
   assert(strcmp(parts[0], "a") == 0);
   assert(strcmp(parts[1], "b") == 0);
 
   strcpy(buffer, "solo");
-  part_count = string_split(buffer, '|', parts, 8);
+  part_count = string_split(buffer, '|', parts, 8, 64);
   assert(part_count == 1);
   assert(strcmp(parts[0], "solo") == 0);
 
   strcpy(buffer, "trailing|");
-  part_count = string_split(buffer, '|', parts, 8);
+  part_count = string_split(buffer, '|', parts, 8, 64);
   assert(part_count == 2);
   assert(strcmp(parts[0], "trailing") == 0);
   assert(strcmp(parts[1], "") == 0);
 
   strcpy(buffer, "salt:hash");
-  part_count = string_split(buffer, ':', parts, 8);
+  part_count = string_split(buffer, ':', parts, 8, 64);
   assert(part_count == 2);
   assert(strcmp(parts[0], "salt") == 0);
   assert(strcmp(parts[1], "hash") == 0);
 
-  assert(string_split(NULL, '|', parts, 8) == 0);
-  assert(string_split(buffer, '|', NULL, 8) == 0);
+  strcpy(buffer, "abcdef|g");
+  part_count = string_split(buffer, '|', parts, 8, 4);
+  assert(part_count == 2);
+  assert(strcmp(parts[0], "abc") == 0);
+  assert(strcmp(parts[1], "g") == 0);
+
+  assert(string_split(NULL, '|', parts, 8, 64) == 0);
+  assert(string_split(buffer, '|', NULL, 8, 64) == 0);
+  assert(string_split(buffer, '|', parts, 0, 64) == 0);
+  assert(string_split(buffer, '|', parts, 8, 1) == 0);
 }
 
 /**

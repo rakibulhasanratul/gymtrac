@@ -3,9 +3,6 @@
 
 #include <stdbool.h>
 
-// Maximum length of one field produced by string_split, including the null terminator.
-#define SPLIT_PART_BUFFER_SIZE 256
-
 /**
  * Copies text into destination with leading and trailing whitespace removed.
  *
@@ -19,21 +16,23 @@
 void string_trim(char destination[], int destination_capacity, const char text[]);
 
 /**
- * Splits text on delimiter, copying each field into its own row of parts.
+ * Splits text on delimiter, copying each field into its own part buffer.
  *
- * Each field is stored as a null-terminated string of up to
- * SPLIT_PART_BUFFER_SIZE - 1 characters. Consecutive delimiters and a
- * trailing delimiter produce empty fields, so the part count is one more
- * than the number of delimiters seen before the capacity is reached.
+ * Each field is copied as a null-terminated string of up to
+ * field_capacity - 1 characters. Consecutive delimiters and a trailing
+ * delimiter produce empty fields, so the part count is one more than the
+ * number of delimiters seen before the capacity is reached.
  *
  * @param text the string to split; not modified
  * @param delimiter the character that separates fields
- * @param parts the array that receives each captured field
- * @param part_capacity the number of rows available in parts
+ * @param parts the array of buffers that receive each captured field; every
+ *              buffer must hold at least field_capacity characters
+ * @param part_capacity the number of buffers available in parts
+ * @param field_capacity the number of characters each buffer can hold
  * @return the number of parts captured; when this equals part_capacity, text
  *         may still hold more unsplit fields
  */
-int string_split(const char text[], char delimiter, char parts[][SPLIT_PART_BUFFER_SIZE], int part_capacity);
+int string_split(const char text[], char delimiter, char *parts[], int part_capacity, int field_capacity);
 
 /**
  * Parses text as a whole non-negative decimal number into value.

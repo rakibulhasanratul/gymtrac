@@ -40,12 +40,12 @@ void string_trim(char destination[], int destination_capacity, const char text[]
   destination[write_index] = '\0';
 }
 
-int string_split(const char text[], char delimiter, char parts[][SPLIT_PART_BUFFER_SIZE], int part_capacity) {
+int string_split(const char text[], char delimiter, char *parts[], int part_capacity, int field_capacity) {
   int part_count;
   int cursor_index;
   int field_index;
 
-  if (text == NULL || parts == NULL || part_capacity < 1) {
+  if (text == NULL || parts == NULL || part_capacity < 1 || field_capacity < 2) {
     return 0;
   }
 
@@ -54,10 +54,12 @@ int string_split(const char text[], char delimiter, char parts[][SPLIT_PART_BUFF
   while (part_count < part_capacity) {
     // Copy the current field into the next part.
     field_index = 0;
-    while (text[cursor_index] != '\0' && text[cursor_index] != delimiter
-           && field_index < SPLIT_PART_BUFFER_SIZE - 1) {
-      parts[part_count][field_index] = text[cursor_index];
-      field_index++;
+    while (text[cursor_index] != '\0' && text[cursor_index] != delimiter) {
+      // Write only the characters that fit in the buffer.
+      if (field_index < field_capacity - 1) {
+        parts[part_count][field_index] = text[cursor_index];
+        field_index++;
+      }
       cursor_index++;
     }
     parts[part_count][field_index] = '\0';

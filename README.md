@@ -36,7 +36,7 @@ Work tracked per item; commit each with a Conventional Commit message (`feat:`, 
 - [x] Add `run.sh` and `run.bat` build scripts that compile `src/` with `-std=c11 -Wall -Wextra -pedantic -g` into `build/`, plus a `.gitignore` ignoring `data/` and `build/` so generated artifacts are never tracked - `chore:`
 
 ### Utils
-- [ ] String helpers that trim whitespace, split on a delimiter, parse numbers safely, and normalize case so every module handles raw text predictably - `feat:`
+- [x] String helpers that trim whitespace, split on a delimiter, parse numbers safely, and normalize case so every module handles raw text predictably - `feat:`
 - [ ] File helpers that read/write one record per line with control characters stripped, so persisted data stays clean and round-trips reliably - `feat:`
 - [ ] Unit tests covering trim/split/parse/case behavior and file read/write round-trip - `test:`
 - [ ] Input wrappers around `fgets()` and `scanf()` that validate and cap input, so no buffer overflow or malformed value reaches the logic - `feat:`

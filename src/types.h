@@ -80,7 +80,7 @@ typedef struct {
   unsigned int amount;
   time_t transaction_time;
   transaction_t transaction_type;
-  char transaction_id[TRANSACTION_ID_BUFFER_SIZE];
+  char transaction_id[TRX_ID_BUFFER_SIZE];
   payment_status_t status;
 } payment_t;
 
@@ -96,7 +96,7 @@ typedef struct {
   id_t gym_member_id;
   unsigned int amount;
   time_t transaction_time;
-  char transaction_id[TRANSACTION_ID_BUFFER_SIZE];
+  char transaction_id[TRX_ID_BUFFER_SIZE];
   payment_status_t status;
 } digital_payment_request_t;
 

@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "tests/test_string_util.h"
+#include "test_string_util.h"
 
 int main(void) {
     run_string_util_tests();

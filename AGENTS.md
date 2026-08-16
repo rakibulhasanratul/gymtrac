@@ -10,7 +10,7 @@ The name of the project is `Gymtrac` which is a gym management system, a `group 
 - Passwords should be stored in hash.
 - Modularity is preferred, although not a hard requirement. If modularity is applied, each module should serve only one purpose.
 - The project should be implemented in `functional programming` manner.
-- The project should ONLY UTILIZE standard C libraries (.h). Prefer the most common headers (`stdio.h`, `stdlib.h`, `string.h`, `math.h`) plus the narrowly-scoped standard helpers the project needs (`ctype.h`, `limits.h`, `time.h`, `stdbool.h`, `stddef.h`); avoid obscure standard headers.
+- The project should ONLY UTILIZE standard C libraries (.h). The use is LIMITED to following headers: `stdio.h`, `string.h`, `math.h`, `time.h`, `stdbool.h`, `limits.h`, `ctype.h`.
 - Variables, struct fields, parameters, and return values use only primitive data types (`int`, `char`, `float`, `double`, and their `signed`/`unsigned`/`short`/`long` variants). Fixed-width types from `stdint.h` are prohibited. Structs and typedef aliases to primitive types are allowed for record modeling; `time_t` is permitted for time fields.
 - Tests are fine but those should be extremely precise, not bloated.
 
@@ -30,7 +30,7 @@ The name of the project is `Gymtrac` which is a gym management system, a `group 
 - Use of `goto` and `label` is strictly prohibited.
 - If a function takes struct as an argument and it is not being modified, add `_payload` suffix to the argument name.
 - Use of `global variables` is highly discouraged, although not a hard requirement.
-- Use short and self explanatory comments for functions, structs, and typedefs. Avoid writing comments for trivial code. Use comments to explain the purpose of a function, struct, or typedef, not how it works.
+- Use short and self explanatory comments for structs, and typedefs. Avoid writing comments for trivial code. Use comments to explain the purpose of a struct, or typedef, not how it works. Use docstring comments for functions, explaining the purpose of the function, its parameters, and return values. Use it to explain the purpose of a function, not how it works.
 
 ## Directory Structure
 ```

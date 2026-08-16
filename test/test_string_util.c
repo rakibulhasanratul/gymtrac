@@ -8,34 +8,40 @@
 #include "test_string_util.h"
 
 /**
- * Verifies that string_trim removes leading and trailing whitespace.
+ * Verifies that string_trim copies text stripped of leading and trailing
+ * whitespace.
  */
 static void test_trim(void) {
-  char buffer[64];
-  char *result;
+  char input[64];
+  char result[64];
 
-  strcpy(buffer, "  hello world  \t\n");
-  result = string_trim(buffer);
-  assert(result == buffer + 2);
+  strcpy(input, "  hello world  \t\n");
+  string_trim(result, sizeof(result), input);
   assert(strcmp(result, "hello world") == 0);
+  assert(strcmp(input, "  hello world  \t\n") == 0);
 
-  strcpy(buffer, "\t\n  ");
-  result = string_trim(buffer);
+  strcpy(input, "\t\n  ");
+  string_trim(result, sizeof(result), input);
   assert(strcmp(result, "") == 0);
 
-  strcpy(buffer, "no-space");
-  result = string_trim(buffer);
+  strcpy(input, "no-space");
+  string_trim(result, sizeof(result), input);
   assert(strcmp(result, "no-space") == 0);
 
-  assert(string_trim(NULL) == NULL);
+  strcpy(input, "hello world");
+  string_trim(result, 6, input);
+  assert(strcmp(result, "hello") == 0);
+
+  string_trim(NULL, sizeof(result), input);
+  string_trim(result, sizeof(result), NULL);
 }
 
 /**
- * Verifies that string_split captures fields in place on a delimiter.
+ * Verifies that string_split copies each field into its own row of parts.
  */
 static void test_split(void) {
   char buffer[64];
-  char *parts[8];
+  char parts[8][SPLIT_PART_BUFFER_SIZE];
   int part_count;
 
   strcpy(buffer, "alpha|beta|gamma");
@@ -44,6 +50,7 @@ static void test_split(void) {
   assert(strcmp(parts[0], "alpha") == 0);
   assert(strcmp(parts[1], "beta") == 0);
   assert(strcmp(parts[2], "gamma") == 0);
+  assert(strcmp(buffer, "alpha|beta|gamma") == 0);
 
   strcpy(buffer, "a||c");
   part_count = string_split(buffer, '|', parts, 8);

@@ -2,7 +2,7 @@
 
 `Gymtrac` is a gym management system, a `group project` for `CSE115L` course of North South University. The project is developed using C following C11 standards. This is a complete `CLI only` project, with no GUI.
 
-## Brief Features
+## Project Brief
 - User authentication and authorization. Login with `username` + password; passwords are stored as salted hashes.
 - 3 user record types: System Administrator (pre-existed), Branch Staff (a `role` field distinguishes Branch Manager from Branch Trainer), and Gym Member.
 - Branches are a simple list of branch names. Every staff member and gym member belongs to exactly one existing branch.
@@ -28,6 +28,7 @@
   - The system administrator can create users of any type (including branch managers); gym members self-register and stay `on_hold` until their branch manager approves them.
 
 ## TODO
+[AI Generated]  
 
 Work tracked per item; commit each with a Conventional Commit message (`feat:`, `fix:`, `chore:`, `test:`, `docs:`).
 

@@ -39,13 +39,13 @@ static void test_write_read_round_trip(void) {
   fclose(file);
 
   file = open_test_file_for_read();
-  assert(file_read_line(file, buffer, sizeof buffer));
+  assert(file_read_line(file, buffer, sizeof(buffer)));
   assert(strcmp(buffer, "alpha|beta") == 0);
-  assert(file_read_line(file, buffer, sizeof buffer));
+  assert(file_read_line(file, buffer, sizeof(buffer)));
   assert(strcmp(buffer, "single") == 0);
-  assert(file_read_line(file, buffer, sizeof buffer));
+  assert(file_read_line(file, buffer, sizeof(buffer)));
   assert(strcmp(buffer, "") == 0);
-  assert(file_read_line(file, buffer, sizeof buffer) == false);
+  assert(file_read_line(file, buffer, sizeof(buffer)) == false);
   fclose(file);
 }
 
@@ -62,9 +62,9 @@ static void test_read_crlf_line_ending(void) {
   fclose(file);
 
   file = open_test_file_for_read();
-  assert(file_read_line(file, buffer, sizeof buffer));
+  assert(file_read_line(file, buffer, sizeof(buffer)));
   assert(strcmp(buffer, "foo") == 0);
-  assert(file_read_line(file, buffer, sizeof buffer));
+  assert(file_read_line(file, buffer, sizeof(buffer)));
   assert(strcmp(buffer, "bar") == 0);
   fclose(file);
 }
@@ -82,8 +82,8 @@ static void test_read_truncated_line_drained(void) {
   fclose(file);
 
   file = open_test_file_for_read();
-  assert(file_read_line(file, buffer, sizeof buffer) == false);
-  assert(file_read_line(file, buffer, sizeof buffer));
+  assert(file_read_line(file, buffer, sizeof(buffer)) == false);
+  assert(file_read_line(file, buffer, sizeof(buffer)));
   assert(strcmp(buffer, "next") == 0);
   fclose(file);
 }
@@ -94,8 +94,8 @@ static void test_read_truncated_line_drained(void) {
 static void test_read_line_invalid_arguments(void) {
   char buffer[64];
 
-  assert(file_read_line(NULL, buffer, sizeof buffer) == false);
-  assert(file_read_line(stdin, NULL, sizeof buffer) == false);
+  assert(file_read_line(NULL, buffer, sizeof(buffer)) == false);
+  assert(file_read_line(stdin, NULL, sizeof(buffer)) == false);
   assert(file_read_line(stdin, buffer, 1) == false);
 }
 

@@ -11,7 +11,7 @@ static void input_discard_line(void) {
   }
 }
 
-bool input_string(char *buffer, int buffer_capacity) {
+bool input_string(char buffer[], int buffer_capacity) {
   int length;
 
   if (buffer == NULL || buffer_capacity < 2) {

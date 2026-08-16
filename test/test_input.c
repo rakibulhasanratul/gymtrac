@@ -12,7 +12,7 @@
 /**
  * Redirects standard input to a temporary file holding content.
  */
-static void redirect_stdin_with_content(const char *content) {
+static void redirect_stdin_with_content(const char content[]) {
   FILE *file;
 
   file = fopen(TEST_INPUT_PATH, "w");
@@ -31,11 +31,11 @@ static void test_read_string_plain_lines(void) {
   char buffer[64];
 
   redirect_stdin_with_content("hello world\nsecond\n");
-  assert(input_string(buffer, sizeof buffer) == true);
+  assert(input_string(buffer, sizeof(buffer)) == true);
   assert(strcmp(buffer, "hello world") == 0);
-  assert(input_string(buffer, sizeof buffer) == true);
+  assert(input_string(buffer, sizeof(buffer)) == true);
   assert(strcmp(buffer, "second") == 0);
-  assert(input_string(buffer, sizeof buffer) == false);
+  assert(input_string(buffer, sizeof(buffer)) == false);
 }
 
 /**
@@ -45,9 +45,9 @@ static void test_read_string_crlf(void) {
   char buffer[64];
 
   redirect_stdin_with_content("foo\r\nbar\n");
-  assert(input_string(buffer, sizeof buffer) == true);
+  assert(input_string(buffer, sizeof(buffer)) == true);
   assert(strcmp(buffer, "foo") == 0);
-  assert(input_string(buffer, sizeof buffer) == true);
+  assert(input_string(buffer, sizeof(buffer)) == true);
   assert(strcmp(buffer, "bar") == 0);
 }
 
@@ -58,9 +58,9 @@ static void test_read_string_caps_and_drains(void) {
   char buffer[8];
 
   redirect_stdin_with_content("toolonginput\nnext\n");
-  assert(input_string(buffer, sizeof buffer) == true);
+  assert(input_string(buffer, sizeof(buffer)) == true);
   assert(strcmp(buffer, "toolong") == 0);
-  assert(input_string(buffer, sizeof buffer) == true);
+  assert(input_string(buffer, sizeof(buffer)) == true);
   assert(strcmp(buffer, "next") == 0);
 }
 
@@ -71,7 +71,7 @@ static void test_read_string_empty_line(void) {
   char buffer[64];
 
   redirect_stdin_with_content("\n");
-  assert(input_string(buffer, sizeof buffer) == true);
+  assert(input_string(buffer, sizeof(buffer)) == true);
   assert(strcmp(buffer, "") == 0);
 }
 
@@ -82,7 +82,7 @@ static void test_read_string_invalid_arguments(void) {
   char buffer[64];
 
   redirect_stdin_with_content("anything\n");
-  assert(input_string(NULL, sizeof buffer) == false);
+  assert(input_string(NULL, sizeof(buffer)) == false);
   assert(input_string(buffer, 1) == false);
 }
 
@@ -129,7 +129,7 @@ static void test_read_integer_drains_line(void) {
   redirect_stdin_with_content("42 junk\nnext\n");
   assert(input_integer(&value) == true);
   assert(value == 42);
-  assert(input_string(buffer, sizeof buffer) == true);
+  assert(input_string(buffer, sizeof(buffer)) == true);
   assert(strcmp(buffer, "next") == 0);
 }
 

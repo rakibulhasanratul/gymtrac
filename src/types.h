@@ -41,10 +41,10 @@ typedef struct {
 
 // Lifecycle status of a gym member's membership.
 typedef unsigned char membership_status_t;
-#define ON_HOLD 0
-#define ACTIVE 1
-#define SUSPENDED 2
-#define CANCELLED 3
+#define MEMBERSHIP_ON_HOLD 0
+#define MEMBERSHIP_ACTIVE 1
+#define MEMBERSHIP_SUSPENDED 2
+#define MEMBERSHIP_CANCELLED 3
 
 // Gym member record with plan, dues, and membership status.
 typedef struct {
@@ -64,15 +64,15 @@ typedef struct {
 
 // Payment method: cash or digital.
 typedef unsigned char transaction_t;
-#define CASH 0
-#define DIGITAL 1
+#define CASH_TRANSACTION 0
+#define DIGITAL_TRANSACTION 1
 
 // Lifecycle status of a payment.
 typedef unsigned char payment_status_t;
-#define PENDING 0
-#define COMPLETED 1
-#define FAILED 2
-#define INVALID 3
+#define PAYMENT_PENDING 0
+#define PAYMENT_COMPLETED 1
+#define PAYMENT_FAILED 2
+#define PAYMENT_INVALID 3
 
 // Payment details shared by cash and digital payments.
 typedef struct {
@@ -102,9 +102,9 @@ typedef struct {
 
 // Lifecycle status of an approval request.
 typedef unsigned char request_status_t;
-#define REQUESTED 0
-#define APPROVED 1
-#define REJECTED 2
+#define REQUEST_REQUESTED 0
+#define REQUEST_APPROVED 1
+#define REQUEST_REJECTED 2
 
 // Trainer request to change a member's status, resolved by a manager.
 typedef struct {

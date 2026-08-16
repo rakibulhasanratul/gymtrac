@@ -4,76 +4,91 @@
 
 #include "string_util.h"
 
-char *string_trim(char *text) {
-  char *start;
-  char *end;
+void string_trim(char destination[], int destination_capacity, const char text[]) {
+  int start_index;
+  int end_index;
+  int write_index;
 
-  if (text == NULL) {
-    return NULL;
+  if (destination == NULL || text == NULL || destination_capacity < 2) {
+    return;
   }
 
   // Skip past leading whitespace.
-  start = text;
-  while (*start != '\0' && isspace((unsigned char)*start)) {
-    start++;
+  start_index = 0;
+  while (text[start_index] != '\0' && isspace((unsigned char)text[start_index])) {
+    start_index++;
+  }
+
+  // Scan to the end of the string.
+  end_index = start_index;
+  while (text[end_index] != '\0') {
+    end_index++;
   }
 
   // Back up over trailing whitespace.
-  end = start + strlen(start);
-  while (end > start && isspace((unsigned char)end[-1])) {
-    end--;
+  while (end_index > start_index && isspace((unsigned char)text[end_index - 1])) {
+    end_index--;
   }
-  // Terminate the string at the last non-whitespace character.
-  *end = '\0';
 
-  return start;
+  // Copy the trimmed slice into destination, capped by the buffer size.
+  write_index = 0;
+  while (start_index < end_index && write_index < destination_capacity - 1) {
+    destination[write_index] = text[start_index];
+    write_index++;
+    start_index++;
+  }
+  destination[write_index] = '\0';
 }
 
-int string_split(char *text, char delimiter, char **parts, int part_capacity) {
-  char *cursor;
+int string_split(const char text[], char delimiter, char parts[][SPLIT_PART_BUFFER_SIZE], int part_capacity) {
   int part_count;
+  int cursor_index;
+  int field_index;
 
   if (text == NULL || parts == NULL || part_capacity < 1) {
     return 0;
   }
 
-  cursor = text;
   part_count = 0;
+  cursor_index = 0;
   while (part_count < part_capacity) {
-    char *found;
-    // Capture the current field start as the next part.
-    parts[part_count] = cursor;
+    // Copy the current field into the next part.
+    field_index = 0;
+    while (text[cursor_index] != '\0' && text[cursor_index] != delimiter
+           && field_index < SPLIT_PART_BUFFER_SIZE - 1) {
+      parts[part_count][field_index] = text[cursor_index];
+      field_index++;
+      cursor_index++;
+    }
+    parts[part_count][field_index] = '\0';
     part_count++;
-    // Stop once no more delimiters remain.
-    found = strchr(cursor, delimiter);
-    if (found == NULL) {
+    // Stop once the string is exhausted.
+    if (text[cursor_index] == '\0') {
       break;
     }
-    // Replace the delimiter with a null terminator.
-    *found = '\0';
-    // Advance past the delimiter to the next field.
-    cursor = found + 1;
+    // Skip the delimiter to reach the next field.
+    cursor_index++;
   }
 
   return part_count;
 }
 
-bool string_parse_unsigned(const char *text, unsigned int *value) {
+bool string_parse_unsigned(const char text[], unsigned int *value) {
   unsigned int accumulated;
-  const char *cursor;
+  int index;
 
-  if (text == NULL || value == NULL || *text == '\0') {
+  if (text == NULL || value == NULL || text[0] == '\0') {
     return false;
   }
 
   accumulated = 0;
-  for (cursor = text; *cursor != '\0'; cursor++) {
+  for (index = 0; text[index] != '\0'; index++) {
     unsigned int digit;
     // Reject any non-digit character.
-    if (*cursor < '0' || *cursor > '9') {
+    if (text[index] < '0' || text[index] > '9') {
       return false;
     }
-    digit = (unsigned int)(*cursor - '0');
+    digit = (unsigned int)(text[index] - '0');
     // Reject when the next digit would overflow the result.
     if (accumulated > (UINT_MAX - digit) / 10u) {
       return false;
@@ -85,22 +100,22 @@ bool string_parse_unsigned(const char *text, unsigned int *value) {
   return true;
 }
 
-bool string_parse_unsigned_long(const char *text, unsigned long int *value) {
+bool string_parse_unsigned_long(const char text[], unsigned long int *value) {
   unsigned long int accumulated;
-  const char *cursor;
+  int index;
 
-  if (text == NULL || value == NULL || *text == '\0') {
+  if (text == NULL || value == NULL || text[0] == '\0') {
     return false;
   }
 
   accumulated = 0;
-  for (cursor = text; *cursor != '\0'; cursor++) {
+  for (index = 0; text[index] != '\0'; index++) {
     unsigned long int digit;
     // Reject any non-digit character.
-    if (*cursor < '0' || *cursor > '9') {
+    if (text[index] < '0' || text[index] > '9') {
       return false;
     }
-    digit = (unsigned long int)(*cursor - '0');
+    digit = (unsigned long int)(text[index] - '0');
     // Reject when the next digit would overflow the result.
     if (accumulated > (ULONG_MAX - digit) / 10ul) {
       return false;
@@ -112,31 +127,31 @@ bool string_parse_unsigned_long(const char *text, unsigned long int *value) {
   return true;
 }
 
-char *string_to_lower(char *text) {
-  char *cursor;
+char *string_to_lower(char text[]) {
+  int index;
 
   if (text == NULL) {
     return NULL;
   }
 
   // Fold every letter to lowercase in place.
-  for (cursor = text; *cursor != '\0'; cursor++) {
-    *cursor = (char)tolower((unsigned char)*cursor);
+  for (index = 0; text[index] != '\0'; index++) {
+    text[index] = (char)tolower((unsigned char)text[index]);
   }
 
   return text;
 }
 
-char *string_to_upper(char *text) {
-  char *cursor;
+char *string_to_upper(char text[]) {
+  int index;
 
   if (text == NULL) {
     return NULL;
   }
 
   // Fold every letter to uppercase in place.
-  for (cursor = text; *cursor != '\0'; cursor++) {
-    *cursor = (char)toupper((unsigned char)*cursor);
+  for (index = 0; text[index] != '\0'; index++) {
+    text[index] = (char)toupper((unsigned char)text[index]);
   }
 
   return text;

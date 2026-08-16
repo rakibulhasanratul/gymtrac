@@ -3,7 +3,7 @@
 
 #include "file_util.h"
 
-bool file_read_line(FILE *file, char *buffer, int buffer_capacity) {
+bool file_read_line(FILE *file, char buffer[], int buffer_capacity) {
   int length;
 
   if (file == NULL || buffer == NULL || buffer_capacity < 2) {
@@ -38,7 +38,7 @@ bool file_read_line(FILE *file, char *buffer, int buffer_capacity) {
   return false;
 }
 
-bool file_write_line(FILE *file, const char *line) {
+bool file_write_line(FILE *file, const char line[]) {
   if (file == NULL || line == NULL) {
     return false;
   }
@@ -52,27 +52,27 @@ bool file_write_line(FILE *file, const char *line) {
   return true;
 }
 
-char *file_sanitize_field(char *text) {
-  char *write_cursor;
-  char *read_cursor;
+char *file_sanitize_field(char text[]) {
+  int read_index;
+  int write_index;
 
   if (text == NULL) {
     return NULL;
   }
 
-  write_cursor = text;
-  for (read_cursor = text; *read_cursor != '\0'; read_cursor++) {
-    unsigned char ch = (unsigned char)*read_cursor;
+  write_index = 0;
+  for (read_index = 0; text[read_index] != '\0'; read_index++) {
+    unsigned char ch = (unsigned char)text[read_index];
     // Drop the field delimiter and any control character.
     if (ch == (unsigned char)FIELD_DELIMITER || iscntrl(ch)) {
       continue;
     }
     // Compact the kept characters toward the front.
-    *write_cursor = *read_cursor;
-    write_cursor++;
+    text[write_index] = text[read_index];
+    write_index++;
   }
   // Terminate the compacted string.
-  *write_cursor = '\0';
+  text[write_index] = '\0';
 
   return text;
 }

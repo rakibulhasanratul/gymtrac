@@ -22,14 +22,14 @@ Field delimiter is `|` (pipe). Input is sanitized to strip control characters an
 Aliases so structs read uniformly and enum-backed fields stay one byte:
 
 - `id_t` = `unsigned long int`
-- `request_status_t` = `unsigned char` (`REQUESTED` / `APPROVED` / `REJECTED`)
+- `request_status_t` = `unsigned char` (`REQUEST_REQUESTED` / `REQUEST_APPROVED` / `REQUEST_REJECTED`)
 - `staff_role_t` = `unsigned char` (`TRAINER` / `BRANCH_MANAGER`), stored in `branch_staff_t.role`
 - `user_role_t` = `unsigned char` (`USER_ROLE_SYSADMIN` / `USER_ROLE_BRANCH_MANAGER` / `USER_ROLE_TRAINER` / `USER_ROLE_MEMBER`), used by `session_t`
-- `membership_status_t` = `unsigned char` (`ON_HOLD` / `ACTIVE` / `SUSPENDED` / `CANCELLED`)
-- `transaction_t` = `unsigned char` (`CASH` / `DIGITAL`)
-- `payment_status_t` = `unsigned char` (`PENDING` / `COMPLETED` / `FAILED` / `INVALID`)
+- `membership_status_t` = `unsigned char` (`MEMBERSHIP_ON_HOLD` / `MEMBERSHIP_ACTIVE` / `MEMBERSHIP_SUSPENDED` / `MEMBERSHIP_CANCELLED`)
+- `transaction_t` = `unsigned char` (`CASH_TRANSACTION` / `DIGITAL_TRANSACTION`)
+- `payment_status_t` = `unsigned char` (`PAYMENT_PENDING` / `PAYMENT_COMPLETED` / `PAYMENT_FAILED` / `PAYMENT_INVALID`)
 
-Every string field is a fixed-size `char` array capped by a macro (`FULL_NAME_BUFFER_SIZE`, `USERNAME_BUFFER_SIZE`, `PASSWORD_HASH_BUFFER_SIZE`, `EMAIL_BUFFER_SIZE`, `PHONE_BUFFER_SIZE`, `BRANCH_NAME_BUFFER_SIZE`, `REASON_BUFFER_SIZE`, `DESCRIPTION_BUFFER_SIZE`, `TRANSACTION_ID_BUFFER_SIZE`). The branch list is capped at `BRANCH_COUNT_MAX` names. No dynamic allocation is used anywhere; the input wrappers cap reads at these sizes and the file helpers sanitize against the delimiter.
+Every string field is a fixed-size `char` array capped by a macro (`FULL_NAME_BUFFER_SIZE`, `USERNAME_BUFFER_SIZE`, `PASSWORD_HASH_BUFFER_SIZE`, `EMAIL_BUFFER_SIZE`, `PHONE_BUFFER_SIZE`, `BRANCH_NAME_BUFFER_SIZE`, `REASON_BUFFER_SIZE`, `DESCRIPTION_BUFFER_SIZE`, `TRX_ID_BUFFER_SIZE`). The branch list is capped at `BRANCH_COUNT_MAX` names. No dynamic allocation is used anywhere; the input wrappers cap reads at these sizes and the file helpers sanitize against the delimiter.
 
 ## Data Model
 
@@ -41,9 +41,9 @@ Structs are designed as if they were database tables. Each user type is its own 
 - `branch_staff_t`: covers both branch managers and branch trainers in one table; `role` (`staff_role_t`: `TRAINER`, `BRANCH_MANAGER`) discriminates. Fields: `id`, `full_name`, `email`, `phone_number`, `gym_branch`, `username`, `password_hash`, `joined_at`, `role`.
 - `gym_member_t`: `id`, `full_name`, `email`, `phone_number`, `gym_branch`, `username`, `password_hash`, `joined_at`, `last_payment_date`, `due_amount`, `plan` (`subscription_plan_t`), `status` (`membership_status_t`).
 
-Membership status (`membership_status_t`): `ON_HOLD`, `ACTIVE`, `SUSPENDED`, `CANCELLED`. `ON_HOLD` applies only to gym members: they just self-registered and have not been approved by a branch manager yet. `CANCELLED` covers a member who ends their membership.
+Membership status (`membership_status_t`): `MEMBERSHIP_ON_HOLD`, `MEMBERSHIP_ACTIVE`, `MEMBERSHIP_SUSPENDED`, `MEMBERSHIP_CANCELLED`. `MEMBERSHIP_ON_HOLD` applies only to gym members: they just self-registered and have not been approved by a branch manager yet. `MEMBERSHIP_CANCELLED` covers a member who ends their membership.
 
-`subscription_plan_t`: `payable_amount`, `interval_days` (only applicable while a member is `ACTIVE`).
+`subscription_plan_t`: `payable_amount`, `interval_days` (only applicable while a member is `MEMBERSHIP_ACTIVE`).
 
 Usernames are globally unique across all three tables. `username_exists()` (user module) checks every table and is enforced on creation and used by login, so login is never ambiguous.
 
@@ -70,7 +70,7 @@ Branch managers and trainers share one table (`branch_staff_t`), so a single sta
 - `membership_status_change_request_t`: a branch trainer requests a member's status change (approve / suspend / unsuspend / cancel). `new_membership_status` is the target status; `reason` is mandatory for suspend/unsuspend. Only a branch manager resolves it (`resolved_by_staff_id` = manager id); on approval the member's status is set (a suspension also writes a `suspension_record_t`).
 - `subscription_plan_change_request_t`: a member requests switching to a new plan (`new_plan`). Branch staff of the member's branch approve or reject; on approval the member's `plan` is replaced. No resolver id is recorded, the acting staff member is implied by branch scope.
 - `profile_edit_request_t`: a member requests profile changes; the fields hold the desired new values. Branch staff of the member's branch approve or reject; on approval the values are copied into the member record.
-- Common request status (`request_status_t`): `REQUESTED`, `APPROVED`, `REJECTED`.
+- Common request status (`request_status_t`): `REQUEST_REQUESTED`, `REQUEST_APPROVED`, `REQUEST_REJECTED`.
 
 ### Records
 
@@ -81,7 +81,7 @@ Branch managers and trainers share one table (`branch_staff_t`), so a single sta
 | `suspension_record_t` | `id`, `gym_member_id`, `reason`, `suspension_date`, `unsuspension_date` |
 | `lost_and_found_record_t` | `id`, `description`, `reported_by_username`, `reported_at`, `resolved_by_staff_id` |
 
-- `payment_t`: transaction history. `transaction_type` is `CASH` / `DIGITAL`; `status` (`payment_status_t`) is `PENDING`, `COMPLETED`, `FAILED`, `INVALID`. Cash payments are recorded as `COMPLETED` by a trainer on handover; digital payments are recorded by the member and carry the status the gateway reports. Only `COMPLETED` payments affect the member's account. `transaction_id` is the external reference.
+- `payment_t`: transaction history. `transaction_type` is `CASH_TRANSACTION` / `DIGITAL_TRANSACTION`; `status` (`payment_status_t`) is `PAYMENT_PENDING`, `PAYMENT_COMPLETED`, `PAYMENT_FAILED`, `PAYMENT_INVALID`. Cash payments are recorded as `PAYMENT_COMPLETED` by a trainer on handover; digital payments are recorded by the member and carry the status the gateway reports. Only `PAYMENT_COMPLETED` payments affect the member's account. `transaction_id` is the external reference.
 - `payment_record_t`: join table linking a member to their payments (a member can have many payments; a payment belongs to exactly one member).
 - `suspension_record_t`: one record per suspension event. `unsuspension_date` is nullable (`0` means still suspended).
 - `lost_and_found_record_t`: `resolved_by_staff_id` is nullable (`0` means open). Resolution is signaled by a non-zero staff id, so no separate status/type/title fields are needed.
@@ -97,11 +97,11 @@ Branch managers and trainers share one table (`branch_staff_t`), so a single sta
 
 ## Rules & Flows
 
-- Members self-register from the login menu (choose an existing branch, set username/password/name/phone/email) and are created as `ON_HOLD`. Only the sysadmin can create staff (choosing a role) or branches.
-- A branch manager approves an `ON_HOLD` member to `ACTIVE` (directly, or by resolving a trainer's status-change request). Approval assigns the default plan, sets `last_payment_date` = approval date and `due_amount` = plan `payable_amount`; the member is payable again at `last_payment_date + interval_days`.
+- Members self-register from the login menu (choose an existing branch, set username/password/name/phone/email) and are created as `MEMBERSHIP_ON_HOLD`. Only the sysadmin can create staff (choosing a role) or branches.
+- A branch manager approves a `MEMBERSHIP_ON_HOLD` member to `MEMBERSHIP_ACTIVE` (directly, or by resolving a trainer's status-change request). Approval assigns the default plan, sets `last_payment_date` = approval date and `due_amount` = plan `payable_amount`; the member is payable again at `last_payment_date + interval_days`.
 - Digital payments are recorded by the member directly; cash payments are handed to a branch trainer who records them directly. Neither flow needs an approval request.
-- Only `COMPLETED` payments reduce `due_amount` (clamped at 0) and push `last_payment_date` forward to the payment date. The next due date is always `last_payment_date + plan.interval_days`.
-- Auto-suspend: at startup, `ACTIVE` members whose due date (`last_payment_date + interval_days`) is more than `MAX_UNPAID_DAYS` (90) in the past are suspended with reason "Auto: unpaid dues". Each suspension creates a `suspension_record_t` with its reason and date.
+- Only `PAYMENT_COMPLETED` payments reduce `due_amount` (clamped at 0) and push `last_payment_date` forward to the payment date. The next due date is always `last_payment_date + plan.interval_days`.
+- Auto-suspend: at startup, `MEMBERSHIP_ACTIVE` members whose due date (`last_payment_date + interval_days`) is more than `MAX_UNPAID_DAYS` (90) in the past are suspended with reason "Auto: unpaid dues". Each suspension creates a `suspension_record_t` with its reason and date.
 - Only branch managers suspend or unsuspend members directly or resolve trainer status-change requests. Trainers can only request. Every suspension carries a mandatory `reason`. The sysadmin can perform these operations too.
 - Members request plan changes and profile edits; branch staff approve or reject them. Staff and sysadmin edit their own records directly.
 - A branch has exactly one branch manager (`branch_has_manager()`).
@@ -117,11 +117,11 @@ The system administrator can perform every operation. Branch staff are limited t
 |---|---|---|---|---|
 | Create new branches | yes | no | no | no |
 | Create staff (manager / trainer) | yes | no | no | no |
-| Self-register as member | no | no | no | yes (on_hold) |
+| Self-register as member | no | no | no | yes (MEMBERSHIP_ON_HOLD) |
 | Record digital payment | yes | no | no | yes |
 | Record cash payment (handover) | yes | yes | yes | no |
 | View payments | all | own branch | own branch | own only |
-| Approve member (on_hold to active) | yes | yes | no | no |
+| Approve member (MEMBERSHIP_ON_HOLD to MEMBERSHIP_ACTIVE) | yes | yes | no | no |
 | Request member status change | no (acts directly) | no | yes | no |
 | Resolve status-change requests | yes | yes | no | no |
 | Suspend/unsuspend member directly | yes | yes | no | no |
@@ -143,8 +143,8 @@ Precise assert-based tests, one file per unit, run via `build/test_runner`:
 - `date_util`: time_t <-> yyyy-mm-dd roundtrip, day normalization, leap years, month-end arithmetic (add_months).
 - `branch`: add/list names, existence validation.
 - `user`: sysadmin/staff/member create/get, credential helpers, username_exists() across all three tables, branch_has_manager() (staff with `role == BRANCH_MANAGER`).
-- `payment`: digital recorded by member, cash recorded by trainer, status handling (only COMPLETED applies), due amount clamp, last_payment_date update.
-- `member`: self-registration -> on_hold, on_hold to active approval (plan assignment, due amount, last_payment_date), suspension records with nullable unsuspension date, auto-suspend sweep with an explicit `today` (as `time_t`).
+- `payment`: digital recorded by member, cash recorded by trainer, status handling (only PAYMENT_COMPLETED applies), due amount clamp, last_payment_date update.
+- `member`: self-registration -> MEMBERSHIP_ON_HOLD, MEMBERSHIP_ON_HOLD to MEMBERSHIP_ACTIVE approval (plan assignment, due amount, last_payment_date), suspension records with nullable unsuspension date, auto-suspend sweep with an explicit `today` (as `time_t`).
 - `request`: status-change (trainer -> manager), plan-change, and profile-edit flows.
 - `lost_found`: report by username, resolve by staff id.
 

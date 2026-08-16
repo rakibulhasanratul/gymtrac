@@ -14,7 +14,7 @@
  * @param buffer_capacity the number of characters buffer can hold
  * @return true when a line was read, false on invalid input or end of input
  */
-bool input_string(char *buffer, int buffer_capacity);
+bool input_string(char buffer[], int buffer_capacity);
 
 /**
  * Reads a whole number from standard input into value.

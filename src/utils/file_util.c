@@ -4,8 +4,6 @@
 #include "file_util.h"
 
 bool file_read_line(FILE *file, char buffer[], int buffer_capacity) {
-  int length;
-
   if (file == NULL || buffer == NULL || buffer_capacity < 2) {
     return false;
   }
@@ -14,7 +12,7 @@ bool file_read_line(FILE *file, char buffer[], int buffer_capacity) {
     return false;
   }
 
-  length = (int)strlen(buffer);
+  int length = (int)strlen(buffer);
   // Strip the trailing newline and any preceding carriage return.
   if (length > 0 && buffer[length - 1] == '\n') {
     buffer[length - 1] = '\0';
@@ -53,15 +51,12 @@ bool file_write_line(FILE *file, const char line[]) {
 }
 
 char *file_sanitize_field(char text[]) {
-  int read_index;
-  int write_index;
-
   if (text == NULL) {
     return NULL;
   }
 
-  write_index = 0;
-  for (read_index = 0; text[read_index] != '\0'; read_index++) {
+  int write_index = 0;
+  for (int read_index = 0; text[read_index] != '\0'; read_index++) {
     unsigned char ch = (unsigned char)text[read_index];
     // Drop the field delimiter and any control character.
     if (ch == (unsigned char)FIELD_DELIMITER || iscntrl(ch)) {

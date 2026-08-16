@@ -12,8 +12,6 @@ static void input_discard_line(void) {
 }
 
 bool input_string(char buffer[], int buffer_capacity) {
-  int length;
-
   if (buffer == NULL || buffer_capacity < 2) {
     return false;
   }
@@ -22,7 +20,7 @@ bool input_string(char buffer[], int buffer_capacity) {
     return false;
   }
 
-  length = (int)strlen(buffer);
+  int length = (int)strlen(buffer);
   // Strip the trailing newline and any preceding carriage return.
   if (length > 0 && buffer[length - 1] == '\n') {
     buffer[length - 1] = '\0';
@@ -38,13 +36,11 @@ bool input_string(char buffer[], int buffer_capacity) {
 }
 
 bool input_integer(int *value) {
-  int matched;
-
   if (value == NULL) {
     return false;
   }
 
-  matched = scanf("%d", value);
+  int matched = scanf("%d", value);
   if (matched != 1) {
     input_discard_line();
     return false;

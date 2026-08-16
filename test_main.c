@@ -1,0 +1,9 @@
+#include <stdio.h>
+
+#include "tests/test_string_util.h"
+
+int main(void) {
+    run_string_util_tests();
+    printf("All tests passed.\n");
+    return 0;
+}

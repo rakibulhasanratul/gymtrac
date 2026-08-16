@@ -11,7 +11,9 @@ if "%~1"=="test" (
     for /r src %%f in (*.c) do (
         if not "%%~nxf"=="main.c" set "SOURCE_FILES=!SOURCE_FILES! "%%f""
     )
-    gcc %COMPILE_FLAGS% test_main.c %SOURCE_FILES% -o "%BUILD_DIR%\test_runner.exe"
+    set "TEST_FILES="
+    for /r tests %%f in (*.c) do set "TEST_FILES=!TEST_FILES! "%%f""
+    gcc %COMPILE_FLAGS% test_main.c %SOURCE_FILES% %TEST_FILES% -o "%BUILD_DIR%\test_runner.exe"
     "%BUILD_DIR%\test_runner.exe"
 ) else (
     set "SOURCE_FILES="

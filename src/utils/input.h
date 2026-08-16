@@ -14,7 +14,7 @@
  * @param buffer_capacity the number of characters buffer can hold
  * @return true when a line was read, false on invalid input or end of input
  */
-bool input_read_string(char *buffer, int buffer_capacity);
+bool input_string(char *buffer, int buffer_capacity);
 
 /**
  * Reads a non-negative whole number from standard input into value.
@@ -26,7 +26,7 @@ bool input_read_string(char *buffer, int buffer_capacity);
  * @param value receives the parsed number on success
  * @return true when a valid number was read, false otherwise
  */
-bool input_read_unsigned(unsigned int *value);
+bool input_unsigned_int(unsigned int *value);
 
 /**
  * Reads a non-negative whole number from standard input into value.
@@ -38,6 +38,6 @@ bool input_read_unsigned(unsigned int *value);
  * @param value receives the parsed number on success
  * @return true when a valid number was read, false otherwise
  */
-bool input_read_unsigned_long(unsigned long int *value);
+bool input_unsigned_long(unsigned long int *value);
 
 #endif

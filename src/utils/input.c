@@ -15,7 +15,7 @@ static void input_discard_line(void) {
     }
 }
 
-bool input_read_string(char *buffer, int buffer_capacity) {
+bool input_string(char *buffer, int buffer_capacity) {
     int length;
 
     if (buffer == NULL || buffer_capacity < 2) {
@@ -41,7 +41,7 @@ bool input_read_string(char *buffer, int buffer_capacity) {
     return true;
 }
 
-bool input_read_unsigned(unsigned int *value) {
+bool input_unsigned_int(unsigned int *value) {
     char token[INPUT_NUMBER_TOKEN_SIZE];
 
     if (value == NULL) {
@@ -57,7 +57,7 @@ bool input_read_unsigned(unsigned int *value) {
     return string_parse_unsigned(token, value);
 }
 
-bool input_read_unsigned_long(unsigned long int *value) {
+bool input_unsigned_long(unsigned long int *value) {
     char token[INPUT_NUMBER_TOKEN_SIZE];
 
     if (value == NULL) {

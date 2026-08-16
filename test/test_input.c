@@ -87,89 +87,65 @@ static void test_read_string_invalid_arguments(void) {
 }
 
 /**
- * Verifies that input_unsigned_int accepts digits up to unsigned int max.
+ * Verifies that input_integer reads positives, negatives, and zero.
  */
-static void test_read_unsigned_valid(void) {
-    unsigned int value;
+static void test_read_integer_valid(void) {
+    int value;
 
-    redirect_stdin_with_content("42\n0\n4294967295\n");
-    assert(input_unsigned_int(&value) == true);
-    assert(value == 42u);
-    assert(input_unsigned_int(&value) == true);
-    assert(value == 0u);
-    assert(input_unsigned_int(&value) == true);
-    assert(value == UINT_MAX);
-    assert(input_unsigned_int(&value) == false);
+    redirect_stdin_with_content("42\n-7\n0\n2147483647\n");
+    assert(input_integer(&value) == true);
+    assert(value == 42);
+    assert(input_integer(&value) == true);
+    assert(value == -7);
+    assert(input_integer(&value) == true);
+    assert(value == 0);
+    assert(input_integer(&value) == true);
+    assert(value == INT_MAX);
+    assert(input_integer(&value) == false);
 }
 
 /**
- * Verifies that input_unsigned_int rejects signs, non-digits, and overflow.
+ * Verifies that input_integer rejects non-numeric input and invalid arguments.
  */
-static void test_read_unsigned_rejects_bad(void) {
-    unsigned int value;
+static void test_read_integer_rejects_bad(void) {
+    int value;
 
-    redirect_stdin_with_content("-5\n");
-    assert(input_unsigned_int(&value) == false);
-
-    redirect_stdin_with_content("12abc\n");
-    assert(input_unsigned_int(&value) == false);
-
-    redirect_stdin_with_content("4294967296\n");
-    assert(input_unsigned_int(&value) == false);
+    redirect_stdin_with_content("abc\n");
+    assert(input_integer(&value) == false);
 
     redirect_stdin_with_content("");
-    assert(input_unsigned_int(&value) == false);
+    assert(input_integer(&value) == false);
 
-    assert(input_unsigned_int(NULL) == false);
+    assert(input_integer(NULL) == false);
 }
 
 /**
  * Verifies that the remainder of a number line is drained for later reads.
  */
-static void test_read_unsigned_drains_line(void) {
-    unsigned int value;
+static void test_read_integer_drains_line(void) {
+    int value;
     char buffer[64];
 
     redirect_stdin_with_content("42 junk\nnext\n");
-    assert(input_unsigned_int(&value) == true);
-    assert(value == 42u);
+    assert(input_integer(&value) == true);
+    assert(value == 42);
     assert(input_string(buffer, sizeof buffer) == true);
     assert(strcmp(buffer, "next") == 0);
 }
 
 /**
- * Verifies that input_unsigned_long accepts digits up to the max value.
+ * Verifies that input_positive_int keeps positives and rejects everything else.
  */
-static void test_read_unsigned_long_valid(void) {
-    unsigned long int value;
+static void test_read_positive_int(void) {
+    int value;
 
-    redirect_stdin_with_content("123\n18446744073709551615\n");
-    assert(input_unsigned_long(&value) == true);
-    assert(value == 123ul);
-    assert(input_unsigned_long(&value) == true);
-    assert(value == ULONG_MAX);
-    assert(input_unsigned_long(&value) == false);
-}
-
-/**
- * Verifies that input_unsigned_long rejects signs, non-digits, overflow.
- */
-static void test_read_unsigned_long_rejects_bad(void) {
-    unsigned long int value;
-
-    redirect_stdin_with_content("-7\n");
-    assert(input_unsigned_long(&value) == false);
-
-    redirect_stdin_with_content("xyz\n");
-    assert(input_unsigned_long(&value) == false);
-
-    redirect_stdin_with_content("18446744073709551616\n");
-    assert(input_unsigned_long(&value) == false);
-
-    redirect_stdin_with_content("");
-    assert(input_unsigned_long(&value) == false);
-
-    assert(input_unsigned_long(NULL) == false);
+    redirect_stdin_with_content("5\n0\n-3\nabc\n");
+    assert(input_positive_int(&value) == true);
+    assert(value == 5);
+    assert(input_positive_int(&value) == false);
+    assert(input_positive_int(&value) == false);
+    assert(input_positive_int(&value) == false);
+    assert(input_positive_int(NULL) == false);
 }
 
 /**
@@ -181,9 +157,8 @@ void run_input_tests(void) {
     test_read_string_caps_and_drains();
     test_read_string_empty_line();
     test_read_string_invalid_arguments();
-    test_read_unsigned_valid();
-    test_read_unsigned_rejects_bad();
-    test_read_unsigned_drains_line();
-    test_read_unsigned_long_valid();
-    test_read_unsigned_long_rejects_bad();
+    test_read_integer_valid();
+    test_read_integer_rejects_bad();
+    test_read_integer_drains_line();
+    test_read_positive_int();
 }

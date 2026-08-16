@@ -17,27 +17,26 @@
 bool input_string(char *buffer, int buffer_capacity);
 
 /**
- * Reads a non-negative whole number from standard input into value.
+ * Reads a whole number from standard input into value.
  *
  * The rest of the input line is discarded after the number, so a later read
- * never sees stray characters. Negative signs, non-digits, and values that
- * overflow unsigned int are rejected.
+ * never sees stray characters. Non-numeric input is rejected.
  *
  * @param value receives the parsed number on success
  * @return true when a valid number was read, false otherwise
  */
-bool input_unsigned_int(unsigned int *value);
+bool input_integer(int *value);
 
 /**
- * Reads a non-negative whole number from standard input into value.
+ * Reads a strictly positive whole number from standard input into value.
  *
  * The rest of the input line is discarded after the number, so a later read
- * never sees stray characters. Negative signs, non-digits, and values that
- * overflow unsigned long int are rejected.
+ * never sees stray characters. Non-numeric input, zero, and negative numbers
+ * are rejected.
  *
  * @param value receives the parsed number on success
- * @return true when a valid number was read, false otherwise
+ * @return true when a valid positive number was read, false otherwise
  */
-bool input_unsigned_long(unsigned long int *value);
+bool input_positive_int(int *value);
 
 #endif

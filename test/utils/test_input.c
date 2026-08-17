@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../src/utils/input.h"
+#include "../../src/utils/input.h"
 #include "test_input.h"
 
 #define TEST_INPUT_PATH "tmp_test_input.dat"

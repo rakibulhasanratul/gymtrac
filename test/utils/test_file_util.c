@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../src/utils/file_util.h"
+#include "../../src/utils/file_util.h"
 #include "test_file_util.h"
 
 #define TEST_FILE_PATH "tmp_test_file_util.dat"

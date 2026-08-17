@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../src/modules/auth.h"
-#include "../src/settings.h"
+#include "../../src/modules/auth.h"
+#include "../../src/settings.h"
 #include "test_auth.h"
 
 /**

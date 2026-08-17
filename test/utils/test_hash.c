@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../src/settings.h"
-#include "../src/utils/hash.h"
+#include "../../src/settings.h"
+#include "../../src/utils/hash.h"
 #include "test_hash.h"
 
 /**

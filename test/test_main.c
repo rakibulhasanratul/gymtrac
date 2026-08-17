@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "test_auth.h"
-#include "test_file_util.h"
-#include "test_hash.h"
-#include "test_input.h"
-#include "test_string_util.h"
+#include "modules/test_auth.h"
+#include "utils/test_file_util.h"
+#include "utils/test_hash.h"
+#include "utils/test_input.h"
+#include "utils/test_string_util.h"
 
 int main()
 {

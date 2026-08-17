@@ -4,8 +4,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../src/settings.h"
-#include "../src/utils/string_util.h"
+#include "../../src/settings.h"
+#include "../../src/utils/string_util.h"
 #include "test_string_util.h"
 
 /**

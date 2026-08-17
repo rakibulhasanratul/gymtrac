@@ -4,9 +4,6 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-// Delimiter separating fields inside a persisted record line.
-#define FIELD_DELIMITER '|'
-
 /**
  * Reads the next line from file into buffer, stripping the trailing newline.
  *
@@ -18,7 +15,7 @@
  * @param buffer_capacity the number of characters buffer can hold
  * @return true when a line was read, false on invalid input or end of file
  */
-bool file_read_line(FILE *file, char buffer[], int buffer_capacity);
+bool read_line_from_file(FILE *file, char buffer[], int buffer_capacity);
 
 /**
  * Writes line to file followed by a newline.
@@ -27,14 +24,6 @@ bool file_read_line(FILE *file, char buffer[], int buffer_capacity);
  * @param line the record line to write
  * @return true when the line was written, false on invalid input or error
  */
-bool file_write_line(FILE *file, const char line[]);
-
-/**
- * Removes control characters and the field delimiter from text in place.
- *
- * @param text the field value to clean
- * @return text, or NULL when text is NULL
- */
-char *file_sanitize_field(char text[]);
+bool write_line_to_file(FILE *file, const char line[]);
 
 #endif

@@ -3,6 +3,6 @@
 
 int main()
 {
-    printf("ENTRYPOINT\n");
-    return 0;
+  printf("ENTRYPOINT\n");
+  return 0;
 }

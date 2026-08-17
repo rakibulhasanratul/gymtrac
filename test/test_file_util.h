@@ -4,6 +4,6 @@
 /**
  * Runs every file_util unit test, aborting on the first failure.
  */
-void run_file_util_tests(void);
+void run_all_file_util_tests(void);
 
 #endif

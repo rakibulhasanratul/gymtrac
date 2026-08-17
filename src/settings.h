@@ -11,5 +11,6 @@
 #define REASON_BUFFER_SIZE 128      // suspension/request reason field
 #define DESCRIPTION_BUFFER_SIZE 256 // description field for lost and found
 #define TRX_ID_BUFFER_SIZE 64       // transaction id field
+#define FIELD_DELIMITER '|'         // delimiter separating fields in a persisted record
 
 #endif

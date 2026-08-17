@@ -6,9 +6,9 @@
 
 int main(void)
 {
-    run_string_util_tests();
-    run_file_util_tests();
-    run_input_tests();
-    printf("All tests passed.\n");
-    return 0;
+  run_all_string_util_tests();
+  run_all_file_util_tests();
+  run_all_input_tests();
+  printf("All tests passed.\n");
+  return 0;
 }

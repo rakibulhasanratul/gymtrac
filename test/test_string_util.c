@@ -4,180 +4,196 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "../src/settings.h"
 #include "../src/utils/string_util.h"
 #include "test_string_util.h"
 
 /**
- * Verifies that string_trim copies text stripped of leading and trailing
+ * Verifies that trim copies text stripped of leading and trailing
  * whitespace.
  */
-static void test_trim(void)
+static void test_trim_strips_whitespace(void)
 {
-    char input[64];
-    char result[64];
+  char input[64];
+  char result[64];
 
-    strcpy(input, "  hello world  \t\n");
-    string_trim(result, sizeof(result), input);
-    assert(strcmp(result, "hello world") == 0);
-    assert(strcmp(input, "  hello world  \t\n") == 0);
+  strcpy(input, "  hello world  \t\n");
+  trim(result, sizeof(result), input);
+  assert(strcmp(result, "hello world") == 0);
+  assert(strcmp(input, "  hello world  \t\n") == 0);
 
-    strcpy(input, "\t\n  ");
-    string_trim(result, sizeof(result), input);
-    assert(strcmp(result, "") == 0);
+  strcpy(input, "\t\n  ");
+  trim(result, sizeof(result), input);
+  assert(strcmp(result, "") == 0);
 
-    strcpy(input, "no-space");
-    string_trim(result, sizeof(result), input);
-    assert(strcmp(result, "no-space") == 0);
+  strcpy(input, "no-space");
+  trim(result, sizeof(result), input);
+  assert(strcmp(result, "no-space") == 0);
 
-    strcpy(input, "hello world");
-    string_trim(result, 6, input);
-    assert(strcmp(result, "hello") == 0);
+  strcpy(input, "hello world");
+  trim(result, 6, input);
+  assert(strcmp(result, "hello") == 0);
 
-    string_trim(NULL, sizeof(result), input);
-    string_trim(result, sizeof(result), NULL);
+  trim(NULL, sizeof(result), input);
+  trim(result, sizeof(result), NULL);
 }
 
 /**
- * Verifies that string_split copies each field into its own part buffer.
+ * Verifies that split copies each field into its own part buffer.
  */
-static void test_split(void)
+static void test_split_copies_fields(void)
 {
-    char buffer[64];
-    char fields[8][64];
-    char *parts[8];
-    int part_index;
-    int part_count;
+  char buffer[64];
+  char fields[8][64];
+  char *parts[8];
+  int part_index;
+  int part_count;
 
-    for (part_index = 0; part_index < 8; part_index++)
-    {
-        parts[part_index] = fields[part_index];
-    }
+  for (part_index = 0; part_index < 8; part_index++)
+  {
+    parts[part_index] = fields[part_index];
+  }
 
-    strcpy(buffer, "alpha|beta|gamma");
-    part_count = string_split(buffer, '|', parts, 8, 64);
-    assert(part_count == 3);
-    assert(strcmp(parts[0], "alpha") == 0);
-    assert(strcmp(parts[1], "beta") == 0);
-    assert(strcmp(parts[2], "gamma") == 0);
-    assert(strcmp(buffer, "alpha|beta|gamma") == 0);
+  strcpy(buffer, "alpha|beta|gamma");
+  part_count = split(buffer, '|', parts, 8, 64);
+  assert(part_count == 3);
+  assert(strcmp(parts[0], "alpha") == 0);
+  assert(strcmp(parts[1], "beta") == 0);
+  assert(strcmp(parts[2], "gamma") == 0);
+  assert(strcmp(buffer, "alpha|beta|gamma") == 0);
 
-    strcpy(buffer, "a||c");
-    part_count = string_split(buffer, '|', parts, 8, 64);
-    assert(part_count == 3);
-    assert(strcmp(parts[0], "a") == 0);
-    assert(strcmp(parts[1], "") == 0);
-    assert(strcmp(parts[2], "c") == 0);
+  strcpy(buffer, "a||c");
+  part_count = split(buffer, '|', parts, 8, 64);
+  assert(part_count == 3);
+  assert(strcmp(parts[0], "a") == 0);
+  assert(strcmp(parts[1], "") == 0);
+  assert(strcmp(parts[2], "c") == 0);
 
-    strcpy(buffer, "a|b|c|d");
-    part_count = string_split(buffer, '|', parts, 2, 64);
-    assert(part_count == 2);
-    assert(strcmp(parts[0], "a") == 0);
-    assert(strcmp(parts[1], "b") == 0);
+  strcpy(buffer, "a|b|c|d");
+  part_count = split(buffer, '|', parts, 2, 64);
+  assert(part_count == 2);
+  assert(strcmp(parts[0], "a") == 0);
+  assert(strcmp(parts[1], "b") == 0);
 
-    strcpy(buffer, "solo");
-    part_count = string_split(buffer, '|', parts, 8, 64);
-    assert(part_count == 1);
-    assert(strcmp(parts[0], "solo") == 0);
+  strcpy(buffer, "solo");
+  part_count = split(buffer, '|', parts, 8, 64);
+  assert(part_count == 1);
+  assert(strcmp(parts[0], "solo") == 0);
 
-    strcpy(buffer, "trailing|");
-    part_count = string_split(buffer, '|', parts, 8, 64);
-    assert(part_count == 2);
-    assert(strcmp(parts[0], "trailing") == 0);
-    assert(strcmp(parts[1], "") == 0);
+  strcpy(buffer, "trailing|");
+  part_count = split(buffer, '|', parts, 8, 64);
+  assert(part_count == 2);
+  assert(strcmp(parts[0], "trailing") == 0);
+  assert(strcmp(parts[1], "") == 0);
 
-    strcpy(buffer, "salt:hash");
-    part_count = string_split(buffer, ':', parts, 8, 64);
-    assert(part_count == 2);
-    assert(strcmp(parts[0], "salt") == 0);
-    assert(strcmp(parts[1], "hash") == 0);
+  strcpy(buffer, "salt:hash");
+  part_count = split(buffer, ':', parts, 8, 64);
+  assert(part_count == 2);
+  assert(strcmp(parts[0], "salt") == 0);
+  assert(strcmp(parts[1], "hash") == 0);
 
-    strcpy(buffer, "abcdef|g");
-    part_count = string_split(buffer, '|', parts, 8, 4);
-    assert(part_count == 2);
-    assert(strcmp(parts[0], "abc") == 0);
-    assert(strcmp(parts[1], "g") == 0);
+  strcpy(buffer, "abcdef|g");
+  part_count = split(buffer, '|', parts, 8, 4);
+  assert(part_count == 2);
+  assert(strcmp(parts[0], "abc") == 0);
+  assert(strcmp(parts[1], "g") == 0);
 
-    assert(string_split(NULL, '|', parts, 8, 64) == 0);
-    assert(string_split(buffer, '|', NULL, 8, 64) == 0);
-    assert(string_split(buffer, '|', parts, 0, 64) == 0);
-    assert(string_split(buffer, '|', parts, 8, 1) == 0);
+  assert(split(NULL, '|', parts, 8, 64) == 0);
+  assert(split(buffer, '|', NULL, 8, 64) == 0);
+  assert(split(buffer, '|', parts, 0, 64) == 0);
+  assert(split(buffer, '|', parts, 8, 1) == 0);
 }
 
 /**
- * Verifies that string_parse_unsigned accepts digits and rejects everything
- * else.
- */
-static void test_parse_unsigned(void)
-{
-    unsigned int value;
-
-    assert(string_parse_unsigned("12345", &value) == true);
-    assert(value == 12345u);
-
-    assert(string_parse_unsigned("0", &value) == true);
-    assert(value == 0u);
-
-    assert(string_parse_unsigned("4294967295", &value) == true);
-    assert(value == UINT_MAX);
-
-    assert(string_parse_unsigned("4294967296", &value) == false);
-    assert(string_parse_unsigned("", &value) == false);
-    assert(string_parse_unsigned("12a", &value) == false);
-    assert(string_parse_unsigned(" 12", &value) == false);
-    assert(string_parse_unsigned("+12", &value) == false);
-    assert(string_parse_unsigned(NULL, &value) == false);
-}
-
-/**
- * Verifies that string_parse_unsigned_long accepts digits and rejects
+ * Verifies that string_to_unsigned_int accepts digits and rejects
  * everything else.
  */
-static void test_parse_unsigned_long(void)
+static void test_string_to_unsigned_int_converts_digits(void)
 {
-    unsigned long int value;
+  assert(string_to_unsigned_int("12345") == 12345u);
+  assert(string_to_unsigned_int("0") == 0u);
+  assert(string_to_unsigned_int("4294967295") == UINT_MAX);
 
-    assert(string_parse_unsigned_long("123", &value) == true);
-    assert(value == 123ul);
-
-    assert(string_parse_unsigned_long("18446744073709551615", &value) == true);
-    assert(value == ULONG_MAX);
-
-    assert(string_parse_unsigned_long("18446744073709551616", &value) == false);
-    assert(string_parse_unsigned_long("abc", &value) == false);
-    assert(string_parse_unsigned_long("", &value) == false);
-    assert(string_parse_unsigned_long(NULL, &value) == false);
+  assert(string_to_unsigned_int("4294967296") == 0);
+  assert(string_to_unsigned_int("") == 0);
+  assert(string_to_unsigned_int("12a") == 0);
+  assert(string_to_unsigned_int(" 12") == 0);
+  assert(string_to_unsigned_int("+12") == 0);
+  assert(string_to_unsigned_int(NULL) == 0);
 }
 
 /**
- * Verifies that string_to_lower and string_to_upper convert letters in place.
+ * Verifies that string_to_unsigned_long_int accepts digits and rejects
+ * everything else.
  */
-static void test_case_conversion(void)
+static void test_string_to_unsigned_long_int_converts_digits(void)
 {
-    char buffer[64];
-    char *result;
+  assert(string_to_unsigned_long_int("123") == 123ul);
+  assert(string_to_unsigned_long_int("18446744073709551615") == ULONG_MAX);
 
-    strcpy(buffer, "HeLLo WoRLD 123");
-    result = string_to_lower(buffer);
-    assert(result == buffer);
-    assert(strcmp(buffer, "hello world 123") == 0);
+  assert(string_to_unsigned_long_int("18446744073709551616") == 0);
+  assert(string_to_unsigned_long_int("abc") == 0);
+  assert(string_to_unsigned_long_int("") == 0);
+  assert(string_to_unsigned_long_int(NULL) == 0);
+}
 
-    strcpy(buffer, "HeLLo WoRLD 123");
-    result = string_to_upper(buffer);
-    assert(result == buffer);
-    assert(strcmp(buffer, "HELLO WORLD 123") == 0);
+/**
+ * Verifies that to_lowercase and to_uppercase convert letters in place.
+ */
+static void test_lowercase_and_uppercase_convert_letters(void)
+{
+  char buffer[64];
+  char *result;
 
-    assert(string_to_lower(NULL) == NULL);
-    assert(string_to_upper(NULL) == NULL);
+  strcpy(buffer, "HeLLo WoRLD 123");
+  result = to_lowercase(buffer);
+  assert(result == buffer);
+  assert(strcmp(buffer, "hello world 123") == 0);
+
+  strcpy(buffer, "HeLLo WoRLD 123");
+  result = to_uppercase(buffer);
+  assert(result == buffer);
+  assert(strcmp(buffer, "HELLO WORLD 123") == 0);
+
+  assert(to_lowercase(NULL) == NULL);
+  assert(to_uppercase(NULL) == NULL);
+}
+
+/**
+ * Verifies that sanitize_field strips control characters and delimiters.
+ */
+static void test_sanitize_field_strips_control_chars(void)
+{
+  char buffer[128];
+
+  strcpy(buffer, "bad\t|\nchar\x01s\r");
+  assert(sanitize_field(buffer) == buffer);
+  assert(strcmp(buffer, "badchars") == 0);
+
+  strcpy(buffer, "clean|text");
+  assert(sanitize_field(buffer) == buffer);
+  assert(strcmp(buffer, "cleantext") == 0);
+
+  strcpy(buffer, "no change needed");
+  assert(sanitize_field(buffer) == buffer);
+  assert(strcmp(buffer, "no change needed") == 0);
+
+  strcpy(buffer, "||||");
+  assert(sanitize_field(buffer) == buffer);
+  assert(strcmp(buffer, "") == 0);
+
+  assert(sanitize_field(NULL) == NULL);
 }
 
 /**
  * Runs every string_util unit test, aborting on the first failure.
  */
-void run_string_util_tests(void)
+void run_all_string_util_tests(void)
 {
-    test_trim();
-    test_split();
-    test_parse_unsigned();
-    test_parse_unsigned_long();
-    test_case_conversion();
+  test_trim_strips_whitespace();
+  test_split_copies_fields();
+  test_string_to_unsigned_int_converts_digits();
+  test_string_to_unsigned_long_int_converts_digits();
+  test_lowercase_and_uppercase_convert_letters();
+  test_sanitize_field_strips_control_chars();
 }

@@ -13,7 +13,7 @@
  * @param destination_capacity the number of characters destination can hold
  * @param text the string to trim
  */
-void string_trim(char destination[], int destination_capacity, const char text[]);
+void trim(char destination[], int destination_capacity, const char text[]);
 
 /**
  * Splits text on delimiter, copying each field into its own part buffer.
@@ -32,27 +32,25 @@ void string_trim(char destination[], int destination_capacity, const char text[]
  * @return the number of parts captured; when this equals part_capacity, text
  *         may still hold more unsplit fields
  */
-int string_split(const char text[], char delimiter, char *parts[], int part_capacity, int field_capacity);
+int split(const char text[], char delimiter, char *parts[], int part_capacity, int field_capacity);
 
 /**
- * Parses text as a whole non-negative decimal number into value.
+ * Converts text to a non-negative decimal number.
  *
- * @param text the string to parse
- * @param value receives the parsed number on success
- * @return true when text is a valid number that fits unsigned int, false when
- *         text is NULL, empty, contains a non-digit, or overflows
+ * @param text the string to convert
+ * @return the parsed number, or 0 when text is NULL, empty, contains a
+ *         non-digit, or overflows
  */
-bool string_parse_unsigned(const char text[], unsigned int *value);
+unsigned int string_to_unsigned_int(const char text[]);
 
 /**
- * Parses text as a whole non-negative decimal number into value.
+ * Converts text to a non-negative decimal number.
  *
- * @param text the string to parse
- * @param value receives the parsed number on success
- * @return true when text is a valid number that fits unsigned long int, false
- *         when text is NULL, empty, contains a non-digit, or overflows
+ * @param text the string to convert
+ * @return the parsed number, or 0 when text is NULL, empty, contains a
+ *         non-digit, or overflows
  */
-bool string_parse_unsigned_long(const char text[], unsigned long int *value);
+unsigned long int string_to_unsigned_long_int(const char text[]);
 
 /**
  * Converts every letter in text to lowercase in place.
@@ -60,7 +58,7 @@ bool string_parse_unsigned_long(const char text[], unsigned long int *value);
  * @param text the string to convert
  * @return text, or NULL when text is NULL
  */
-char *string_to_lower(char text[]);
+char *to_lowercase(char text[]);
 
 /**
  * Converts every letter in text to uppercase in place.
@@ -68,6 +66,14 @@ char *string_to_lower(char text[]);
  * @param text the string to convert
  * @return text, or NULL when text is NULL
  */
-char *string_to_upper(char text[]);
+char *to_uppercase(char text[]);
+
+/**
+ * Removes control characters and the field delimiter from text in place.
+ *
+ * @param text the field value to clean
+ * @return text, or NULL when text is NULL
+ */
+char *sanitize_field(char text[]);
 
 #endif

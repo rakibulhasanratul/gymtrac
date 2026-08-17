@@ -45,9 +45,9 @@ Work tracked per item; commit each with a Conventional Commit message (`feat:`, 
 
 ### Utils
 
-- [x] String helpers that trim whitespace, split on a delimiter, parse numbers safely, and normalize case so every module handles raw text predictably - `feat:`
-- [x] File helpers that read/write one record per line with control characters stripped, so persisted data stays clean and round-trips reliably - `feat:`
-- [x] Unit tests covering trim/split/parse/case behavior and file read/write round-trip - `test:`
+- [x] String helpers that trim whitespace, split on a delimiter, parse numbers safely, normalize case, and sanitize field values so every module handles raw text predictably - `feat:`
+- [x] File helpers that read/write one record per line, so persisted data stays clean and round-trips reliably - `feat:`
+- [x] Unit tests covering trim/split/parse/case/sanitize behavior and file read/write round-trip - `test:`
 - [x] Input wrappers around `fgets()` and `scanf()` that validate and cap input, so no buffer overflow or malformed value reaches the logic - `feat:`
 - [x] Unit tests covering the input wrappers: line capping with overflow drain, and rejection of non-numeric input, zero, and negatives - `test:`
 - [ ] Polynomial hash and hash verification function (demo, similar to Java's `String.hashCode()`) with per-password random salt generation and `mix_salt`, so credentials are never stored in plaintext and identical passwords differ on disk. Updates in types and settings required as per deciding to not use SHA256 - `feat:`

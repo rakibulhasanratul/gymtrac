@@ -38,6 +38,8 @@ The name of the project is `Gymtrac` which is a gym management system, a `group 
   - good name: `REQUEST_APPROVED`
   - bad name: `string_trim()`
   - good name: `trim_string()` or, `trim()`
+  - bad name: `unsigned_int_to_str()`
+  - good name: `unsigned_int_to_string()`
 - Strings are fixed-size `char` arrays with macro caps; dynamic memory allocation (`malloc`/`free`) is not used.
 - The code should follow UNIX Coding Standards. Use `4 spaces` for indentation, no tabs. Use `\n` for new lines, not `\r\n`. Use `\t` for tabulation. Each function should have only one purpose.
 - Use guard clauses and early returns to avoid deep nesting of code.
@@ -53,7 +55,7 @@ The name of the project is `Gymtrac` which is a gym management system, a `group 
 
 ## Committing Changes
 
-- Before you commit, format all files using clang-format with --style=Microsoft.
+- Before you commit, format all files using clang-format.
 
 ## Directory Structure
 
@@ -74,8 +76,8 @@ src/
 │   ├── session.[ch]    session_t (role, user_id, username, branch_name) + access predicates
 │   └── menu.[ch]       login/register menus + one menu handler per role
 └── utils/
-    ├── string_util.[ch] trim, split, parse numbers, case helpers
-    ├── file_util.[ch]   read/write lines, field sanitization
+    ├── string_util.[ch] trim, split, parse numbers, case helpers, sanitize_field
+    ├── file_util.[ch]   read/write lines
     ├── input.[ch]       safe fgets/scanf wrappers with validation
     ├── hash.[ch]        polynomial hash (demo) + salt generation + mix_salt helpers
     └── date_util.[ch]   time_t <-> yyyy-mm-dd conversion (day-normalized) + add_months()

@@ -139,7 +139,7 @@ Managers and trainers see only their own branch's resources; the sysadmin sees a
 Precise assert-based tests, one file per unit, run via `build/test_runner`:
 
 - `hash`: known polynomial hash vectors, salt generation, mix_salt correctness.
-- `string_util` / `file_util`: trim, split, roundtrip read/write.
+- `string_util` / `file_util`: trim, split, sanitize_field, roundtrip read/write.
 - `date_util`: time_t <-> yyyy-mm-dd roundtrip, day normalization, leap years, month-end arithmetic (add_months).
 - `branch`: add/list names, existence validation.
 - `user`: sysadmin/staff/member create/get, credential helpers, username_exists() across all three tables, branch_has_manager() (staff with `role == BRANCH_MANAGER`).

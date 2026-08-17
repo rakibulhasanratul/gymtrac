@@ -49,7 +49,7 @@ The name of the project is `Gymtrac` which is a gym management system, a `group 
 - Use of `global variables` is highly discouraged, although not a hard requirement.
 - Use short and self explanatory comments for each typedefs and statements. Avoid writing comments for trivial code. Use comments to explain the purpose of a struct, or typedef, not how it works. Use docstring comments for functions, explaining the purpose of the function, its parameters, and return values. Use it to explain the purpose of a function, not how it works.
 - Use _2 spaces_ for indentation in comments, not 4 spaces.
-- Prefer arrays over pointers as variables and function parameters. Use pointer only when there is no other option or using pointers can increase readability or make it easier to comprehend to new C learners. Use array indices syntax for iterating over arrays.
+- Prefer arrays over pointers as variables and function parameters. Use pointer only when there is no other option or using pointers can increase readability or make it easier to comprehend to new C learners. Use array indices syntax for iterating over arrays. Focus on readability more here.
 - Use `()` instead of `(void)` for functions with no parameters.
 - Do not introduce new blocks for single statements in `if`, `else`, `for`, and `while` statements. Use `{}` only when there are multiple statements in the block.
 

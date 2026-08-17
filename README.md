@@ -50,8 +50,12 @@ Work tracked per item; commit each with a Conventional Commit message (`feat:`, 
 - [x] Unit tests covering trim/split/parse/case/sanitize behavior and file read/write round-trip - `test:`
 - [x] Input wrappers around `fgets()` and `scanf()` that validate and cap input, so no buffer overflow or malformed value reaches the logic - `feat:`
 - [x] Unit tests covering the input wrappers: line capping with overflow drain, and rejection of non-numeric input, zero, and negatives - `test:`
-- [ ] Polynomial hash and hash verification function (demo, similar to Java's `String.hashCode()`) with per-password random salt generation and `mix_salt`, so credentials are never stored in plaintext and identical passwords differ on disk. Updates in types and settings required as per deciding to not use SHA256 - `feat:`
-- [ ] Unit tests using known polynomial hash vectors, plus salt generation and mix_salt correctness - `test:`
+- [ ] Update `settings.h`: resize `PASSWORD_HASH_BUFFER_SIZE` from 130 to 40, add `SALT_BUFFER_SIZE` (16) and `HASH_STRING_BUFFER_SIZE` (32) macros - `chore:`
+- [ ] Add `hash_t` typedef (`unsigned long`) to `types.h` - `chore:`
+- [ ] Hash utility (`src/utils/hash.[ch]`): polynomial hash function (`h = 31 * h + c`, similar to Java's `String.hashCode()`), 15-char random salt generation via `rand()` seeded by `time(NULL)`, `mix_salt` (sandwich password between salt halves), `hash_value_to_string` / `parse_hash_value` conversions, and `compare_hash` equality check. Demo only, not cryptographically secure. - `feat:`
+- [ ] Auth module (`src/modules/auth.[ch]`): `hash_password` (generate salt, mix, hash, store salt+hash string) and `verify_password` (extract salt, re-hash, compare). Builds on hash utility for credential storage. - `feat:`
+- [ ] Unit tests for hash utility: known polynomial hash vectors, salt generation length and character set, `mix_salt` sandwich output, `hash_value_to_string` / `parse_hash_value` round-trip, `compare_hash` equality - `test:`
+- [ ] Unit tests for auth module: `hash_password` produces valid stored format, `verify_password` accepts correct and rejects wrong passwords - `test:`
 - [ ] Date helpers that convert `time_t` to `yyyy-mm-dd` and back (day-normalized), with `add_months()` handling month-end, so due dates and suspensions compute correctly - `feat:`
 - [ ] Unit tests covering date round-trips, leap years, and month-end arithmetic - `test:`
 
@@ -62,7 +66,7 @@ Work tracked per item; commit each with a Conventional Commit message (`feat:`, 
 - [ ] Unit tests covering branch listing and existence validation - `test:`
 - [ ] User module that creates/fetches each role with auto-incremented ids, enforces globally unique usernames across all roles, and enforces one manager per branch - `feat:`
 - [ ] Unit tests covering per-role CRUD, cross-role username uniqueness, and the one-manager-per-branch rule - `test:`
-- [ ] Auth module that verifies username + password against stored salted hashes on login and clears the session on logout, so only verified users get in - `feat:`
+- [ ] Auth module that verifies username + password against stored salted polynomial hashes on login and clears the session on logout, so only verified users get in - `feat:`
 - [ ] Member lifecycle: approve `on_hold` members to active, suspend/unsuspend with a mandatory reason (recording dated suspension records), and auto-suspend members with 90+ days unpaid dues - `feat:`
 - [ ] Unit tests covering approval, suspension records with optional unsuspension date, and the auto-suspend sweep - `test:`
 - [ ] Payment module: record digital payments instantly, let trainers record cash payments directly, then reduce `due_amount` (clamped at 0) and update `last_payment_date` - `feat:`

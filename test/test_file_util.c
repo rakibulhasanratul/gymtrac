@@ -10,7 +10,7 @@
 /**
  * Writes the given lines to the test file and returns the open file.
  */
-static FILE *open_test_file_for_write(void)
+static FILE *open_test_file_for_write()
 {
   FILE *file = fopen(TEST_FILE_PATH, "w");
   assert(file != NULL);
@@ -20,7 +20,7 @@ static FILE *open_test_file_for_write(void)
 /**
  * Opens the test file for reading and returns the open file.
  */
-static FILE *open_test_file_for_read(void)
+static FILE *open_test_file_for_read()
 {
   FILE *file = fopen(TEST_FILE_PATH, "r");
   assert(file != NULL);
@@ -30,7 +30,7 @@ static FILE *open_test_file_for_read(void)
 /**
  * Verifies that lines written with write_line_to_file read back unchanged.
  */
-static void test_write_read_round_trip(void)
+static void test_write_read_round_trip()
 {
   FILE *file;
   char buffer[128];
@@ -55,7 +55,7 @@ static void test_write_read_round_trip(void)
 /**
  * Verifies that reading tolerates CRLF line endings.
  */
-static void test_read_tolerates_crlf_line_ending(void)
+static void test_read_tolerates_crlf_line_ending()
 {
   FILE *file;
   char buffer[128];
@@ -76,7 +76,7 @@ static void test_read_tolerates_crlf_line_ending(void)
 /**
  * Verifies that an over-long line is drained and never read as records.
  */
-static void test_read_drains_overlong_line(void)
+static void test_read_drains_overlong_line()
 {
   FILE *file;
   char buffer[8];
@@ -96,7 +96,7 @@ static void test_read_drains_overlong_line(void)
 /**
  * Verifies that read_line_from_file rejects invalid arguments.
  */
-static void test_read_line_rejects_invalid_arguments(void)
+static void test_read_line_rejects_invalid_arguments()
 {
   char buffer[64];
 
@@ -108,7 +108,7 @@ static void test_read_line_rejects_invalid_arguments(void)
 /**
  * Verifies that write_line_to_file rejects invalid arguments.
  */
-static void test_write_line_rejects_invalid_arguments(void)
+static void test_write_line_rejects_invalid_arguments()
 {
   assert(write_line_to_file(NULL, "line") == false);
   assert(write_line_to_file(stdout, NULL) == false);
@@ -117,7 +117,7 @@ static void test_write_line_rejects_invalid_arguments(void)
 /**
  * Runs every file_util unit test, aborting on the first failure.
  */
-void run_all_file_util_tests(void)
+void run_all_file_util_tests()
 {
   test_write_read_round_trip();
   test_read_tolerates_crlf_line_ending();

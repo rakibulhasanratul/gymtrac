@@ -30,7 +30,7 @@
 
 ## Demo Hashing Function
 
-This project uses a polynomial hash function (similar to Java's `String.hashCode()`) for password storage. This is **not** a cryptographically secure hash and should **never** be used in production. It is used here due to CSE115L project constraints that prohibit dynamic memory allocation, bitwise operations, and `stdlib.h` functions required by proper hashing libraries.
+This project uses a polynomial hash function (similar to Java's `String.hashCode()`) for password storage. This is **not** a cryptographically secure hash and should **never** be used in production. It is used here due to CSE115L project constraints that prohibit dynamic memory allocation, bitwise operations, and proper hashing libraries (e.g., SHA-256, bcrypt).
 
 ## TODO
 

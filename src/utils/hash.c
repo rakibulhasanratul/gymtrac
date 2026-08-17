@@ -1,0 +1,80 @@
+// WARNING: This file implements a DEMO hashing function for educational
+// purposes only. The polynomial hash used here (h = 31 * h + c) is NOT
+// cryptographically secure and should NEVER be used in production.
+//
+// It is used in this project due to CSE115L constraints that prohibit
+// dynamic memory allocation, bitwise operations, and proper hashing
+// libraries (e.g., SHA-256, bcrypt).
+
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "../settings.h"
+#include "hash.h"
+#include "string_util.h"
+
+void generate_salt(char *destination)
+{
+  if (destination == NULL)
+    return;
+
+  // Fill 15 characters from the alphanumeric charset.
+  int charset_size = (int)strlen(SALT_CHARSET);
+  for (int index = 0; index < SALT_BUFFER_SIZE - 1; index++)
+    destination[index] = SALT_CHARSET[rand() % charset_size];
+  destination[SALT_BUFFER_SIZE - 1] = '\0';
+}
+
+void mix_salt(const char *password, const char *salt, char *destination)
+{
+  if (password == NULL || salt == NULL || destination == NULL)
+    return;
+
+  int write_index = 0;
+
+  // Copy first 7 characters of salt (indices 0-6).
+  for (int index = 0; index < 7 && salt[index] != '\0'; index++)
+    destination[write_index++] = salt[index];
+
+  // Copy the password.
+  for (int index = 0; password[index] != '\0'; index++)
+    destination[write_index++] = password[index];
+
+  // Copy salt characters 8 through 14 (skipping index 7).
+  for (int index = 8; index < 15 && salt[index] != '\0'; index++)
+    destination[write_index++] = salt[index];
+
+  destination[write_index] = '\0';
+}
+
+hash_t create_hash(const char *text)
+{
+  if (text == NULL)
+    return 0;
+
+  hash_t hash_value = 0;
+  for (int index = 0; text[index] != '\0'; index++)
+    hash_value = POLYNOMIAL_MULTIPLIER * hash_value + (unsigned char)text[index];
+
+  return hash_value;
+}
+
+bool compare_hash(hash_t stored, hash_t computed)
+{
+  return stored == computed;
+}
+
+void hash_value_to_string(hash_t value, char *destination)
+{
+  if (destination == NULL)
+    return;
+
+  sprintf(destination, "%lu", value);
+}
+
+hash_t parse_hash_value(const char *text)
+{
+  return string_to_unsigned_long_int(text);
+}

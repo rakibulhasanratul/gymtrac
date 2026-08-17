@@ -4,6 +4,6 @@
 /**
  * Runs every string_util unit test, aborting on the first failure.
  */
-void run_all_string_util_tests(void);
+void run_all_string_util_tests();
 
 #endif

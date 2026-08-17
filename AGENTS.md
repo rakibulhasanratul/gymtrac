@@ -51,7 +51,7 @@ The name of the project is `Gymtrac` which is a gym management system, a `group 
 - Use _2 spaces_ for indentation in comments, not 4 spaces.
 - Prefer arrays over pointers as variables and function parameters. Use pointer only when there is no other option or using pointers can increase readability or make it easier to comprehend to new C learners. Use array indices syntax for iterating over arrays. Focus on readability more here.
 - Use `()` instead of `(void)` for functions with no parameters.
-- Do not introduce new blocks for single statements in `if`, `else`, `for`, and `while` statements. Use `{}` only when there are multiple statements in the block.
+- Do not introduce new blocks for single statements in `if`, `else`, `switch`, `case`, `for`, `while`, and function bodies. Use `{}` only when there are multiple statements in the block.
 
 ## Committing Changes
 

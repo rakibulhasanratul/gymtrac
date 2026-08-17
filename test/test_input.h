@@ -4,6 +4,6 @@
 /**
  * Runs every input unit test, aborting on the first failure.
  */
-void run_all_input_tests(void);
+void run_all_input_tests();
 
 #endif

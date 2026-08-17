@@ -3,7 +3,9 @@
 
 #define FULL_NAME_BUFFER_SIZE 64
 #define USERNAME_BUFFER_SIZE 32
-#define PASSWORD_HASH_BUFFER_SIZE 130 // salted SHA-256 hash field length cap
+#define PASSWORD_HASH_BUFFER_SIZE 40 // salt (15 chars) + polynomial hash decimal + null
+#define SALT_BUFFER_SIZE 16          // 15 printable chars + null
+#define HASH_STRING_BUFFER_SIZE 32   // decimal representation of unsigned long + null
 #define EMAIL_BUFFER_SIZE 64
 #define PHONE_BUFFER_SIZE 11        // phone number pattern: 01XXXXXXXXX
 #define BRANCH_NAME_BUFFER_SIZE 128 // should allow detailed location names
@@ -12,5 +14,7 @@
 #define DESCRIPTION_BUFFER_SIZE 256 // description field for lost and found
 #define TRX_ID_BUFFER_SIZE 64       // transaction id field
 #define FIELD_DELIMITER '|'         // delimiter separating fields in a persisted record
+#define POLYNOMIAL_MULTIPLIER 31    // multiplier matching Java's String.hashCode()
+#define SALT_CHARSET "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
 
 #endif

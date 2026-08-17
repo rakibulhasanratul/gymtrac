@@ -4,26 +4,20 @@
 #include "input.h"
 
 // Discards every character up to the end of the current input line.
-static void discard_remaining_input(void)
+static void discard_remaining_input()
 {
   int ch;
   while ((ch = getchar()) != '\n' && ch != EOF)
-  {
-    // Swallow the character and keep scanning for the newline.
-  }
+    ;
 }
 
 bool input_string(char buffer[], int buffer_capacity)
 {
   if (buffer == NULL || buffer_capacity < 2)
-  {
     return false;
-  }
 
   if (fgets(buffer, buffer_capacity, stdin) == NULL)
-  {
     return false;
-  }
 
   int length = (int)strlen(buffer);
   // Strip the trailing newline and any preceding carriage return.
@@ -31,9 +25,7 @@ bool input_string(char buffer[], int buffer_capacity)
   {
     buffer[length - 1] = '\0';
     if (length > 1 && buffer[length - 2] == '\r')
-    {
       buffer[length - 2] = '\0';
-    }
     return true;
   }
 
@@ -45,9 +37,7 @@ bool input_string(char buffer[], int buffer_capacity)
 bool input_integer(int *value)
 {
   if (value == NULL)
-  {
     return false;
-  }
 
   int matched = scanf("%d", value);
   if (matched != 1)
@@ -63,13 +53,9 @@ bool input_integer(int *value)
 bool input_positive_int(int *value)
 {
   if (!input_integer(value))
-  {
     return false;
-  }
   // Reject zero and negative numbers so only a positive amount is kept.
   if (*value <= 0)
-  {
     return false;
-  }
   return true;
 }

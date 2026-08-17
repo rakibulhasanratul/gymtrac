@@ -20,7 +20,7 @@ The name of the project is `Gymtrac` which is a gym management system, a `group 
 - Represent enumeration values as `#define` constants and give each enumeration a `typedef unsigned char` alias, so enum-backed fields take one byte and keep a self-describing type.
 - Use `UPPERCASE` for macros.
 - DO NOT use constants, use macros instead.
-- Hex escapes in string literals and hex numeric constants are prohibited; use plain characters and decimal literals only. The sole exception is the SHA-256 implementation's round and initial-hash constants. The persisted-record field delimiter is `|` (pipe); field values never contain `|`.
+- Hex escapes in string literals and hex numeric constants are prohibited; use plain characters and decimal literals only. The persisted-record field delimiter is `|` (pipe); field values never contain `|`.
 - Use self describing names for variables, functions, and types. Avoid using single letter names or abbreviations.
 - Strings are fixed-size `char` arrays with macro caps; dynamic memory allocation (`malloc`/`free`) is not used.
 - The code should follow UNIX Coding Standards. Use `4 spaces` for indentation, no tabs. Use `\n` for new lines, not `\r\n`. Use `\t` for tabulation. Each function should have only one purpose.
@@ -52,7 +52,7 @@ src/
     ├── string_util.[ch] trim, split, parse numbers, case helpers
     ├── file_util.[ch]   read/write lines, field sanitization
     ├── input.[ch]       safe fgets/scanf wrappers with validation
-    ├── hash.[ch]        SHA-256 + salt generation + hash/verify password helpers
+    ├── hash.[ch]        polynomial hash (demo) + salt generation + mix_salt helpers
     └── date_util.[ch]   time_t <-> yyyy-mm-dd conversion (day-normalized) + add_months()
 ```
 The main.c should include modules as `#include "modules/module_name.h"` and utils as `#include "utils/util_name.h"`. The test_main.c should include modules as `#include "../src/modules/module_name.h"` and utils as `#include "../src/utils/util_name.h"`.

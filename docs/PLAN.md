@@ -15,7 +15,7 @@ Gymtrac is a CLI-only gym management system for CSE115L (North South University)
 
 ## Data Storage
 
-Field delimiter is `|` (pipe). Input is sanitized to strip control characters and the delimiter from field values before writing, so records stay unambiguous with no escaping logic. One record per line. Passwords are stored as `salt_hex:hash_hex` strings (SHA-256, implemented from scratch, standard library only, using plain `unsigned int`/`unsigned char` arithmetic with no fixed-width types; salted so identical passwords do not produce identical stored values). Time fields use `time_t`; `date_util` normalizes them to whole days (midnight) for due-date and suspension math, and tests inject an explicit `today` as a `time_t`. Amounts are whole Taka (`unsigned int`). Enumeration values are `#define` constants; each enumeration is a `typedef unsigned char` alias, so enum-backed fields take one byte and read as their semantic type.
+Field delimiter is `|` (pipe). Input is sanitized to strip control characters and the delimiter from field values before writing, so records stay unambiguous with no escaping logic. One record per line. Passwords are stored as `salt:hash_value` strings (polynomial hash, similar to Java's `String.hashCode()`, demo only -- not cryptographically secure; salted so identical passwords do not produce identical stored values). The salt is 16 alphanumeric characters; the hash is a decimal `unsigned int` (max 10 digits). The hash utility provides `generate_salt`, `polynomial_hash`, and `mix_salt`; the auth module composes these into `hash_password` and `verify_password`. Time fields use `time_t`; `date_util` normalizes them to whole days (midnight) for due-date and suspension math, and tests inject an explicit `today` as a `time_t`. Amounts are whole Taka (`unsigned int`). Enumeration values are `#define` constants; each enumeration is a `typedef unsigned char` alias, so enum-backed fields take one byte and read as their semantic type.
 
 ## Type aliases and size caps
 
@@ -138,7 +138,7 @@ Managers and trainers see only their own branch's resources; the sysadmin sees a
 
 Precise assert-based tests, one file per unit, run via `build/test_runner`:
 
-- `hash`: known SHA-256 vectors, salt generation, verify_password.
+- `hash`: known polynomial hash vectors, salt generation, mix_salt correctness.
 - `string_util` / `file_util`: trim, split, roundtrip read/write.
 - `date_util`: time_t <-> yyyy-mm-dd roundtrip, day normalization, leap years, month-end arithmetic (add_months).
 - `branch`: add/list names, existence validation.

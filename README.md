@@ -27,6 +27,10 @@
   - Only the system administrator can create new branches.
   - The system administrator can create users of any type (including branch managers); gym members self-register and stay `on_hold` until their branch manager approves them.
 
+## Demo Hashing Function
+
+This project uses a polynomial hash function (similar to Java's `String.hashCode()`) for password storage. This is **not** a cryptographically secure hash and should **never** be used in production. It is used here due to CSE115L project constraints that prohibit dynamic memory allocation, bitwise operations, and `stdlib.h` functions required by proper hashing libraries.
+
 ## TODO
 [AI Generated]  
 
@@ -42,8 +46,8 @@ Work tracked per item; commit each with a Conventional Commit message (`feat:`, 
 - [x] Unit tests covering trim/split/parse/case behavior and file read/write round-trip - `test:`
 - [x] Input wrappers around `fgets()` and `scanf()` that validate and cap input, so no buffer overflow or malformed value reaches the logic - `feat:`
 - [x] Unit tests covering the input wrappers: line capping with overflow drain, and rejection of non-numeric input, zero, and negatives - `test:`
-- [ ] SHA-256 password hashing with a per-password random salt, so credentials are never stored in plaintext and identical passwords differ on disk - `feat:`
-- [ ] Unit tests using known SHA-256 vectors, plus salt generation and verify-password round-trips - `test:`
+- [ ] Polynomial hash function (demo, similar to Java's `String.hashCode()`) with per-password random salt generation and `mix_salt`, so credentials are never stored in plaintext and identical passwords differ on disk - `feat:`
+- [ ] Unit tests using known polynomial hash vectors, plus salt generation and mix_salt correctness - `test:`
 - [ ] Date helpers that convert `time_t` to `yyyy-mm-dd` and back (day-normalized), with `add_months()` handling month-end, so due dates and suspensions compute correctly - `feat:`
 - [ ] Unit tests covering date round-trips, leap years, and month-end arithmetic - `test:`
 

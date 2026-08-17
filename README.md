@@ -3,6 +3,7 @@
 `Gymtrac` is a gym management system, a `group project` for `CSE115L` course of North South University. The project is developed using C following C11 standards. This is a complete `CLI only` project, with no GUI.
 
 ## Project Brief
+
 - User authentication and authorization. Login with `username` + password; passwords are stored as salted hashes.
 - 3 user record types: System Administrator (pre-existed), Branch Staff (a `role` field distinguishes Branch Manager from Branch Trainer), and Gym Member.
 - Branches are a simple list of branch names. Every staff member and gym member belongs to exactly one existing branch.
@@ -32,26 +33,30 @@
 This project uses a polynomial hash function (similar to Java's `String.hashCode()`) for password storage. This is **not** a cryptographically secure hash and should **never** be used in production. It is used here due to CSE115L project constraints that prohibit dynamic memory allocation, bitwise operations, and `stdlib.h` functions required by proper hashing libraries.
 
 ## TODO
-[AI Generated]  
+
+[AI Generated]
 
 Work tracked per item; commit each with a Conventional Commit message (`feat:`, `fix:`, `chore:`, `test:`, `docs:`).
 
 ### Scaffold
+
 - [x] Add shared `src/types.h` defining every record struct plus `session_t` (fixed-size `char` arrays for strings), the `typedef unsigned char` enum aliases (`user_role_t` included) with `#define` constants, and the `BRANCH_COUNT_MAX` cap (already created) - `chore:`
 - [x] Add `run.sh` and `run.bat` build scripts that compile `src/` with `-std=c11 -Wall -Wextra -pedantic -g` into `build/`, plus a `.gitignore` ignoring `data/` and `build/` so generated artifacts are never tracked - `chore:`
 
 ### Utils
+
 - [x] String helpers that trim whitespace, split on a delimiter, parse numbers safely, and normalize case so every module handles raw text predictably - `feat:`
 - [x] File helpers that read/write one record per line with control characters stripped, so persisted data stays clean and round-trips reliably - `feat:`
 - [x] Unit tests covering trim/split/parse/case behavior and file read/write round-trip - `test:`
 - [x] Input wrappers around `fgets()` and `scanf()` that validate and cap input, so no buffer overflow or malformed value reaches the logic - `feat:`
 - [x] Unit tests covering the input wrappers: line capping with overflow drain, and rejection of non-numeric input, zero, and negatives - `test:`
-- [ ] Polynomial hash function (demo, similar to Java's `String.hashCode()`) with per-password random salt generation and `mix_salt`, so credentials are never stored in plaintext and identical passwords differ on disk - `feat:`
+- [ ] Polynomial hash and hash verification function (demo, similar to Java's `String.hashCode()`) with per-password random salt generation and `mix_salt`, so credentials are never stored in plaintext and identical passwords differ on disk. Updates in types and settings required as per deciding to not use SHA256 - `feat:`
 - [ ] Unit tests using known polynomial hash vectors, plus salt generation and mix_salt correctness - `test:`
 - [ ] Date helpers that convert `time_t` to `yyyy-mm-dd` and back (day-normalized), with `add_months()` handling month-end, so due dates and suspensions compute correctly - `feat:`
 - [ ] Unit tests covering date round-trips, leap years, and month-end arithmetic - `test:`
 
 ### Modules
+
 - [ ] Config module that resolves the data directory, builds file paths, and auto-creates the directory so all modules share one consistent storage location - `feat:`
 - [ ] Branch module that loads/lists branch names and validates existence before anyone is assigned, so users can never attach to a nonexistent branch - `feat:`
 - [ ] Unit tests covering branch listing and existence validation - `test:`

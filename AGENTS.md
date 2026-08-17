@@ -6,7 +6,7 @@ The name of the project is `Gymtrac` which is a gym management system, a `group 
 ### Requirements for The Codebase
 - NO use of SQL or non-SQL databases. For persistence, the project should use `FILE *` macro.
 - Use fgets() for string input and scanf() for the rest.
-- Use of `pthread.h` and `random.h` is strictly prohibited.
+- Use of `pthread.h` is strictly prohibited.
 - Passwords should be stored in hash.
 - Modularity is preferred, although not a hard requirement. If modularity is applied, each module should serve only one purpose.
 - The project should be implemented in `functional programming` manner.
@@ -32,7 +32,9 @@ The name of the project is `Gymtrac` which is a gym management system, a `group 
 - Use of `global variables` is highly discouraged, although not a hard requirement.
 - Use short and self explanatory comments for each typedefs and statements. Avoid writing comments for trivial code. Use comments to explain the purpose of a struct, or typedef, not how it works. Use docstring comments for functions, explaining the purpose of the function, its parameters, and return values. Use it to explain the purpose of a function, not how it works.
 - Use _2 spaces_ for indentation in comments, not 4 spaces.
-- Prefer arrays over pointers as variables and function parameters. Use pointer only when there is no other option. Use array indices syntax for iterating over arrays.
+- Prefer arrays over pointers as variables and function parameters. Use pointer only when there is no other option or using pointers can increase readability or make it easier to comprehend to new C learners. Use array indices syntax for iterating over arrays.
+- Use `()` instead of `(void)` for functions with no parameters.
+- Do not introduce new blocks for single statements in `if`, `else`, `for`, and `while` statements. Use `{}` only when there are multiple statements in the block.
 
 ## Directory Structure
 ```

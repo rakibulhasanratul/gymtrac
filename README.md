@@ -59,8 +59,8 @@ Work tracked per item; commit each with a Conventional Commit message (`feat:`, 
 - [x] Auth module (`src/modules/auth.[ch]`): `hash_password` (generate salt, mix, hash, store salt+hash string) and `verify_password` (extract salt, re-hash, compare). Builds on hash utility for credential storage. - `feat:`
 - [x] Unit tests for hash utility: known polynomial hash vectors, salt generation length and character set, `mix_salt` sandwich output, `hash_value_to_string` / `parse_hash_value` round-trip, `compare_hash` equality - `test:`
 - [x] Unit tests for auth module: `hash_password` produces valid stored format, `verify_password` accepts correct and rejects wrong passwords - `test:`
-- [ ] Date helpers that convert `time_t` to `yyyy-mm-dd` and back (day-normalized), with `add_months()` handling month-end, so due dates and suspensions compute correctly - `feat:`
-- [ ] Unit tests covering date round-trips, leap years, and month-end arithmetic - `test:`
+- [x] Date helpers that convert `time_t` to `yyyy-mm-dd` and back (day-normalized), with `add_months()` handling month-end, so due dates and suspensions compute correctly - `feat:`
+- [x] Unit tests covering date round-trips, leap years, and month-end arithmetic - `test:`
 
 ### Modules
 

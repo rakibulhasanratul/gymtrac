@@ -80,6 +80,7 @@ src/
     ├── file_util.[ch]   read/write lines
     ├── input.[ch]       safe fgets/scanf wrappers with validation
     ├── hash.[ch]        polynomial hash (demo) + salt generation + mix_salt helpers
+    ├── rng.[ch]         xoshiro128** PRNG (demo) + seed_rng + random_number
     └── date_util.[ch]   time_t <-> yyyy-mm-dd conversion (day-normalized) + add_months()
 ```
 

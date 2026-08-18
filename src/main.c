@@ -1,12 +1,11 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <time.h>
 
-#include "utils/string_util.h"
+#include "utils/rng.h"
 
 int main()
 {
-  srand((unsigned int)time(NULL));
+  seed_rng((unsigned int)time(NULL));
   printf("ENTRYPOINT\n");
   return 0;
 }

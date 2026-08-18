@@ -8,11 +8,11 @@
 
 #include <stdbool.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include "../settings.h"
 #include "hash.h"
+#include "rng.h"
 #include "string_util.h"
 
 void generate_salt(char *destination)
@@ -23,7 +23,7 @@ void generate_salt(char *destination)
   // Fill 15 characters from the alphanumeric charset.
   int charset_size = (int)strlen(SALT_CHARSET);
   for (int i = 0; i < SALT_BUFFER_SIZE - 1; i++)
-    destination[i] = SALT_CHARSET[rand() % charset_size];
+    destination[i] = SALT_CHARSET[random_number() % charset_size];
   destination[SALT_BUFFER_SIZE - 1] = '\0';
 }
 

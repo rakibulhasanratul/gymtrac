@@ -2,6 +2,14 @@
 
 `Gymtrac` is a gym management system, a `group project` for `CSE115L` course of North South University. The project is developed using C following C11 standards. This is a complete `CLI only` project, with no GUI.
 
+### Disclaimer About Hashing Function
+
+This project uses a polynomial hash function (similar to Java's `String.hashCode()`) for password storage. This is **not** a cryptographically secure hash and should **never** be used in production. It is used here due to CSE115L project constraints that prohibit dynamic memory allocation, bitwise operations, and proper hashing libraries (e.g., SHA-256, bcrypt).
+
+### About Random Number Generator
+
+This project uses the [xoshiro128**](https://prng.di.unimi.it/xoshiro128starstar.c) pseudorandom number generator by David Blackman and Sebastiano Vigna for random number generation. This is **not** a cryptographically secure PRNG and should **never** be used in production. It is used here as a higher-quality alternative to the standard library `rand()` function. The implementation avoids bitwise operators by achieving equivalent computational results through arithmetic operations. Reference: <https://prng.di.unimi.it/>
+
 ## Project Brief
 
 - User authentication and authorization. Login with `username` + password; passwords are stored as salted hashes.
@@ -27,10 +35,6 @@
   - The system administrator can perform every operation.
   - Only the system administrator can create new branches.
   - The system administrator can create users of any type (including branch managers); gym members self-register and stay `on_hold` until their branch manager approves them.
-
-## Demo Hashing Function
-
-This project uses a polynomial hash function (similar to Java's `String.hashCode()`) for password storage. This is **not** a cryptographically secure hash and should **never** be used in production. It is used here due to CSE115L project constraints that prohibit dynamic memory allocation, bitwise operations, and proper hashing libraries (e.g., SHA-256, bcrypt).
 
 ## TODO
 

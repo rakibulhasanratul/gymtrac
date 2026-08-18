@@ -18,5 +18,7 @@
 #define POLYNOMIAL_MULTIPLIER 31    // multiplier matching Java's String.hashCode()
 #define SALT_CHARSET "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
 #define DEFAULT_DATA_DIRECTORY "data" // default directory for persisted records
+#define GYM_BRANCHES_FILENAME "branches.txt" // branch names file
+#define PATH_BUFFER_SIZE 256                  // buffer for resolved file paths
 
 #endif

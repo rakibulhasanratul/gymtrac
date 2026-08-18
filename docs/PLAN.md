@@ -49,7 +49,7 @@ Usernames are globally unique across all three tables. `username_exists()` (user
 
 ### Branches
 
-Branches are not a table. `data/branches.txt` holds one branch name per line (array of strings, capped at `BRANCH_COUNT_MAX`). `branch_exists()` is required when adding staff or gym members, so nobody is attached to a branch that does not exist. A branch has exactly one branch manager: `branch_has_manager()` (user module) is checked before a staff member with `role == BRANCH_MANAGER` is created.
+Branches are not a table. `data/branches.txt` holds one branch name per line (array of strings, capped at `BRANCH_COUNT_MAX`). At startup, `load_branches()` reads the file into a static in-memory array; all subsequent lookups (`branch_exists()`) and mutations (`add_branch()`) operate on this copy, with writes also persisted to the file. `branch_exists()` is required when adding staff or gym members, so nobody is attached to a branch that does not exist. A branch has exactly one branch manager: `branch_has_manager()` (user module) is checked before a staff member with `role == BRANCH_MANAGER` is created.
 
 ### Session
 

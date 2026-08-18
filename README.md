@@ -65,8 +65,8 @@ Work tracked per item; commit each with a Conventional Commit message (`feat:`, 
 ### Modules
 
 - [x] Add `DEFAULT_DATA_DIRECTORY` macro and `build_file_path()` helper in `file_util` so every module resolves data files through one shared path convention - `feat:`
-- [ ] Branch module that loads/lists branch names and validates existence before anyone is assigned, so users can never attach to a nonexistent branch - `feat:`
-- [ ] Unit tests covering branch listing and existence validation - `test:`
+- [x] Branch module that loads/lists branch names and validates existence before anyone is assigned, so users can never attach to a nonexistent branch - `feat:`
+- [x] Unit tests covering branch listing and existence validation - `test:`
 - [ ] User module that creates/fetches each role with auto-incremented ids, enforces globally unique usernames across all roles, and enforces one manager per branch - `feat:`
 - [ ] Unit tests covering per-role CRUD, cross-role username uniqueness, and the one-manager-per-branch rule - `test:`
 - [ ] Auth module that verifies username + password against stored salted polynomial hashes on login and clears the session on logout, so only verified users get in - `feat:`

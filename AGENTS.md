@@ -56,6 +56,7 @@ The name of the project is `Gymtrac` which is a gym management system, a `group 
 ## Committing Changes
 
 - Before you commit, format all files using clang-format.
+- Use one-line self explanatory commit messages unless you are explicitly told to write a long commit message.
 
 ## Directory Structure
 

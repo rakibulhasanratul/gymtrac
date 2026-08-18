@@ -40,7 +40,7 @@ Work tracked per item; commit each with a Conventional Commit message (`feat:`, 
 
 ### Scaffold
 
-- [x] Add shared `src/types.h` defining every record struct plus `session_t` (fixed-size `char` arrays for strings), the `typedef unsigned char` enum aliases (`user_role_t` included) with `#define` constants, and the `BRANCH_COUNT_MAX` cap (already created) - `chore:`
+- [x] Add shared `src/types.h` defining every record struct plus `session_t` (fixed-size `char` arrays for strings), the `typedef unsigned char` enum aliases (`user_role_t` included) with `#define` constants, and `BRANCH_COUNT_MAX` in `settings.h` (already created) - `chore:`
 - [x] Add `run.sh` and `run.bat` build scripts that compile `src/` with `-std=c11 -Wall -Wextra -pedantic -g` into `build/`, plus a `.gitignore` ignoring `data/` and `build/` so generated artifacts are never tracked - `chore:`
 
 ### Utils
@@ -50,12 +50,11 @@ Work tracked per item; commit each with a Conventional Commit message (`feat:`, 
 - [x] Unit tests covering trim/split/parse/case/sanitize behavior and file read/write round-trip - `test:`
 - [x] Input wrappers around `fgets()` and `scanf()` that validate and cap input, so no buffer overflow or malformed value reaches the logic - `feat:`
 - [x] Unit tests covering the input wrappers: line capping with overflow drain, and rejection of non-numeric input, zero, and negatives - `test:`
-- [ ] Update `settings.h`: resize `PASSWORD_HASH_BUFFER_SIZE` from 130 to 40, add `SALT_BUFFER_SIZE` (16) and `HASH_STRING_BUFFER_SIZE` (32) macros - `chore:`
-- [ ] Add `hash_t` typedef (`unsigned long`) to `types.h` - `chore:`
-- [ ] Hash utility (`src/utils/hash.[ch]`): polynomial hash function (`h = 31 * h + c`, similar to Java's `String.hashCode()`), 15-char random salt generation via `rand()` seeded by `time(NULL)`, `mix_salt` (sandwich password between salt halves), `hash_value_to_string` / `parse_hash_value` conversions, and `compare_hash` equality check. Demo only, not cryptographically secure. - `feat:`
-- [ ] Auth module (`src/modules/auth.[ch]`): `hash_password` (generate salt, mix, hash, store salt+hash string) and `verify_password` (extract salt, re-hash, compare). Builds on hash utility for credential storage. - `feat:`
-- [ ] Unit tests for hash utility: known polynomial hash vectors, salt generation length and character set, `mix_salt` sandwich output, `hash_value_to_string` / `parse_hash_value` round-trip, `compare_hash` equality - `test:`
-- [ ] Unit tests for auth module: `hash_password` produces valid stored format, `verify_password` accepts correct and rejects wrong passwords - `test:`
+- [x] Update `settings.h`: resize `PASSWORD_HASH_BUFFER_SIZE` from 130 to 40, add `SALT_BUFFER_SIZE` (16) and `HASH_STRING_BUFFER_SIZE` (32) macros - `chore:`
+- [x] Hash utility (`src/utils/hash.[ch]`): polynomial hash function (`h = 31 * h + c`, similar to Java's `String.hashCode()`), 15-char random salt generation via `rand()` seeded by `time(NULL)`, `mix_salt` (sandwich password between salt halves), `hash_value_to_string` / `parse_hash_value` conversions, and `compare_hash` equality check. Demo only, not cryptographically secure. - `feat:`
+- [x] Auth module (`src/modules/auth.[ch]`): `hash_password` (generate salt, mix, hash, store salt+hash string) and `verify_password` (extract salt, re-hash, compare). Builds on hash utility for credential storage. - `feat:`
+- [x] Unit tests for hash utility: known polynomial hash vectors, salt generation length and character set, `mix_salt` sandwich output, `hash_value_to_string` / `parse_hash_value` round-trip, `compare_hash` equality - `test:`
+- [x] Unit tests for auth module: `hash_password` produces valid stored format, `verify_password` accepts correct and rejects wrong passwords - `test:`
 - [ ] Date helpers that convert `time_t` to `yyyy-mm-dd` and back (day-normalized), with `add_months()` handling month-end, so due dates and suspensions compute correctly - `feat:`
 - [ ] Unit tests covering date round-trips, leap years, and month-end arithmetic - `test:`
 

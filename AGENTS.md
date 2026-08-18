@@ -67,7 +67,6 @@ src/
 ├── settings.h          Settings-like MACROs for the entire project
 ├── main.c
 ├── modules/
-│   ├── config.[ch]     data_dir + path helpers + ensure data dir exists
 │   ├── branch.[ch]     branch name list + existence validation
 │   ├── user.[ch]       user record CRUD (sysadmin / branch_staff / gym_member tables), id allocation, username_exists(), branch_manager_count(), branch_trainer_count(), branch_member_count()
 │   ├── auth.[ch]       login/logout, username + password verification
@@ -78,7 +77,7 @@ src/
 │   └── menu.[ch]       login/register menus + one menu handler per role
 └── utils/
     ├── string_util.[ch] trim, split, parse numbers, case helpers, sanitize_field
-    ├── file_util.[ch]   read/write lines
+    ├── file_util.[ch]   read/write lines, build_file_path
     ├── input.[ch]       safe fgets/scanf wrappers with validation
     ├── hash.[ch]        polynomial hash (demo) + salt generation + mix_salt helpers
     ├── rng.[ch]         xoshiro128** PRNG (demo) + seed_rng + random_number

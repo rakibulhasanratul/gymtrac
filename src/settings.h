@@ -12,6 +12,9 @@
 #define DESCRIPTION_BUFFER_SIZE 256 // description field for lost and found
 #define TRX_ID_BUFFER_SIZE 64       // transaction id field
 #define DATE_BUFFER_SIZE 11         // yyyy-mm-dd + null terminator
+#define FIELD_BUFFER_SIZE 256       // buffer for a single field when splitting a pipe-delimited record line
+#define PATH_BUFFER_SIZE 256        // buffer for resolved file paths
+#define LINE_BUFFER_SIZE 1024        // one single line of a file, I think 1KB is large enough`
 
 // Hashing internals.
 #define SALT_BUFFER_SIZE 16         // 15 printable chars + null
@@ -24,14 +27,22 @@
 #define MAX_MANAGERS_PER_BRANCH 1
 #define MAX_TRAINERS_PER_BRANCH 5
 #define MAX_MEMBERS_PER_BRANCH 100
+#define MAX_SYSTEM_ADMINS 1
 #define MAX_BRANCH_MANAGERS (BRANCH_COUNT_MAX * MAX_MANAGERS_PER_BRANCH)
 #define MAX_TRAINERS (BRANCH_COUNT_MAX * MAX_TRAINERS_PER_BRANCH)
 #define MAX_GYM_MEMBERS (BRANCH_COUNT_MAX * MAX_MEMBERS_PER_BRANCH)
 
 // File storage.
 #define FIELD_DELIMITER '|'         // delimiter separating fields in a persisted record
+#ifdef TEST_ENV
+#define DEFAULT_DATA_DIRECTORY "test_data"
+#else
 #define DEFAULT_DATA_DIRECTORY "data"
+#endif
 #define GYM_BRANCHES_FILENAME "branches.txt"
-#define PATH_BUFFER_SIZE 256        // buffer for resolved file paths
+#define SYSDADMINS_FILENAME "sysadmins.dat"
+#define BRANCH_STAFF_FILENAME "branch_staff.dat"
+#define GYM_MEMBERS_FILENAME "gym_members.dat"
+#define MAX_RECORD_FIELDS 14        // maximum number of fields in any pipe-delimited record
 
 #endif

@@ -25,8 +25,7 @@ int load_branches()
   {
     if (strlen(line) > 0)
     {
-      strncpy(branches[branch_count], line, BRANCH_NAME_BUFFER_SIZE - 1);
-      branches[branch_count][BRANCH_NAME_BUFFER_SIZE - 1] = '\0';
+      strcpy(branches[branch_count], line);
       branch_count++;
     }
   }
@@ -72,8 +71,7 @@ bool add_branch(const char branch_name[])
 
   if (success)
   {
-    strncpy(branches[branch_count], branch_name, BRANCH_NAME_BUFFER_SIZE - 1);
-    branches[branch_count][BRANCH_NAME_BUFFER_SIZE - 1] = '\0';
+    strcpy(branches[branch_count], branch_name);
     branch_count++;
   }
 

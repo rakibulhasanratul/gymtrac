@@ -5,6 +5,7 @@
 #include "../src/utils/rng.h"
 #include "modules/test_auth.h"
 #include "modules/test_branch.h"
+#include "modules/test_user.h"
 #include "utils/test_date_util.h"
 #include "utils/test_file_util.h"
 #include "utils/test_hash.h"
@@ -22,6 +23,7 @@ int main()
   run_all_auth_tests();
   run_all_date_util_tests();
   run_all_branch_tests();
+  run_all_user_tests();
   printf("All tests passed.\n");
   return 0;
 }

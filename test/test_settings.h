@@ -1,0 +1,6 @@
+#ifndef GYMTRAC_TEST_SETTINGS_H
+#define GYMTRAC_TEST_SETTINGS_H
+
+#define TEST_ENV
+
+#endif

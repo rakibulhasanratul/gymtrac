@@ -4,8 +4,9 @@
 
 #include "../../src/utils/file_util.h"
 #include "test_file_util.h"
+#include "../../src/settings.h"
 
-#define TEST_FILE_PATH "tmp_test_file_util.dat"
+#define TEST_FILE_PATH  DEFAULT_DATA_DIRECTORY"/tmp_test_file_util.dat"
 
 /**
  * Writes the given lines to the test file and returns the open file.

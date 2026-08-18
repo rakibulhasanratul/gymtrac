@@ -5,9 +5,10 @@
 #include <string.h>
 
 #include "../../src/utils/input.h"
+#include "../../src/settings.h"
 #include "test_input.h"
 
-#define TEST_INPUT_PATH "tmp_test_input.dat"
+#define TEST_INPUT_PATH DEFAULT_DATA_DIRECTORY"tmp_test_input.dat"
 
 /**
  * Redirects standard input to a temporary file holding content.

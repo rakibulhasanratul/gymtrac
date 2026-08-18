@@ -69,7 +69,7 @@ src/
 ├── modules/
 │   ├── config.[ch]     data_dir + path helpers + ensure data dir exists
 │   ├── branch.[ch]     branch name list + existence validation
-│   ├── user.[ch]       user record CRUD (sysadmin / branch_staff / gym_member tables), id allocation, username_exists(), branch_has_manager()
+│   ├── user.[ch]       user record CRUD (sysadmin / branch_staff / gym_member tables), id allocation, username_exists(), branch_manager_count(), branch_trainer_count(), branch_member_count()
 │   ├── auth.[ch]       login/logout, username + password verification
 │   ├── member.[ch]     member lifecycle: approval, suspensions, auto-suspend sweep, status-change / plan-change / profile-edit requests
 │   ├── payment.[ch]    payments (digital recorded by member, cash recorded by trainer) + due_amount / last_payment_date updates

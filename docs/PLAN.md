@@ -49,7 +49,7 @@ Usernames are globally unique across all three tables. `username_exists()` (user
 
 ### Branches
 
-Branches are not a table. `data/branches.txt` holds one branch name per line (array of strings, capped at `BRANCH_COUNT_MAX`). At startup, `load_branches()` reads the file into a static in-memory array; all subsequent lookups (`branch_exists()`) and mutations (`add_branch()`) operate on this copy, with writes also persisted to the file. `branch_exists()` is required when adding staff or gym members, so nobody is attached to a branch that does not exist. A branch has exactly one branch manager: `branch_has_manager()` (user module) is checked before a staff member with `role == BRANCH_MANAGER` is created.
+Branches are not a table. `data/branches.txt` holds one branch name per line (array of strings, capped at `BRANCH_COUNT_MAX`). At startup, `load_branches()` reads the file into a static in-memory array; all subsequent lookups (`branch_exists()`) and mutations (`add_branch()`) operate on this copy, with writes also persisted to the file. `branch_exists()` is required when adding staff or gym members, so nobody is attached to a branch that does not exist. A branch's staff counts are capped by `MAX_MANAGERS_PER_BRANCH`, `MAX_TRAINERS_PER_BRANCH`, and `MAX_MEMBERS_PER_BRANCH` (defined in `settings.h`). Before creating a staff member or approving a member, the user module counts existing records of that role in the branch and rejects the operation when the cap is reached (`branch_manager_count()`, `branch_trainer_count()`, `branch_member_count()`).
 
 ### Session
 
@@ -104,7 +104,7 @@ Branch managers and trainers share one table (`branch_staff_t`), so a single sta
 - Auto-suspend: at startup, `MEMBERSHIP_ACTIVE` members whose due date (`last_payment_date + interval_days`) is more than `MAX_UNPAID_DAYS` (90) in the past are suspended with reason "Auto: unpaid dues". Each suspension creates a `suspension_record_t` with its reason and date.
 - Only branch managers suspend or unsuspend members directly or resolve trainer status-change requests. Trainers can only request. Every suspension carries a mandatory `reason`. The sysadmin can perform these operations too.
 - Members request plan changes and profile edits; branch staff approve or reject them. Staff and sysadmin edit their own records directly.
-- A branch has exactly one branch manager (`branch_has_manager()`).
+- Per-branch capacity caps: `MAX_MANAGERS_PER_BRANCH` (default 1), `MAX_TRAINERS_PER_BRANCH` (default 5), `MAX_MEMBERS_PER_BRANCH` (default 100); enforced by `branch_manager_count()`, `branch_trainer_count()`, `branch_member_count()` in the user module. Derived global caps (`MAX_BRANCH_MANAGERS`, `MAX_TRAINERS`, `MAX_GYM_MEMBERS`) equal `BRANCH_COUNT_MAX` times the respective per-branch limit and bound the static arrays that store all records.
 - Suspended members can still log in, but get a banner with the reason and are restricted to paying dues, viewing history, and reporting lost/found.
 - Seeded sysadmin: username `admin`, password `admin` (created on first run when no sysadmin exists).
 - Member economics macros: `DEFAULT_PLAN_AMOUNT` (default plan payable amount, whole Taka), `DEFAULT_PLAN_INTERVAL_DAYS` (default plan interval in days), `MAX_UNPAID_DAYS` (grace period, 90).
@@ -142,7 +142,7 @@ Precise assert-based tests, one file per unit, run via `build/test_runner`:
 - `string_util` / `file_util`: trim, split, sanitize_field, roundtrip read/write.
 - `date_util`: time_t <-> yyyy-mm-dd roundtrip, day normalization, leap years, month-end arithmetic (add_months).
 - `branch`: add/list names, existence validation.
-- `user`: sysadmin/staff/member create/get, credential helpers, username_exists() across all three tables, branch_has_manager() (staff with `role == BRANCH_MANAGER`).
+- `user`: sysadmin/staff/member create/get, credential helpers, username_exists() across all three tables, branch_manager_count() / branch_trainer_count() / branch_member_count() (per-branch capacity enforcement).
 - `payment`: digital recorded by member, cash recorded by trainer, status handling (only PAYMENT_COMPLETED applies), due amount clamp, last_payment_date update.
 - `member`: self-registration -> MEMBERSHIP_ON_HOLD, MEMBERSHIP_ON_HOLD to MEMBERSHIP_ACTIVE approval (plan assignment, due amount, last_payment_date), suspension records with nullable unsuspension date, auto-suspend sweep with an explicit `today` (as `time_t`).
 - `request`: status-change (trainer -> manager), plan-change, and profile-edit flows.

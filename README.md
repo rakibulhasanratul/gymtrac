@@ -15,7 +15,7 @@ This project uses the [xoshiro128**](https://prng.di.unimi.it/xoshiro128starstar
 - User authentication and authorization. Login with `username` + password; passwords are stored as salted hashes.
 - 3 user record types: System Administrator (pre-existed), Branch Staff (a `role` field distinguishes Branch Manager from Branch Trainer), and Gym Member.
 - Branches are a simple list of branch names. Every staff member and gym member belongs to exactly one existing branch.
-- Each branch has exactly one branch manager (a staff member with the manager role) and can have multiple trainers and multiple members.
+- Each branch's staff and member counts are capped by `MAX_MANAGERS_PER_BRANCH`, `MAX_TRAINERS_PER_BRANCH`, and `MAX_MEMBERS_PER_BRANCH` macros defined in `settings.h`. Derived global caps (`MAX_BRANCH_MANAGERS`, `MAX_TRAINERS`, `MAX_GYM_MEMBERS`) bound the static arrays that store all records.
 - A newly self-registered gym member has status `on_hold` until a branch manager approves them to `active`.
 - Each member subscribes to a plan (`payable_amount` + `interval_days`), which drives their fee amount and payment interval.
 - Digital payments are recorded by the member directly. Cash payments are handed to a branch trainer, who records them directly (no approval request).
@@ -67,8 +67,8 @@ Work tracked per item; commit each with a Conventional Commit message (`feat:`, 
 - [x] Add `DEFAULT_DATA_DIRECTORY` macro and `build_file_path()` helper in `file_util` so every module resolves data files through one shared path convention - `feat:`
 - [x] Branch module that loads/lists branch names and validates existence before anyone is assigned, so users can never attach to a nonexistent branch - `feat:`
 - [x] Unit tests covering branch listing and existence validation - `test:`
-- [ ] User module that creates/fetches each role with auto-incremented ids, enforces globally unique usernames across all roles, and enforces one manager per branch - `feat:`
-- [ ] Unit tests covering per-role CRUD, cross-role username uniqueness, and the one-manager-per-branch rule - `test:`
+- [ ] User module that creates/fetches each role with auto-incremented ids, enforces globally unique usernames across all roles, and enforces per-branch capacity limits via `branch_manager_count()`, `branch_trainer_count()`, `branch_member_count()` - `feat:`
+- [ ] Unit tests covering per-role CRUD, cross-role username uniqueness, and per-branch capacity enforcement - `test:`
 - [ ] Auth module that verifies username + password against stored salted polynomial hashes on login and clears the session on logout, so only verified users get in - `feat:`
 - [ ] Member lifecycle: approve `on_hold` members to active, suspend/unsuspend with a mandatory reason (recording dated suspension records), and auto-suspend members with 90+ days unpaid dues - `feat:`
 - [ ] Unit tests covering approval, suspension records with optional unsuspension date, and the auto-suspend sweep - `test:`

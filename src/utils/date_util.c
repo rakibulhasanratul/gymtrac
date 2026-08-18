@@ -9,7 +9,7 @@
 #define SECONDS_PER_DAY 86400
 
 // Calendar fields extracted from a time_t timestamp.
-typedef struct tm calendar_t;
+typedef struct tm calendar_time_t;
 
 // Days in each month (non-leap year).
 static const int DAYS_IN_MONTH[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
@@ -43,12 +43,12 @@ static int days_in_month(int year, int month)
  */
 static time_t normalize_to_midnight(time_t timestamp)
 {
-  calendar_t info;
-  localtime_r(&timestamp, &info);
-  info.tm_hour = 0;
-  info.tm_min = 0;
-  info.tm_sec = 0;
-  return mktime(&info);
+  calendar_time_t calendar_time;
+  localtime_r(&timestamp, &calendar_time);
+  calendar_time.tm_hour = 0;
+  calendar_time.tm_min = 0;
+  calendar_time.tm_sec = 0;
+  return mktime(&calendar_time);
 }
 
 bool time_t_to_string(time_t timestamp, char *buffer, int buffer_capacity)
@@ -57,12 +57,12 @@ bool time_t_to_string(time_t timestamp, char *buffer, int buffer_capacity)
     return 0;
 
   // Extract calendar fields from the timestamp.
-  calendar_t info;
-  localtime_r(&timestamp, &info);
+  calendar_time_t calendar_time;
+  localtime_r(&timestamp, &calendar_time);
 
   // Format as yyyy-mm-dd into the caller's buffer.
   int written =
-    snprintf(buffer, (size_t)buffer_capacity, "%04d-%02d-%02d", info.tm_year + 1900, info.tm_mon + 1, info.tm_mday);
+    snprintf(buffer, (size_t)buffer_capacity, "%04d-%02d-%02d", calendar_time.tm_year + 1900, calendar_time.tm_mon + 1, calendar_time.tm_mday);
 
   // Verify the full 10-character date was written.
   return (written == DATE_BUFFER_SIZE - 1);
@@ -93,25 +93,25 @@ time_t string_to_time_t(const char *date_string)
   if (day < 1 || day > days_in_month(year, month))
     return (time_t)-1;
 
-  // Populate a calendar_t and convert to a normalized time_t.
-  calendar_t info;
-  memset(&info, 0, sizeof(info));
-  info.tm_year = year - 1900;
-  info.tm_mon = month - 1;
-  info.tm_mday = day;
+  // Populate a calendar_time_t and convert to a normalized time_t.
+  calendar_time_t calendar_time;
+  memset(&calendar_time, 0, sizeof(calendar_time));
+  calendar_time.tm_year = year - 1900;
+  calendar_time.tm_mon = month - 1;
+  calendar_time.tm_mday = day;
 
-  time_t result = mktime(&info);
+  time_t result = mktime(&calendar_time);
   return normalize_to_midnight(result);
 }
 
 time_t add_months(time_t date, int months)
 {
-  calendar_t info;
-  localtime_r(&date, &info);
+  calendar_time_t calendar_time;
+  localtime_r(&date, &calendar_time);
 
   // Decompose into year and 1-indexed month for easier arithmetic.
-  int target_month = info.tm_mon + 1 + months;
-  int target_year = info.tm_year + 1900;
+  int target_month = calendar_time.tm_mon + 1 + months;
+  int target_year = calendar_time.tm_year + 1900;
 
   // Normalize so month is in range 1-12 with year carry.
   target_year += (target_month - 1) / 12;
@@ -124,18 +124,18 @@ time_t add_months(time_t date, int months)
 
   // Clamp the day to the last day of the target month.
   int max_day = days_in_month(target_year, target_month);
-  int target_day = info.tm_mday;
+  int target_day = calendar_time.tm_mday;
   if (target_day > max_day)
     target_day = max_day;
 
   // Build the result date and normalize to midnight.
-  calendar_t result;
-  memset(&result, 0, sizeof(result));
-  result.tm_year = target_year - 1900;
-  result.tm_mon = target_month - 1;
-  result.tm_mday = target_day;
+  calendar_time_t result_calendar_time;
+  memset(&result_calendar_time, 0, sizeof(result_calendar_time));
+  result_calendar_time.tm_year = target_year - 1900;
+  result_calendar_time.tm_mon = target_month - 1;
+  result_calendar_time.tm_mday = target_day;
 
-  time_t result_time = mktime(&result);
+  time_t result_time = mktime(&result_calendar_time);
   return normalize_to_midnight(result_time);
 }
 

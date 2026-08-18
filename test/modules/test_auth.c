@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <ctype.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
@@ -21,17 +22,11 @@ static void test_hash_password_valid_format()
 
   // First 15 characters must be alphanumeric (the salt).
   for (int index = 0; index < SALT_BUFFER_SIZE - 1; index++)
-  {
-    char ch = stored[index];
-    bool is_upper = (ch >= 'A' && ch <= 'Z');
-    bool is_lower = (ch >= 'a' && ch <= 'z');
-    bool is_digit = (ch >= '0' && ch <= '9');
-    assert(is_upper || is_lower || is_digit);
-  }
+    assert(isalnum((unsigned char)stored[index]));
 
   // Remaining characters must be decimal digits (the hash string).
   for (int index = SALT_BUFFER_SIZE - 1; stored[index] != '\0'; index++)
-    assert(stored[index] >= '0' && stored[index] <= '9');
+    assert(isdigit((unsigned char)stored[index]));
 }
 
 /**

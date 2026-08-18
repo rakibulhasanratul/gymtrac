@@ -77,7 +77,7 @@ unsigned int string_to_unsigned_int(const char text[])
   for (int i = 0; text[i] != '\0'; i++)
   {
     // Reject any non-digit character.
-    if (text[i] < '0' || text[i] > '9')
+    if (!isdigit((unsigned char)text[i]))
       return 0;
     unsigned int digit = (unsigned int)(text[i] - '0');
     // Reject when the next digit would overflow the result.
@@ -98,7 +98,7 @@ unsigned long int string_to_unsigned_long_int(const char text[])
   for (int i = 0; text[i] != '\0'; i++)
   {
     // Reject any non-digit character.
-    if (text[i] < '0' || text[i] > '9')
+    if (!isdigit((unsigned char)text[i]))
       return 0;
     unsigned long int digit = (unsigned long int)(text[i] - '0');
     // Reject when the next digit would overflow the result.

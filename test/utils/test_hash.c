@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <ctype.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
@@ -39,13 +40,7 @@ static void test_generate_salt_length_and_charset()
   assert((int)strlen(salt) == SALT_BUFFER_SIZE - 1);
 
   for (int index = 0; salt[index] != '\0'; index++)
-  {
-    char ch = salt[index];
-    bool is_upper = (ch >= 'A' && ch <= 'Z');
-    bool is_lower = (ch >= 'a' && ch <= 'z');
-    bool is_digit = (ch >= '0' && ch <= '9');
-    assert(is_upper || is_lower || is_digit);
-  }
+    assert(isalnum((unsigned char)salt[index]));
 }
 
 /**

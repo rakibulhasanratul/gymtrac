@@ -53,6 +53,7 @@ The name of the project is `Gymtrac` which is a gym management system, a `group 
 - Use `()` instead of `(void)` for functions with no parameters. THIS IS NON NEGOTIABLE.
 - Do not introduce new blocks for single statements in `if`, `else`, `switch`, `case`, `for`, `while`, and function bodies. Use `{}` only when there are multiple statements in the block.
 - Prefer `strcpy()` over `strncpy()` when dealing with string copies. Use `strncpy()` only when there is no ther option but to use it.
+- Wildly use is* functions from `ctype.h` to reduce lines of codes and improve readability.
 
 ## Committing Changes
 

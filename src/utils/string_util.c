@@ -74,12 +74,12 @@ unsigned int string_to_unsigned_int(const char text[])
     return 0;
 
   unsigned int accumulated = 0;
-  for (int index = 0; text[index] != '\0'; index++)
+  for (int i = 0; text[i] != '\0'; i++)
   {
     // Reject any non-digit character.
-    if (text[index] < '0' || text[index] > '9')
+    if (text[i] < '0' || text[i] > '9')
       return 0;
-    unsigned int digit = (unsigned int)(text[index] - '0');
+    unsigned int digit = (unsigned int)(text[i] - '0');
     // Reject when the next digit would overflow the result.
     if (accumulated > (UINT_MAX - digit) / 10u)
       return 0;
@@ -95,12 +95,12 @@ unsigned long int string_to_unsigned_long_int(const char text[])
     return 0;
 
   unsigned long int accumulated = 0;
-  for (int index = 0; text[index] != '\0'; index++)
+  for (int i = 0; text[i] != '\0'; i++)
   {
     // Reject any non-digit character.
-    if (text[index] < '0' || text[index] > '9')
+    if (text[i] < '0' || text[i] > '9')
       return 0;
-    unsigned long int digit = (unsigned long int)(text[index] - '0');
+    unsigned long int digit = (unsigned long int)(text[i] - '0');
     // Reject when the next digit would overflow the result.
     if (accumulated > (ULONG_MAX - digit) / 10ul)
       return 0;
@@ -116,8 +116,8 @@ char *to_lowercase(char text[])
     return NULL;
 
   // Fold every letter to lowercase in place.
-  for (int index = 0; text[index] != '\0'; index++)
-    text[index] = (char)tolower((unsigned char)text[index]);
+  for (int i = 0; text[i] != '\0'; i++)
+    text[i] = (char)tolower((unsigned char)text[i]);
 
   return text;
 }
@@ -128,8 +128,8 @@ char *to_uppercase(char text[])
     return NULL;
 
   // Fold every letter to uppercase in place.
-  for (int index = 0; text[index] != '\0'; index++)
-    text[index] = (char)toupper((unsigned char)text[index]);
+  for (int i = 0; text[i] != '\0'; i++)
+    text[i] = (char)toupper((unsigned char)text[i]);
 
   return text;
 }
@@ -140,14 +140,14 @@ char *sanitize_field(char text[])
     return NULL;
 
   int write_index = 0;
-  for (int read_index = 0; text[read_index] != '\0'; read_index++)
+  for (int i = 0; text[i] != '\0'; i++)
   {
-    unsigned char ch = (unsigned char)text[read_index];
+    unsigned char ch = (unsigned char)text[i];
     // Drop the field delimiter and any control character.
     if (ch == (unsigned char)FIELD_DELIMITER || iscntrl(ch))
       continue;
     // Compact the kept characters toward the front.
-    text[write_index] = text[read_index];
+    text[write_index] = text[i];
     write_index++;
   }
   // Terminate the compacted string.

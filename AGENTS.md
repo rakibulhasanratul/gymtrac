@@ -29,7 +29,7 @@ The name of the project is `Gymtrac` which is a gym management system, a `group 
   - `ensure_username_is_available(...)`
   - `ensure_branch_has_no_manager(...)`
   - `ensure_branch_name_is_valid(...)`
-- Use self describing short names. Avoid using single letter names or abbreviations.
+- Use self describing short names. Avoid using single letter names (except loops' iterators) or abbreviations.
   - bad name: `file_write_line(...)`
   - good name: `write_line_to_file(...)`
   - bad name: `get_user(...)`

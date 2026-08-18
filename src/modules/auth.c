@@ -34,12 +34,12 @@ void hash_password(const char *password, char *destination)
   int write_index = 0;
 
   // Copy salt without null terminator.
-  for (int index = 0; index < SALT_BUFFER_SIZE - 1 && salt[index] != '\0'; index++)
-    destination[write_index++] = salt[index];
+  for (int i = 0; i < SALT_BUFFER_SIZE - 1 && salt[i] != '\0'; i++)
+    destination[write_index++] = salt[i];
 
   // Append the hash decimal string.
-  for (int index = 0; hash_str[index] != '\0'; index++)
-    destination[write_index++] = hash_str[index];
+  for (int i = 0; hash_str[i] != '\0'; i++)
+    destination[write_index++] = hash_str[i];
 
   destination[write_index] = '\0';
 }
@@ -51,10 +51,10 @@ bool verify_password(const char *password, const char *stored_hash)
 
   // Extract the first 15 characters as the salt.
   char salt[SALT_BUFFER_SIZE];
-  int index = 0;
-  for (; index < SALT_BUFFER_SIZE - 1 && stored_hash[index] != '\0'; index++)
-    salt[index] = stored_hash[index];
-  salt[index] = '\0';
+  int i = 0;
+  for (; i < SALT_BUFFER_SIZE - 1 && stored_hash[i] != '\0'; i++)
+    salt[i] = stored_hash[i];
+  salt[i] = '\0';
 
   // Mix the input password with the extracted salt.
   char mixed[MIXED_BUFFER_SIZE];

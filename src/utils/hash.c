@@ -22,8 +22,8 @@ void generate_salt(char *destination)
 
   // Fill 15 characters from the alphanumeric charset.
   int charset_size = (int)strlen(SALT_CHARSET);
-  for (int index = 0; index < SALT_BUFFER_SIZE - 1; index++)
-    destination[index] = SALT_CHARSET[rand() % charset_size];
+  for (int i = 0; i < SALT_BUFFER_SIZE - 1; i++)
+    destination[i] = SALT_CHARSET[rand() % charset_size];
   destination[SALT_BUFFER_SIZE - 1] = '\0';
 }
 
@@ -35,16 +35,16 @@ void mix_salt(const char *password, const char *salt, char *destination)
   int write_index = 0;
 
   // Copy first 7 characters of salt (indices 0-6).
-  for (int index = 0; index < 7 && salt[index] != '\0'; index++)
-    destination[write_index++] = salt[index];
+  for (int i = 0; i < 7 && salt[i] != '\0'; i++)
+    destination[write_index++] = salt[i];
 
   // Copy the password.
-  for (int index = 0; password[index] != '\0'; index++)
-    destination[write_index++] = password[index];
+  for (int i = 0; password[i] != '\0'; i++)
+    destination[write_index++] = password[i];
 
   // Copy salt characters 8 through 14 (skipping index 7).
-  for (int index = 8; index < 15 && salt[index] != '\0'; index++)
-    destination[write_index++] = salt[index];
+  for (int i = 8; i < 15 && salt[i] != '\0'; i++)
+    destination[write_index++] = salt[i];
 
   destination[write_index] = '\0';
 }
@@ -55,8 +55,8 @@ hash_t create_hash(const char *text)
     return 0;
 
   hash_t hash_value = 0;
-  for (int index = 0; text[index] != '\0'; index++)
-    hash_value = POLYNOMIAL_MULTIPLIER * hash_value + (unsigned char)text[index];
+  for (int i = 0; text[i] != '\0'; i++)
+    hash_value = POLYNOMIAL_MULTIPLIER * hash_value + (unsigned char)text[i];
 
   return hash_value;
 }

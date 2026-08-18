@@ -50,7 +50,7 @@ The name of the project is `Gymtrac` which is a gym management system, a `group 
 - Use short and self explanatory comments for each typedefs and statements. Avoid writing comments for trivial code. Use comments to explain the purpose of a struct, or typedef, not how it works. Use docstring comments for functions, explaining the purpose of the function, its parameters, and return values. Use it to explain the purpose of a function, not how it works.
 - Use _2 spaces_ for indentation in comments, not 4 spaces.
 - Prefer arrays over pointers as variables and function parameters. Use pointer only when there is no other option or using pointers can increase readability or make it easier to comprehend to new C learners. Use array indices syntax for iterating over arrays. Focus on readability more here.
-- Use `()` instead of `(void)` for functions with no parameters.
+- Use `()` instead of `(void)` for functions with no parameters. THIS IS NON NEGOTIABLE.
 - Do not introduce new blocks for single statements in `if`, `else`, `switch`, `case`, `for`, `while`, and function bodies. Use `{}` only when there are multiple statements in the block.
 
 ## Committing Changes

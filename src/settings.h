@@ -13,6 +13,7 @@
 #define REASON_BUFFER_SIZE 128      // suspension/request reason field
 #define DESCRIPTION_BUFFER_SIZE 256 // description field for lost and found
 #define TRX_ID_BUFFER_SIZE 64       // transaction id field
+#define DATE_BUFFER_SIZE 11         // yyyy-mm-dd + null terminator
 #define FIELD_DELIMITER '|'         // delimiter separating fields in a persisted record
 #define POLYNOMIAL_MULTIPLIER 31    // multiplier matching Java's String.hashCode()
 #define SALT_CHARSET "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"

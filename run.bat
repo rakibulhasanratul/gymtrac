@@ -1,6 +1,7 @@
 @echo off
 
 if not exist build mkdir build
+if not exist data mkdir data
 
 if "%~1"=="test" (
     gcc -Wall -Wextra -pedantic -g test\test_main.c test\modules\*.c test\utils\*.c src\modules\*.c src\utils\*.c -o build\test_runner.exe -lm

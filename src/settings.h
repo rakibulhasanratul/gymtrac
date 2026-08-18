@@ -17,5 +17,6 @@
 #define FIELD_DELIMITER '|'         // delimiter separating fields in a persisted record
 #define POLYNOMIAL_MULTIPLIER 31    // multiplier matching Java's String.hashCode()
 #define SALT_CHARSET "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+#define DEFAULT_DATA_DIRECTORY "data" // default directory for persisted records
 
 #endif

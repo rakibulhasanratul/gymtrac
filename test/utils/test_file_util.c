@@ -115,6 +115,47 @@ static void test_write_line_rejects_invalid_arguments()
 }
 
 /**
+ * Verifies that build_file_path correctly joins a directory and filename.
+ */
+static void test_build_file_path_joins_correctly()
+{
+  char path[260];
+  build_file_path("branches.txt", path, sizeof(path));
+  assert(strcmp(path, "data/branches.txt") == 0);
+}
+
+/**
+ * Verifies that build_file_path handles NULL inputs without crashing.
+ */
+static void test_build_file_path_null_inputs_are_safe()
+{
+  char path[260];
+  path[0] = '\0';
+
+  build_file_path(NULL, path, sizeof(path));
+  assert(strlen(path) == 0);
+
+  build_file_path("file.txt", NULL, 0);
+}
+
+/**
+ * Verifies that build_file_path produces an empty string on overflow.
+ */
+static void test_build_file_path_overflow_produces_empty()
+{
+  char long_directory[260];
+  int index;
+
+  for (index = 0; index < 257; index++)
+    long_directory[index] = 'a';
+  long_directory[index] = '\0';
+
+  char path[260];
+  build_file_path(long_directory, path, sizeof(path));
+  assert(strlen(path) == 0);
+}
+
+/**
  * Runs every file_util unit test, aborting on the first failure.
  */
 void run_all_file_util_tests()
@@ -124,4 +165,7 @@ void run_all_file_util_tests()
   test_read_drains_overlong_line();
   test_read_line_rejects_invalid_arguments();
   test_write_line_rejects_invalid_arguments();
+  test_build_file_path_joins_correctly();
+  test_build_file_path_null_inputs_are_safe();
+  test_build_file_path_overflow_produces_empty();
 }

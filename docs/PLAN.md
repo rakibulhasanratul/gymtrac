@@ -148,4 +148,4 @@ Precise assert-based tests, one file per unit, run via `build/test_runner`:
 - `request`: status-change (trainer -> manager), plan-change, and profile-edit flows.
 - `lost_found`: report by username, resolve by staff id.
 
-Tests use a temp data dir via `config_set_data_dir()`, so they never touch real data.
+Tests use a temp data directory set via the `DEFAULT_DATA_DIRECTORY` macro, so they never touch real data.

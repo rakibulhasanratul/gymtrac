@@ -2,6 +2,7 @@
 set -euo pipefail
 
 mkdir -p build
+mkdir -p data
 
 if [ "${1:-}" = "test" ]; then
     gcc -Wall -Wextra -pedantic -g test/test_main.c test/modules/*.c test/utils/*.c src/modules/*.c src/utils/*.c -o build/test_runner -lm

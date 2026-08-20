@@ -8,9 +8,9 @@
 #include "../utils/string_util.h"
 #include "user.h"
 
-// Short alias so record format strings read as "%lu" DELIM "%s" instead of
+// Short alias so record format strings read as "%lu" SEP "%s" instead of
 // repeating the full FIELD_DELIMITER_STRING macro at every field boundary.
-#define DELIM FIELD_DELIMITER_STRING
+#define SEP FIELD_DELIMITER_STRING
 
 static sysadmin_t sysadmins[MAX_SYSTEM_ADMINS];
 static int sysadmin_count;
@@ -29,7 +29,7 @@ static id_t next_gym_member_id;
  */
 static void format_sysadmin_line(const sysadmin_t *record_payload, char line_destination[])
 {
-  snprintf(line_destination, LINE_BUFFER_SIZE, "%lu" DELIM "%s" DELIM "%s", (unsigned long)record_payload->id,
+  snprintf(line_destination, LINE_BUFFER_SIZE, "%lu" SEP "%s" SEP "%s", (unsigned long)record_payload->id,
            record_payload->username, record_payload->password_hash);
 }
 
@@ -59,7 +59,7 @@ static bool persist_sysadmin(const sysadmin_t *record_payload)
 static void format_branch_staff_line(const branch_staff_t *record_payload, char line_destination[])
 {
   snprintf(line_destination, LINE_BUFFER_SIZE,
-           "%lu" DELIM "%s" DELIM "%s" DELIM "%s" DELIM "%s" DELIM "%s" DELIM "%s" DELIM "%ld" DELIM "%d",
+           "%lu" SEP "%s" SEP "%s" SEP "%s" SEP "%s" SEP "%s" SEP "%s" SEP "%ld" SEP "%d",
            (unsigned long)record_payload->id, record_payload->full_name, record_payload->email,
            record_payload->phone_number, record_payload->gym_branch, record_payload->username,
            record_payload->password_hash, (long)record_payload->joined_at, (int)record_payload->role);
@@ -70,14 +70,13 @@ static void format_branch_staff_line(const branch_staff_t *record_payload, char 
  */
 static void format_gym_member_line(const gym_member_t *record_payload, char line_destination[])
 {
-  snprintf(line_destination, LINE_BUFFER_SIZE,
-           "%lu" DELIM "%s" DELIM "%s" DELIM "%s" DELIM "%s" DELIM "%s" DELIM "%s" DELIM "%ld" DELIM "%ld" DELIM
-           "%u" DELIM "%u" DELIM "%u" DELIM "%d",
-           (unsigned long)record_payload->id, record_payload->full_name, record_payload->email,
-           record_payload->phone_number, record_payload->gym_branch, record_payload->username,
-           record_payload->password_hash, (long)record_payload->joined_at, (long)record_payload->last_payment_date,
-           record_payload->due_amount, record_payload->plan.payable_amount, record_payload->plan.interval_days,
-           (int)record_payload->status);
+  snprintf(
+    line_destination, LINE_BUFFER_SIZE,
+    "%lu" SEP "%s" SEP "%s" SEP "%s" SEP "%s" SEP "%s" SEP "%s" SEP "%ld" SEP "%ld" SEP "%u" SEP "%u" SEP "%u" SEP "%d",
+    (unsigned long)record_payload->id, record_payload->full_name, record_payload->email, record_payload->phone_number,
+    record_payload->gym_branch, record_payload->username, record_payload->password_hash,
+    (long)record_payload->joined_at, (long)record_payload->last_payment_date, record_payload->due_amount,
+    record_payload->plan.payable_amount, record_payload->plan.interval_days, (int)record_payload->status);
 }
 
 /**

@@ -25,7 +25,7 @@ static time_t make_date(int year, int month, int day)
 /**
  * Verifies that time_t_to_string produces the expected yyyy-mm-dd output.
  */
-static void test_time_t_to_string_formats_date()
+void test_time_t_to_string_formats_date()
 {
   char buffer[DATE_BUFFER_SIZE];
 
@@ -42,7 +42,7 @@ static void test_time_t_to_string_formats_date()
 /**
  * Verifies that time_t_to_string returns false on invalid input.
  */
-static void test_time_t_to_string_invalid_input()
+void test_time_t_to_string_invalid_input()
 {
   char buffer[DATE_BUFFER_SIZE];
 
@@ -53,7 +53,7 @@ static void test_time_t_to_string_invalid_input()
 /**
  * Verifies that string_to_time_t parses valid yyyy-mm-dd strings.
  */
-static void test_string_to_time_t_parses_valid_dates()
+void test_string_to_time_t_parses_valid_dates()
 {
   time_t result;
 
@@ -73,7 +73,7 @@ static void test_string_to_time_t_parses_valid_dates()
 /**
  * Verifies that string_to_time_t rejects invalid formats and values.
  */
-static void test_string_to_time_t_rejects_invalid()
+void test_string_to_time_t_rejects_invalid()
 {
   assert(string_to_time_t(NULL) == (time_t)-1);
   assert(string_to_time_t("") == (time_t)-1);
@@ -90,7 +90,7 @@ static void test_string_to_time_t_rejects_invalid()
 /**
  * Verifies that time_t_to_string and string_to_time_t round-trip.
  */
-static void test_date_round_trip()
+void test_date_round_trip()
 {
   char buffer[DATE_BUFFER_SIZE];
   time_t original;
@@ -115,7 +115,7 @@ static void test_date_round_trip()
 /**
  * Verifies that leap year dates parse correctly.
  */
-static void test_leap_year_dates()
+void test_leap_year_dates()
 {
   // 2024 is a leap year (divisible by 4, not by 100).
   time_t feb29_2024 = string_to_time_t("2024-02-29");
@@ -138,7 +138,7 @@ static void test_leap_year_dates()
  * Verifies that add_months clamps the day to the last day of the target
  * month when the original day exceeds it.
  */
-static void test_add_months_clamps_day()
+void test_add_months_clamps_day()
 {
   time_t result;
   char buffer[DATE_BUFFER_SIZE];
@@ -168,7 +168,7 @@ static void test_add_months_clamps_day()
  * Verifies that add_months handles positive and negative offsets
  * across year boundaries.
  */
-static void test_add_months_year_boundary()
+void test_add_months_year_boundary()
 {
   time_t result;
   char buffer[DATE_BUFFER_SIZE];
@@ -193,7 +193,7 @@ static void test_add_months_year_boundary()
  * Verifies that add_months preserves the day when it fits the target
  * month.
  */
-static void test_add_months_preserves_day()
+void test_add_months_preserves_day()
 {
   time_t result;
   char buffer[DATE_BUFFER_SIZE];
@@ -212,7 +212,7 @@ static void test_add_months_preserves_day()
 /**
  * Verifies that days_between calculates the correct number of days.
  */
-static void test_days_between_calculates_difference()
+void test_days_between_calculates_difference()
 {
   assert(days_between(make_date(2024, 1, 1), make_date(2024, 1, 1)) == 0);
   assert(days_between(make_date(2024, 1, 1), make_date(2024, 1, 2)) == 1);
@@ -227,27 +227,9 @@ static void test_days_between_calculates_difference()
 /**
  * Verifies that add_months with zero months returns the same date.
  */
-static void test_add_months_zero_returns_same()
+void test_add_months_zero_returns_same()
 {
   time_t original = make_date(2024, 6, 15);
   time_t result = add_months(original, 0);
   assert(result == original);
-}
-
-/**
- * Runs every date_util unit test, aborting on the first failure.
- */
-void run_all_date_util_tests()
-{
-  test_time_t_to_string_formats_date();
-  test_time_t_to_string_invalid_input();
-  test_string_to_time_t_parses_valid_dates();
-  test_string_to_time_t_rejects_invalid();
-  test_date_round_trip();
-  test_leap_year_dates();
-  test_add_months_clamps_day();
-  test_add_months_year_boundary();
-  test_add_months_preserves_day();
-  test_days_between_calculates_difference();
-  test_add_months_zero_returns_same();
 }

@@ -11,7 +11,7 @@
 /**
  * Verifies that create_hash matches known Java String.hashCode() vectors.
  */
-static void test_create_hash_known_vectors()
+void test_create_hash_known_vectors()
 {
   assert(create_hash("Hello") == 69609650);
   assert(create_hash("") == 0);
@@ -23,7 +23,7 @@ static void test_create_hash_known_vectors()
 /**
  * Verifies that create_hash returns 0 for NULL input.
  */
-static void test_create_hash_null_returns_zero()
+void test_create_hash_null_returns_zero()
 {
   assert(create_hash(NULL) == 0);
 }
@@ -31,7 +31,7 @@ static void test_create_hash_null_returns_zero()
 /**
  * Verifies that generate_salt produces exactly 15 alphanumeric characters.
  */
-static void test_generate_salt_length_and_charset()
+void test_generate_salt_length_and_charset()
 {
   char salt[SALT_BUFFER_SIZE];
 
@@ -46,7 +46,7 @@ static void test_generate_salt_length_and_charset()
 /**
  * Verifies that generate_salt does not crash on NULL input.
  */
-static void test_generate_salt_null_is_safe()
+void test_generate_salt_null_is_safe()
 {
   generate_salt(NULL);
 }
@@ -54,7 +54,7 @@ static void test_generate_salt_null_is_safe()
 /**
  * Verifies that mix_salt sandwiches the password between salt halves.
  */
-static void test_mix_salt_sandwich_output()
+void test_mix_salt_sandwich_output()
 {
   char mixed[128];
 
@@ -65,7 +65,7 @@ static void test_mix_salt_sandwich_output()
 /**
  * Verifies that mix_salt handles empty password.
  */
-static void test_mix_salt_empty_password()
+void test_mix_salt_empty_password()
 {
   char mixed[128];
 
@@ -76,7 +76,7 @@ static void test_mix_salt_empty_password()
 /**
  * Verifies that mix_salt is safe with NULL inputs.
  */
-static void test_mix_salt_null_is_safe()
+void test_mix_salt_null_is_safe()
 {
   char mixed[128];
 
@@ -88,7 +88,7 @@ static void test_mix_salt_null_is_safe()
 /**
  * Verifies that compare_hash returns true for equal values.
  */
-static void test_compare_hash_equal()
+void test_compare_hash_equal()
 {
   assert(compare_hash(69609650, 69609650) == true);
   assert(compare_hash(0, 0) == true);
@@ -98,7 +98,7 @@ static void test_compare_hash_equal()
 /**
  * Verifies that compare_hash returns false for different values.
  */
-static void test_compare_hash_different()
+void test_compare_hash_different()
 {
   assert(compare_hash(69609650, 69609651) == false);
   assert(compare_hash(0, 1) == false);
@@ -108,7 +108,7 @@ static void test_compare_hash_different()
 /**
  * Verifies that hash_value_to_string produces correct decimal output.
  */
-static void test_hash_value_to_string_decimal()
+void test_hash_value_to_string_decimal()
 {
   char buffer[HASH_STRING_BUFFER_SIZE];
 
@@ -125,7 +125,7 @@ static void test_hash_value_to_string_decimal()
 /**
  * Verifies that hash_value_to_string is safe with NULL destination.
  */
-static void test_hash_value_to_string_null_is_safe()
+void test_hash_value_to_string_null_is_safe()
 {
   hash_value_to_string(69609650, NULL);
 }
@@ -133,7 +133,7 @@ static void test_hash_value_to_string_null_is_safe()
 /**
  * Verifies that parse_hash_value correctly parses decimal strings.
  */
-static void test_parse_hash_value_decimal()
+void test_parse_hash_value_decimal()
 {
   assert(parse_hash_value("69609650") == 69609650);
   assert(parse_hash_value("0") == 0);
@@ -144,7 +144,7 @@ static void test_parse_hash_value_decimal()
 /**
  * Verifies that parse_hash_value returns 0 for invalid input.
  */
-static void test_parse_hash_value_invalid_returns_zero()
+void test_parse_hash_value_invalid_returns_zero()
 {
   assert(parse_hash_value("") == 0);
   assert(parse_hash_value(NULL) == 0);
@@ -155,7 +155,7 @@ static void test_parse_hash_value_invalid_returns_zero()
 /**
  * Verifies that hash_value_to_string and parse_hash_value round-trip.
  */
-static void test_hash_value_to_string_parse_round_trip()
+void test_hash_value_to_string_parse_round_trip()
 {
   char buffer[HASH_STRING_BUFFER_SIZE];
   hash_t original = 69609650;
@@ -169,7 +169,7 @@ static void test_hash_value_to_string_parse_round_trip()
 /**
  * Verifies that a mixed string hashes consistently.
  */
-static void test_create_hash_consistency()
+void test_create_hash_consistency()
 {
   char mixed1[128];
   char mixed2[128];
@@ -183,7 +183,7 @@ static void test_create_hash_consistency()
 /**
  * Verifies that different salts produce different hashes for the same password.
  */
-static void test_different_salts_different_hashes()
+void test_different_salts_different_hashes()
 {
   char mixed1[128];
   char mixed2[128];
@@ -192,24 +192,4 @@ static void test_different_salts_different_hashes()
   mix_salt("mypassword", "BBBBBBBBBBBBBBB", mixed2);
 
   assert(create_hash(mixed1) != create_hash(mixed2));
-}
-
-void run_all_hash_tests()
-{
-  test_create_hash_known_vectors();
-  test_create_hash_null_returns_zero();
-  test_generate_salt_length_and_charset();
-  test_generate_salt_null_is_safe();
-  test_mix_salt_sandwich_output();
-  test_mix_salt_empty_password();
-  test_mix_salt_null_is_safe();
-  test_compare_hash_equal();
-  test_compare_hash_different();
-  test_hash_value_to_string_decimal();
-  test_hash_value_to_string_null_is_safe();
-  test_parse_hash_value_decimal();
-  test_parse_hash_value_invalid_returns_zero();
-  test_hash_value_to_string_parse_round_trip();
-  test_create_hash_consistency();
-  test_different_salts_different_hashes();
 }

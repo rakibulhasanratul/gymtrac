@@ -12,7 +12,7 @@
  * Verifies that trim copies text stripped of leading and trailing
  * whitespace.
  */
-static void test_trim_strips_whitespace()
+void test_trim_strips_whitespace()
 {
   char input[64];
   char result[64];
@@ -41,7 +41,7 @@ static void test_trim_strips_whitespace()
 /**
  * Verifies that split copies each field into its own part buffer.
  */
-static void test_split_copies_fields()
+void test_split_copies_fields()
 {
   char buffer[64];
   char fields[8][64];
@@ -106,7 +106,7 @@ static void test_split_copies_fields()
  * Verifies that string_to_unsigned_int accepts digits and rejects
  * everything else.
  */
-static void test_string_to_unsigned_int_converts_digits()
+void test_string_to_unsigned_int_converts_digits()
 {
   assert(string_to_unsigned_int("12345") == 12345u);
   assert(string_to_unsigned_int("0") == 0u);
@@ -124,7 +124,7 @@ static void test_string_to_unsigned_int_converts_digits()
  * Verifies that string_to_unsigned_long_int accepts digits and rejects
  * everything else.
  */
-static void test_string_to_unsigned_long_int_converts_digits()
+void test_string_to_unsigned_long_int_converts_digits()
 {
   assert(string_to_unsigned_long_int("123") == 123ul);
   assert(string_to_unsigned_long_int("18446744073709551615") == ULONG_MAX);
@@ -138,7 +138,7 @@ static void test_string_to_unsigned_long_int_converts_digits()
 /**
  * Verifies that to_lowercase and to_uppercase convert letters in place.
  */
-static void test_lowercase_and_uppercase_convert_letters()
+void test_lowercase_and_uppercase_convert_letters()
 {
   char buffer[64];
   char *result;
@@ -160,7 +160,7 @@ static void test_lowercase_and_uppercase_convert_letters()
 /**
  * Verifies that sanitize_field strips control characters and delimiters.
  */
-static void test_sanitize_field_strips_control_chars()
+void test_sanitize_field_strips_control_chars()
 {
   char buffer[128];
 
@@ -181,17 +181,4 @@ static void test_sanitize_field_strips_control_chars()
   assert(strcmp(buffer, "") == 0);
 
   assert(sanitize_field(NULL) == NULL);
-}
-
-/**
- * Runs every string_util unit test, aborting on the first failure.
- */
-void run_all_string_util_tests()
-{
-  test_trim_strips_whitespace();
-  test_split_copies_fields();
-  test_string_to_unsigned_int_converts_digits();
-  test_string_to_unsigned_long_int_converts_digits();
-  test_lowercase_and_uppercase_convert_letters();
-  test_sanitize_field_strips_control_chars();
 }

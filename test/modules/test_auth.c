@@ -12,7 +12,7 @@
  * Verifies that hash_password produces a valid stored format:
  * 15-char salt prefix followed by decimal hash digits.
  */
-static void test_hash_password_valid_format()
+void test_hash_password_valid_format()
 {
   char stored[PASSWORD_HASH_BUFFER_SIZE];
 
@@ -33,7 +33,7 @@ static void test_hash_password_valid_format()
  * Verifies that hash_password produces different outputs for the same
  * password due to random salt generation.
  */
-static void test_hash_password_unique_salts()
+void test_hash_password_unique_salts()
 {
   char stored1[PASSWORD_HASH_BUFFER_SIZE];
   char stored2[PASSWORD_HASH_BUFFER_SIZE];
@@ -47,7 +47,7 @@ static void test_hash_password_unique_salts()
 /**
  * Verifies that verify_password accepts the correct password.
  */
-static void test_verify_password_correct()
+void test_verify_password_correct()
 {
   char stored[PASSWORD_HASH_BUFFER_SIZE];
 
@@ -58,7 +58,7 @@ static void test_verify_password_correct()
 /**
  * Verifies that verify_password rejects a wrong password.
  */
-static void test_verify_password_wrong()
+void test_verify_password_wrong()
 {
   char stored[PASSWORD_HASH_BUFFER_SIZE];
 
@@ -70,7 +70,7 @@ static void test_verify_password_wrong()
  * Verifies that verify_password rejects an empty password against a
  * non-empty stored hash.
  */
-static void test_verify_password_empty_vs_nonempty()
+void test_verify_password_empty_vs_nonempty()
 {
   char stored[PASSWORD_HASH_BUFFER_SIZE];
 
@@ -81,7 +81,7 @@ static void test_verify_password_empty_vs_nonempty()
 /**
  * Verifies that verify_password handles empty password stored hash.
  */
-static void test_verify_password_empty_password()
+void test_verify_password_empty_password()
 {
   char stored[PASSWORD_HASH_BUFFER_SIZE];
 
@@ -93,7 +93,7 @@ static void test_verify_password_empty_password()
 /**
  * Verifies that verify_password returns false for NULL inputs.
  */
-static void test_verify_password_null_returns_false()
+void test_verify_password_null_returns_false()
 {
   char stored[PASSWORD_HASH_BUFFER_SIZE];
 
@@ -106,23 +106,11 @@ static void test_verify_password_null_returns_false()
 /**
  * Verifies that hash_password is safe with NULL inputs.
  */
-static void test_hash_password_null_is_safe()
+void test_hash_password_null_is_safe()
 {
   char buffer[PASSWORD_HASH_BUFFER_SIZE];
 
   hash_password(NULL, buffer);
   hash_password("test", NULL);
   hash_password(NULL, NULL);
-}
-
-void run_all_auth_tests()
-{
-  test_hash_password_valid_format();
-  test_hash_password_unique_salts();
-  test_verify_password_correct();
-  test_verify_password_wrong();
-  test_verify_password_empty_vs_nonempty();
-  test_verify_password_empty_password();
-  test_verify_password_null_returns_false();
-  test_hash_password_null_is_safe();
 }

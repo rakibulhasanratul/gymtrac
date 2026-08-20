@@ -2,14 +2,14 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "../../src/settings.h"
 #include "../../src/utils/file_util.h"
 #include "test_file_util.h"
-#include "../../src/settings.h"
 
-#define TEST_FILE_PATH  DEFAULT_DATA_DIRECTORY"/tmp_test_file_util.dat"
+#define TEST_FILE_PATH DEFAULT_DATA_DIRECTORY "/tmp_test_file_util.dat"
 
 /**
- * Writes the given lines to the test file and returns the open file.
+ * Opens the test file for writing and returns the open file.
  */
 static FILE *open_test_file_for_write()
 {
@@ -31,7 +31,7 @@ static FILE *open_test_file_for_read()
 /**
  * Verifies that lines written with write_line_to_file read back unchanged.
  */
-static void test_write_read_round_trip()
+void test_write_read_round_trip()
 {
   FILE *file;
   char buffer[128];
@@ -56,7 +56,7 @@ static void test_write_read_round_trip()
 /**
  * Verifies that reading tolerates CRLF line endings.
  */
-static void test_read_tolerates_crlf_line_ending()
+void test_read_tolerates_crlf_line_ending()
 {
   FILE *file;
   char buffer[128];
@@ -77,7 +77,7 @@ static void test_read_tolerates_crlf_line_ending()
 /**
  * Verifies that an over-long line is drained and never read as records.
  */
-static void test_read_drains_overlong_line()
+void test_read_drains_overlong_line()
 {
   FILE *file;
   char buffer[8];
@@ -97,7 +97,7 @@ static void test_read_drains_overlong_line()
 /**
  * Verifies that read_line_from_file rejects invalid arguments.
  */
-static void test_read_line_rejects_invalid_arguments()
+void test_read_line_rejects_invalid_arguments()
 {
   char buffer[64];
 
@@ -109,7 +109,7 @@ static void test_read_line_rejects_invalid_arguments()
 /**
  * Verifies that write_line_to_file rejects invalid arguments.
  */
-static void test_write_line_rejects_invalid_arguments()
+void test_write_line_rejects_invalid_arguments()
 {
   assert(write_line_to_file(NULL, "line") == false);
   assert(write_line_to_file(stdout, NULL) == false);
@@ -118,17 +118,17 @@ static void test_write_line_rejects_invalid_arguments()
 /**
  * Verifies that build_file_path correctly joins a directory and filename.
  */
-static void test_build_file_path_joins_correctly()
+void test_build_file_path_joins_correctly()
 {
   char path[260];
   build_file_path("branches.txt", path, sizeof(path));
-  assert(strcmp(path, DEFAULT_DATA_DIRECTORY"/branches.txt") == 0);
+  assert(strcmp(path, DEFAULT_DATA_DIRECTORY "/branches.txt") == 0);
 }
 
 /**
  * Verifies that build_file_path handles NULL inputs without crashing.
  */
-static void test_build_file_path_null_inputs_are_safe()
+void test_build_file_path_null_inputs_are_safe()
 {
   char path[260];
   path[0] = '\0';
@@ -142,7 +142,7 @@ static void test_build_file_path_null_inputs_are_safe()
 /**
  * Verifies that build_file_path produces an empty string on overflow.
  */
-static void test_build_file_path_overflow_produces_empty()
+void test_build_file_path_overflow_produces_empty()
 {
   char long_directory[260];
   int index;
@@ -154,19 +154,4 @@ static void test_build_file_path_overflow_produces_empty()
   char path[260];
   build_file_path(long_directory, path, sizeof(path));
   assert(strlen(path) == 0);
-}
-
-/**
- * Runs every file_util unit test, aborting on the first failure.
- */
-void run_all_file_util_tests()
-{
-  test_write_read_round_trip();
-  test_read_tolerates_crlf_line_ending();
-  test_read_drains_overlong_line();
-  test_read_line_rejects_invalid_arguments();
-  test_write_line_rejects_invalid_arguments();
-  test_build_file_path_joins_correctly();
-  test_build_file_path_null_inputs_are_safe();
-  test_build_file_path_overflow_produces_empty();
 }

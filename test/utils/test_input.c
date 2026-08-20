@@ -4,11 +4,11 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../../src/utils/input.h"
 #include "../../src/settings.h"
+#include "../../src/utils/input.h"
 #include "test_input.h"
 
-#define TEST_INPUT_PATH DEFAULT_DATA_DIRECTORY"/tmp_test_input.dat"
+#define TEST_INPUT_PATH DEFAULT_DATA_DIRECTORY "/tmp_test_input.dat"
 
 /**
  * Redirects standard input to a temporary file holding content.
@@ -29,7 +29,7 @@ static void redirect_stdin_with_content(const char content[])
 /**
  * Verifies that input_string reads lines stripped of the newline.
  */
-static void test_input_string_reads_plain_lines()
+void test_input_string_reads_plain_lines()
 {
   char buffer[64];
 
@@ -44,7 +44,7 @@ static void test_input_string_reads_plain_lines()
 /**
  * Verifies that input_string tolerates CRLF line endings.
  */
-static void test_input_string_tolerates_crlf()
+void test_input_string_tolerates_crlf()
 {
   char buffer[64];
 
@@ -58,7 +58,7 @@ static void test_input_string_tolerates_crlf()
 /**
  * Verifies that an over-long line is capped and its remainder drained.
  */
-static void test_input_string_caps_and_drains_overlong()
+void test_input_string_caps_and_drains_overlong()
 {
   char buffer[8];
 
@@ -72,7 +72,7 @@ static void test_input_string_caps_and_drains_overlong()
 /**
  * Verifies that an empty line reads back as an empty string.
  */
-static void test_input_string_reads_empty_line()
+void test_input_string_reads_empty_line()
 {
   char buffer[64];
 
@@ -84,7 +84,7 @@ static void test_input_string_reads_empty_line()
 /**
  * Verifies that input_string rejects invalid arguments.
  */
-static void test_input_string_rejects_invalid_arguments()
+void test_input_string_rejects_invalid_arguments()
 {
   char buffer[64];
 
@@ -96,7 +96,7 @@ static void test_input_string_rejects_invalid_arguments()
 /**
  * Verifies that input_integer reads positives, negatives, and zero.
  */
-static void test_input_integer_reads_valid_values()
+void test_input_integer_reads_valid_values()
 {
   int value;
 
@@ -115,7 +115,7 @@ static void test_input_integer_reads_valid_values()
 /**
  * Verifies that input_integer rejects non-numeric input and invalid arguments.
  */
-static void test_input_integer_rejects_bad_input()
+void test_input_integer_rejects_bad_input()
 {
   int value;
 
@@ -131,7 +131,7 @@ static void test_input_integer_rejects_bad_input()
 /**
  * Verifies that the remainder of a number line is drained for later reads.
  */
-static void test_input_integer_drains_remaining_line()
+void test_input_integer_drains_remaining_line()
 {
   int value;
   char buffer[64];
@@ -146,7 +146,7 @@ static void test_input_integer_drains_remaining_line()
 /**
  * Verifies that input_positive_int keeps positives and rejects everything else.
  */
-static void test_input_positive_int_keeps_positives_only()
+void test_input_positive_int_keeps_positives_only()
 {
   int value;
 
@@ -157,20 +157,4 @@ static void test_input_positive_int_keeps_positives_only()
   assert(input_positive_int(&value) == false);
   assert(input_positive_int(&value) == false);
   assert(input_positive_int(NULL) == false);
-}
-
-/**
- * Runs every input unit test, aborting on the first failure.
- */
-void run_all_input_tests()
-{
-  test_input_string_reads_plain_lines();
-  test_input_string_tolerates_crlf();
-  test_input_string_caps_and_drains_overlong();
-  test_input_string_reads_empty_line();
-  test_input_string_rejects_invalid_arguments();
-  test_input_integer_reads_valid_values();
-  test_input_integer_rejects_bad_input();
-  test_input_integer_drains_remaining_line();
-  test_input_positive_int_keeps_positives_only();
 }

@@ -14,12 +14,12 @@
 #define DATE_BUFFER_SIZE 11         // yyyy-mm-dd + null terminator
 #define FIELD_BUFFER_SIZE 256       // buffer for a single field when splitting a pipe-delimited record line
 #define PATH_BUFFER_SIZE 256        // buffer for resolved file paths
-#define LINE_BUFFER_SIZE 1024        // one single line of a file, I think 1KB is large enough`
+#define LINE_BUFFER_SIZE 1024       // one single line of a file, I think 1KB is large enough`
 
 // Hashing internals.
-#define SALT_BUFFER_SIZE 16         // 15 printable chars + null
-#define HASH_STRING_BUFFER_SIZE 32  // decimal representation of unsigned long + null
-#define POLYNOMIAL_MULTIPLIER 31    // multiplier matching Java's String.hashCode()
+#define SALT_BUFFER_SIZE 16        // 15 printable chars + null
+#define HASH_STRING_BUFFER_SIZE 32 // decimal representation of unsigned long + null
+#define POLYNOMIAL_MULTIPLIER 31   // multiplier matching Java's String.hashCode()
 #define SALT_CHARSET "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
 
 // Capacity limits: branch count, per-branch caps, and derived global caps.
@@ -33,7 +33,7 @@
 #define MAX_GYM_MEMBERS (BRANCH_COUNT_MAX * MAX_MEMBERS_PER_BRANCH)
 
 // File storage.
-#define FIELD_DELIMITER '|'         // delimiter separating fields in a persisted record
+#define FIELD_DELIMITER '|' // delimiter separating fields in a persisted record
 #ifndef DEFAULT_DATA_DIRECTORY
 #define DEFAULT_DATA_DIRECTORY "data"
 #endif
@@ -41,6 +41,10 @@
 #define SYSDADMINS_FILENAME "sysadmins.dat"
 #define BRANCH_STAFF_FILENAME "branch_staff.dat"
 #define GYM_MEMBERS_FILENAME "gym_members.dat"
-#define MAX_RECORD_FIELDS 14        // maximum number of fields in any pipe-delimited record
+#define MAX_RECORD_FIELDS 14 // maximum number of fields in any pipe-delimited record
+
+// some random unimportant stuffs! :p (not really)
+#define DEFAULT_SYSADMIN_USERNAME "admin"
+#define DEFAULT_SYSADMIN_PASSWORD "admin123"
 
 #endif

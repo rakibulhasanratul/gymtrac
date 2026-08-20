@@ -4,11 +4,8 @@
 #include "modules/auth.h"
 #include "modules/branch.h"
 #include "modules/user.h"
+#include "settings.h"
 #include "utils/rng.h"
-
-#define DEFAULT_SYSADMIN_USERNAME "admin"
-#define DEFAULT_SYSADMIN_PASSWORD "admin123"
-
 int main()
 {
   seed_rng((unsigned int)time(NULL));

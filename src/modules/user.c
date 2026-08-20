@@ -8,7 +8,7 @@
 #include "../utils/string_util.h"
 #include "user.h"
 
-static sysadmin_t sysadmins[1];
+static sysadmin_t sysadmins[MAX_SYSTEM_ADMINS];
 static int sysadmin_count;
 static id_t next_sysadmin_id;
 
@@ -269,8 +269,8 @@ id_t create_sysadmin(const char username[], const char password_hash[])
   if (!persist_sysadmin(&record))
     return 0;
 
-  sysadmins[0] = record;
-  sysadmin_count = 1;
+  sysadmins[sysadmin_count] = record;
+  sysadmin_count++;
   return record.id;
 }
 

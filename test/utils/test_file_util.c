@@ -122,7 +122,7 @@ static void test_build_file_path_joins_correctly()
 {
   char path[260];
   build_file_path("branches.txt", path, sizeof(path));
-  assert(strcmp(path, "data/branches.txt") == 0);
+  assert(strcmp(path, DEFAULT_DATA_DIRECTORY"/branches.txt") == 0);
 }
 
 /**

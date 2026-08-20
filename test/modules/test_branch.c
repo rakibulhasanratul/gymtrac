@@ -1,5 +1,3 @@
-#include "../test_settings.h"
-
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>

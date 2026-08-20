@@ -34,9 +34,7 @@
 
 // File storage.
 #define FIELD_DELIMITER '|'         // delimiter separating fields in a persisted record
-#ifdef TEST_ENV
-#define DEFAULT_DATA_DIRECTORY "test_data"
-#else
+#ifndef DEFAULT_DATA_DIRECTORY
 #define DEFAULT_DATA_DIRECTORY "data"
 #endif
 #define GYM_BRANCHES_FILENAME "branches.txt"

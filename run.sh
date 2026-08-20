@@ -2,12 +2,13 @@
 set -euo pipefail
 
 mkdir -p build
-mkdir -p data
 
 if [ "${1:-}" = "test" ]; then
-    gcc -Wall -Wextra -pedantic -g test/test_main.c test/modules/*.c test/utils/*.c src/modules/*.c src/utils/*.c -o build/test_runner -lm
+    mkdir -p test_data
+    gcc -Wall -Wextra -pedantic -g -DDEFAULT_DATA_DIRECTORY=\"test_data\" test/test_main.c test/modules/*.c test/utils/*.c src/modules/*.c src/utils/*.c -o build/test_runner -lm
     build/test_runner
 else
+    mkdir -p data
     gcc -Wall -Wextra -pedantic -g src/main.c src/modules/*.c src/utils/*.c -o build/gymtrac -lm
     build/gymtrac
 fi

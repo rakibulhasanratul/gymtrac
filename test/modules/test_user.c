@@ -1,5 +1,3 @@
-#include "../test_settings.h"
-
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
@@ -289,7 +287,7 @@ static void test_create_gym_member_and_get()
   plan.interval_days = 30;
 
   id_t id = create_gym_member("Nusrat Jahan", "nusrat@test.com", "0181234567", "Uttara", "nusrat", "hash1", plan,
-                               MEMBERSHIP_ON_HOLD);
+                              MEMBERSHIP_ON_HOLD);
   assert(id == 1);
 
   gym_member_t *found = get_gym_member_by_id(id);
@@ -497,8 +495,8 @@ static void test_username_exists_cross_table_uniqueness()
   id_t staff_id = create_branch_staff("Name", "e@t.com", "0171111111", "B1", "shared_name", "hash2", TRAINER);
   assert(staff_id == 0);
 
-  id_t member_id = create_gym_member("Name", "e@t.com", "0171111111", "B1", "shared_name", "hash3", plan,
-                                     MEMBERSHIP_ON_HOLD);
+  id_t member_id =
+    create_gym_member("Name", "e@t.com", "0171111111", "B1", "shared_name", "hash3", plan, MEMBERSHIP_ON_HOLD);
   assert(member_id == 0);
 
   cleanup_user_files();

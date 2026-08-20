@@ -29,6 +29,9 @@ This project uses the [xoshiro128**](https://prng.di.unimi.it/xoshiro128starstar
   - Branch trainers can only _request_ a member's status change (`membership_status_change_request_t`), and only branch managers resolve those requests.
   - Members request plan changes (`subscription_plan_change_request_t`) and profile edits (`profile_edit_request_t`); branch staff approve or reject them.
   - Every suspension has a mandatory `reason`, stored in a dedicated suspension record with its date (and an optional unsuspension date).
+- Deletion rules:
+  - A branch can only be deleted when no staff or member is assigned to it (`ensure_branch_has_no_users()`).
+  - Branch staff and gym members can be deleted; a member with outstanding dues is protected (`ensure_member_has_no_dues()`), and the system administrator account has no delete path.
 - Access control:
   - Members see only their own data.
   - Branch managers and trainers see only their own branch's resources (members, payments, requests, lost & found).
@@ -61,6 +64,7 @@ Work tracked per item; commit each with a Conventional Commit message (`feat:`, 
 - [x] Unit tests for auth module: `hash_password` produces valid stored format, `verify_password` accepts correct and rejects wrong passwords - `test:`
 - [x] Date helpers that convert `time_t` to `yyyy-mm-dd` and back (day-normalized), with `add_months()` handling month-end, so due dates and suspensions compute correctly - `feat:`
 - [x] Unit tests covering date round-trips, leap years, and month-end arithmetic - `test:`
+- [x] Derive `FIELD_DELIMITER` from a `FIELD_DELIMITER_STRING` literal so record format strings concatenate the shared macro instead of hardcoding the delimiter byte, with a one-character startup check in `main` - `chore:`
 
 ### Modules
 
@@ -68,6 +72,9 @@ Work tracked per item; commit each with a Conventional Commit message (`feat:`, 
 - [x] Branch module that loads/lists branch names and validates existence before anyone is assigned, so users can never attach to a nonexistent branch - `feat:`
 - [x] Unit tests covering branch listing and existence validation - `test:`
 - [x] User module that creates/fetches each role with auto-incremented ids, enforces globally unique usernames across all roles, and enforces per-branch capacity limits via `branch_manager_count()`, `branch_trainer_count()`, `branch_member_count()` - `feat:`
+- [x] Branch deletion guarded by `ensure_branch_has_no_users()`, so a branch with assigned staff or members can never be removed - `feat:`
+- [x] User deletion for branch staff and gym members; `ensure_member_has_no_dues()` blocks deleting indebted members, and sysadmins have no delete path - `feat:`
+- [x] Unit tests covering both delete policies, memory+disk round-trips after deletion, and username reuse once a record is gone - `test:`
 - [ ] Unit tests covering per-role CRUD, cross-role username uniqueness, and per-branch capacity enforcement - `test:`
 - [ ] Auth module that verifies username + password against stored salted polynomial hashes on login and clears the session on logout, so only verified users get in - `feat:`
 - [ ] Member lifecycle: approve `on_hold` members to active, suspend/unsuspend with a mandatory reason (recording dated suspension records), and auto-suspend members with 90+ days unpaid dues - `feat:`

@@ -33,7 +33,11 @@
 #define MAX_GYM_MEMBERS (BRANCH_COUNT_MAX * MAX_MEMBERS_PER_BRANCH)
 
 // File storage.
-#define FIELD_DELIMITER '|' // delimiter separating fields in a persisted record
+// String form feeds format strings via literal concatenation; the char form
+// feeds split()/sanitize comparisons. main() rejects any delimiter whose
+// string form is not exactly one character long.
+#define FIELD_DELIMITER_STRING "|"
+#define FIELD_DELIMITER FIELD_DELIMITER_STRING[0]
 #ifndef DEFAULT_DATA_DIRECTORY
 #define DEFAULT_DATA_DIRECTORY "data"
 #endif

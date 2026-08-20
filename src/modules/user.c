@@ -8,6 +8,10 @@
 #include "../utils/string_util.h"
 #include "user.h"
 
+// Short alias so record format strings read as "%lu" DELIM "%s" instead of
+// repeating the full FIELD_DELIMITER_STRING macro at every field boundary.
+#define DELIM FIELD_DELIMITER_STRING
+
 static sysadmin_t sysadmins[MAX_SYSTEM_ADMINS];
 static int sysadmin_count;
 static id_t next_sysadmin_id;
@@ -21,7 +25,16 @@ static int gym_member_count;
 static id_t next_gym_member_id;
 
 /**
- * Appends a sysadmin record as a pipe-delimited line to the data file.
+ * Formats a sysadmin record as a delimiter-separated line.
+ */
+static void format_sysadmin_line(const sysadmin_t *record_payload, char line_destination[])
+{
+  snprintf(line_destination, LINE_BUFFER_SIZE, "%lu" DELIM "%s" DELIM "%s", (unsigned long)record_payload->id,
+           record_payload->username, record_payload->password_hash);
+}
+
+/**
+ * Appends a sysadmin record as a delimiter-separated line to the data file.
  */
 static bool persist_sysadmin(const sysadmin_t *record_payload)
 {
@@ -33,8 +46,7 @@ static bool persist_sysadmin(const sysadmin_t *record_payload)
     return false;
 
   char line[LINE_BUFFER_SIZE];
-  snprintf(line, LINE_BUFFER_SIZE, "%lu|%s|%s", (unsigned long)record_payload->id, record_payload->username,
-           record_payload->password_hash);
+  format_sysadmin_line(record_payload, line);
 
   bool success = write_line_to_file(file, line);
   fclose(file);
@@ -42,7 +54,34 @@ static bool persist_sysadmin(const sysadmin_t *record_payload)
 }
 
 /**
- * Appends a branch staff record as a pipe-delimited line to the data file.
+ * Formats a branch staff record as a delimiter-separated line.
+ */
+static void format_branch_staff_line(const branch_staff_t *record_payload, char line_destination[])
+{
+  snprintf(line_destination, LINE_BUFFER_SIZE,
+           "%lu" DELIM "%s" DELIM "%s" DELIM "%s" DELIM "%s" DELIM "%s" DELIM "%s" DELIM "%ld" DELIM "%d",
+           (unsigned long)record_payload->id, record_payload->full_name, record_payload->email,
+           record_payload->phone_number, record_payload->gym_branch, record_payload->username,
+           record_payload->password_hash, (long)record_payload->joined_at, (int)record_payload->role);
+}
+
+/**
+ * Formats a gym member record as a delimiter-separated line.
+ */
+static void format_gym_member_line(const gym_member_t *record_payload, char line_destination[])
+{
+  snprintf(line_destination, LINE_BUFFER_SIZE,
+           "%lu" DELIM "%s" DELIM "%s" DELIM "%s" DELIM "%s" DELIM "%s" DELIM "%s" DELIM "%ld" DELIM "%ld" DELIM
+           "%u" DELIM "%u" DELIM "%u" DELIM "%d",
+           (unsigned long)record_payload->id, record_payload->full_name, record_payload->email,
+           record_payload->phone_number, record_payload->gym_branch, record_payload->username,
+           record_payload->password_hash, (long)record_payload->joined_at, (long)record_payload->last_payment_date,
+           record_payload->due_amount, record_payload->plan.payable_amount, record_payload->plan.interval_days,
+           (int)record_payload->status);
+}
+
+/**
+ * Appends a branch staff record as a delimiter-separated line to the data file.
  */
 static bool persist_branch_staff(const branch_staff_t *record_payload)
 {
@@ -54,10 +93,7 @@ static bool persist_branch_staff(const branch_staff_t *record_payload)
     return false;
 
   char line[LINE_BUFFER_SIZE];
-  snprintf(line, LINE_BUFFER_SIZE, "%lu|%s|%s|%s|%s|%s|%s|%ld|%d", (unsigned long)record_payload->id,
-           record_payload->full_name, record_payload->email, record_payload->phone_number, record_payload->gym_branch,
-           record_payload->username, record_payload->password_hash, (long)record_payload->joined_at,
-           (int)record_payload->role);
+  format_branch_staff_line(record_payload, line);
 
   bool success = write_line_to_file(file, line);
   fclose(file);
@@ -65,7 +101,7 @@ static bool persist_branch_staff(const branch_staff_t *record_payload)
 }
 
 /**
- * Appends a gym member record as a pipe-delimited line to the data file.
+ * Appends a gym member record as a delimiter-separated line to the data file.
  */
 static bool persist_gym_member(const gym_member_t *record_payload)
 {
@@ -77,15 +113,101 @@ static bool persist_gym_member(const gym_member_t *record_payload)
     return false;
 
   char line[LINE_BUFFER_SIZE];
-  snprintf(line, LINE_BUFFER_SIZE, "%lu|%s|%s|%s|%s|%s|%s|%ld|%ld|%u|%u|%u|%d", (unsigned long)record_payload->id,
-           record_payload->full_name, record_payload->email, record_payload->phone_number, record_payload->gym_branch,
-           record_payload->username, record_payload->password_hash, (long)record_payload->joined_at,
-           (long)record_payload->last_payment_date, record_payload->due_amount, record_payload->plan.payable_amount,
-           record_payload->plan.interval_days, (int)record_payload->status);
+  format_gym_member_line(record_payload, line);
 
   bool success = write_line_to_file(file, line);
   fclose(file);
   return success;
+}
+
+/**
+ * Removes the branch staff record at index from memory by shifting later
+ * records left.
+ */
+static void remove_branch_staff_at(int index)
+{
+  for (int i = index; i < branch_staff_count - 1; i++)
+    branch_staff_list[i] = branch_staff_list[i + 1];
+
+  branch_staff_count--;
+}
+
+/**
+ * Removes the gym member record at index from memory by shifting later
+ * records left.
+ */
+static void remove_gym_member_at(int index)
+{
+  for (int i = index; i < gym_member_count - 1; i++)
+    gym_members[i] = gym_members[i + 1];
+
+  gym_member_count--;
+}
+
+/**
+ * Rewrites the branch staff file from memory, skipping the record at index.
+ *
+ * Used by delete_branch_staff so the persisted file never contains the
+ * removed record, matching the file-first ordering of creation.
+ */
+static bool rewrite_branch_staff_file_without(int index)
+{
+  char path[PATH_BUFFER_SIZE];
+  build_file_path(BRANCH_STAFF_FILENAME, path, PATH_BUFFER_SIZE);
+
+  FILE *file = fopen(path, "w");
+  if (file == NULL)
+    return false;
+
+  char line[LINE_BUFFER_SIZE];
+  for (int i = 0; i < branch_staff_count; i++)
+  {
+    if (i == index)
+      continue;
+
+    format_branch_staff_line(&branch_staff_list[i], line);
+    if (!write_line_to_file(file, line))
+    {
+      fclose(file);
+      return false;
+    }
+  }
+
+  fclose(file);
+  return true;
+}
+
+/**
+ * Rewrites the gym members file from memory, skipping the record at index.
+ *
+ * Used by delete_gym_member so the persisted file never contains the
+ * removed record, matching the file-first ordering of creation.
+ */
+static bool rewrite_gym_members_file_without(int index)
+{
+  char path[PATH_BUFFER_SIZE];
+  build_file_path(GYM_MEMBERS_FILENAME, path, PATH_BUFFER_SIZE);
+
+  FILE *file = fopen(path, "w");
+  if (file == NULL)
+    return false;
+
+  char line[LINE_BUFFER_SIZE];
+  for (int i = 0; i < gym_member_count; i++)
+  {
+    if (i == index)
+      continue;
+
+    format_gym_member_line(&gym_members[i], line);
+    if (!write_line_to_file(file, line))
+    {
+      fclose(file);
+      return false;
+    }
+  }
+
+  fclose(file);
+  return true;
 }
 
 /**
@@ -371,6 +493,61 @@ id_t create_gym_member(const char full_name[], const char email[], const char ph
   gym_members[gym_member_count] = record;
   gym_member_count++;
   return record.id;
+}
+
+bool ensure_member_has_no_dues(const gym_member_t *member_payload)
+{
+  if (member_payload == NULL)
+    return false;
+
+  return member_payload->due_amount == 0;
+}
+
+bool delete_branch_staff(id_t id)
+{
+  int index = -1;
+  for (int i = 0; i < branch_staff_count; i++)
+  {
+    if (branch_staff_list[i].id == id)
+    {
+      index = i;
+      break;
+    }
+  }
+
+  if (index < 0)
+    return false;
+
+  if (!rewrite_branch_staff_file_without(index))
+    return false;
+
+  remove_branch_staff_at(index);
+  return true;
+}
+
+bool delete_gym_member(id_t id)
+{
+  int index = -1;
+  for (int i = 0; i < gym_member_count; i++)
+  {
+    if (gym_members[i].id == id)
+    {
+      index = i;
+      break;
+    }
+  }
+
+  if (index < 0)
+    return false;
+
+  if (!ensure_member_has_no_dues(&gym_members[index]))
+    return false;
+
+  if (!rewrite_gym_members_file_without(index))
+    return false;
+
+  remove_gym_member_at(index);
+  return true;
 }
 
 bool username_exists(const char username[])

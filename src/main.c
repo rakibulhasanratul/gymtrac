@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <time.h>
 
 #include "modules/auth.h"
@@ -8,6 +9,12 @@
 #include "utils/rng.h"
 int main()
 {
+  if (strlen(FIELD_DELIMITER_STRING) != 1)
+  {
+    fprintf(stderr, "FIELD_DELIMITER_STRING must be exactly one character long.\n");
+    return 1;
+  }
+
   seed_rng((unsigned int)time(NULL));
   load_branches();
 

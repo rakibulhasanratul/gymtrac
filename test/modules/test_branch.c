@@ -3,9 +3,25 @@
 #include <string.h>
 
 #include "../../src/modules/branch.h"
+#include "../../src/modules/user.h"
 #include "../../src/settings.h"
+#include "../../src/types.h"
 #include "../../src/utils/file_util.h"
 #include "test_branch.h"
+
+/**
+ * Removes all user data files so branch policy tests start clean.
+ */
+static void cleanup_user_data_files()
+{
+  char path[PATH_BUFFER_SIZE];
+  build_file_path(SYSDADMINS_FILENAME, path, PATH_BUFFER_SIZE);
+  remove(path);
+  build_file_path(BRANCH_STAFF_FILENAME, path, PATH_BUFFER_SIZE);
+  remove(path);
+  build_file_path(GYM_MEMBERS_FILENAME, path, PATH_BUFFER_SIZE);
+  remove(path);
+}
 
 /**
  * Removes the test branches file from the test_data directory.
@@ -167,4 +183,101 @@ void test_get_branch_name()
   assert(strcmp(get_branch_name(1), "Beta") == 0);
   assert(get_branch_name(2) == NULL);
   assert(get_branch_name(-1) == NULL);
+}
+
+/**
+ * Verifies the no-users policy passes for an empty branch and fails once
+ * any staff is assigned.
+ */
+void test_ensure_branch_has_no_users()
+{
+  cleanup_branches_file();
+  cleanup_user_data_files();
+  load_branches();
+  load_sysadmins();
+  load_branch_staff();
+  load_gym_members();
+
+  add_branch("QuietBranch");
+  assert(ensure_branch_has_no_users("QuietBranch") == true);
+
+  id_t staff_id =
+    create_branch_staff("Quiet Staff", "quiet@t.com", "0171111111", "QuietBranch", "quietstaff", "hash", TRAINER);
+  assert(staff_id != 0);
+  assert(ensure_branch_has_no_users("QuietBranch") == false);
+
+  assert(delete_branch_staff(staff_id) == true);
+  assert(ensure_branch_has_no_users("QuietBranch") == true);
+}
+
+/**
+ * Verifies that delete_branch removes the branch from memory and disk and
+ * keeps the remaining branches in order.
+ */
+void test_delete_branch_removes_and_persists()
+{
+  cleanup_branches_file();
+  load_branches();
+
+  add_branch("Uttara");
+  add_branch("Gulshan");
+  add_branch("Mohakhali");
+
+  assert(delete_branch("Gulshan") == true);
+  assert(branch_exists("Gulshan") == false);
+  assert(get_branch_count() == 2);
+  assert(strcmp(get_branch_name(0), "Uttara") == 0);
+  assert(strcmp(get_branch_name(1), "Mohakhali") == 0);
+
+  load_branches();
+  assert(get_branch_count() == 2);
+  assert(branch_exists("Gulshan") == false);
+  assert(branch_exists("Uttara") == true);
+  assert(branch_exists("Mohakhali") == true);
+}
+
+/**
+ * Verifies that delete_branch rejects missing, NULL, and empty names.
+ */
+void test_delete_branch_rejects_missing_null_and_empty()
+{
+  cleanup_branches_file();
+  load_branches();
+
+  add_branch("ExistingBranch");
+
+  assert(delete_branch("NoSuchBranch") == false);
+  assert(delete_branch(NULL) == false);
+  assert(delete_branch("") == false);
+  assert(branch_exists("ExistingBranch") == true);
+}
+
+/**
+ * Verifies that delete_branch rejects a branch that still has assigned
+ * users and accepts it once they are removed.
+ */
+void test_delete_branch_rejects_branch_with_users()
+{
+  cleanup_branches_file();
+  cleanup_user_data_files();
+  load_branches();
+  load_sysadmins();
+  load_branch_staff();
+  load_gym_members();
+
+  add_branch("BusyBranch");
+
+  subscription_plan_t plan;
+  plan.payable_amount = 1000;
+  plan.interval_days = 30;
+
+  id_t member_id = create_gym_member("Busy Member", "busy@t.com", "0172222222", "BusyBranch", "busymember", "hash",
+                                     plan, MEMBERSHIP_ACTIVE);
+  assert(member_id != 0);
+
+  assert(delete_branch("BusyBranch") == false);
+  assert(branch_exists("BusyBranch") == true);
+
+  assert(delete_gym_member(member_id) == true);
+  assert(delete_branch("BusyBranch") == true);
 }

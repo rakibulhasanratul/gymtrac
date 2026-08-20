@@ -465,3 +465,133 @@ void test_member_username_blocks_staff_creation()
   id_t id = create_branch_staff("Name", "e@t.com", "0171111111", "B1", "taken", "h2", TRAINER);
   assert(id == 0);
 }
+
+// ---- deletion ----
+
+/**
+ * Verifies the no-dues policy accepts a cleared member and rejects an
+ * indebted one or a NULL record.
+ */
+void test_ensure_member_has_no_dues()
+{
+  gym_member_t member;
+  memset(&member, 0, sizeof(member));
+
+  assert(ensure_member_has_no_dues(&member) == true);
+
+  member.due_amount = 500;
+  assert(ensure_member_has_no_dues(&member) == false);
+
+  assert(ensure_member_has_no_dues(NULL) == false);
+}
+
+/**
+ * Verifies that delete_branch_staff removes the record from memory and
+ * disk and frees the username for reuse.
+ */
+void test_delete_branch_staff_removes_and_persists()
+{
+  cleanup_user_files();
+  load_sysadmins();
+  load_branch_staff();
+  load_gym_members();
+
+  id_t id1 = create_branch_staff("Staff One", "s1@t.com", "0171111111", "B1", "staffdel1", "h1", TRAINER);
+  id_t id2 = create_branch_staff("Staff Two", "s2@t.com", "0172222222", "B1", "staffdel2", "h2", BRANCH_MANAGER);
+  assert(id1 != 0 && id2 != 0);
+
+  assert(delete_branch_staff(id1) == true);
+  assert(get_branch_staff_by_id(id1) == NULL);
+  assert(get_branch_staff_by_username("staffdel1") == NULL);
+  assert(get_branch_staff_by_id(id2) != NULL);
+
+  load_branch_staff();
+  assert(get_branch_staff_by_id(id1) == NULL);
+  assert(get_branch_staff_by_id(id2) != NULL);
+
+  id_t reused = create_branch_staff("Staff Three", "s3@t.com", "0173333333", "B1", "staffdel1", "h3", TRAINER);
+  assert(reused != 0);
+}
+
+/**
+ * Verifies that delete_branch_staff rejects an unknown id.
+ */
+void test_delete_branch_staff_rejects_unknown_id()
+{
+  cleanup_user_files();
+  load_sysadmins();
+  load_branch_staff();
+  load_gym_members();
+
+  assert(delete_branch_staff(9999) == false);
+}
+
+/**
+ * Verifies that delete_gym_member removes the record from memory and disk
+ * and frees the username for reuse.
+ */
+void test_delete_gym_member_removes_and_persists()
+{
+  cleanup_user_files();
+  load_sysadmins();
+  load_branch_staff();
+  load_gym_members();
+
+  subscription_plan_t plan;
+  plan.payable_amount = 1000;
+  plan.interval_days = 30;
+
+  id_t id1 =
+    create_gym_member("Member One", "m1@t.com", "0181111111", "B1", "memberdel1", "h1", plan, MEMBERSHIP_ACTIVE);
+  id_t id2 =
+    create_gym_member("Member Two", "m2@t.com", "0182222222", "B1", "memberdel2", "h2", plan, MEMBERSHIP_ON_HOLD);
+  assert(id1 != 0 && id2 != 0);
+
+  assert(delete_gym_member(id1) == true);
+  assert(get_gym_member_by_id(id1) == NULL);
+  assert(get_gym_member_by_username("memberdel1") == NULL);
+  assert(get_gym_member_by_id(id2) != NULL);
+
+  load_gym_members();
+  assert(get_gym_member_by_id(id1) == NULL);
+  assert(get_gym_member_by_id(id2) != NULL);
+
+  subscription_plan_t reuse_plan;
+  reuse_plan.payable_amount = 500;
+  reuse_plan.interval_days = 15;
+
+  id_t reused = create_gym_member("Member Three", "m3@t.com", "0183333333", "B1", "memberdel1", "h3", reuse_plan,
+                                  MEMBERSHIP_ON_HOLD);
+  assert(reused != 0);
+}
+
+/**
+ * Verifies that delete_gym_member rejects a member with outstanding dues
+ * and accepts them once the dues are cleared.
+ */
+void test_delete_gym_member_rejects_member_with_dues()
+{
+  cleanup_user_files();
+  load_sysadmins();
+  load_branch_staff();
+  load_gym_members();
+
+  subscription_plan_t plan;
+  plan.payable_amount = 1000;
+  plan.interval_days = 30;
+
+  id_t id =
+    create_gym_member("Debtor Member", "debt@t.com", "0184444444", "B1", "debtor", "h1", plan, MEMBERSHIP_ACTIVE);
+  assert(id != 0);
+
+  gym_member_t *member = get_gym_member_by_id(id);
+  assert(member != NULL);
+
+  member->due_amount = 750;
+  assert(delete_gym_member(id) == false);
+  assert(get_gym_member_by_id(id) != NULL);
+
+  member->due_amount = 0;
+  assert(delete_gym_member(id) == true);
+  assert(get_gym_member_by_id(id) == NULL);
+}

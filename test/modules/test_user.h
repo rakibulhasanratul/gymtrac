@@ -58,4 +58,11 @@ void test_branch_counts_null_and_empty();
 void test_staff_username_blocks_member_creation();
 void test_member_username_blocks_staff_creation();
 
+/* deletion */
+void test_ensure_member_has_no_dues();
+void test_delete_branch_staff_removes_and_persists();
+void test_delete_branch_staff_rejects_unknown_id();
+void test_delete_gym_member_removes_and_persists();
+void test_delete_gym_member_rejects_member_with_dues();
+
 #endif

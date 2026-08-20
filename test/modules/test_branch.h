@@ -16,5 +16,9 @@ void test_add_branch_respects_max_count();
 void test_branch_names_are_case_sensitive();
 void test_get_branch_count();
 void test_get_branch_name();
+void test_ensure_branch_has_no_users();
+void test_delete_branch_removes_and_persists();
+void test_delete_branch_rejects_missing_null_and_empty();
+void test_delete_branch_rejects_branch_with_users();
 
 #endif

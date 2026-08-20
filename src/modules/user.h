@@ -60,8 +60,8 @@ id_t create_sysadmin(const char username[], const char password_hash[]);
  * @param role TRAINER or BRANCH_MANAGER
  * @return the new staff member's id, or 0 on failure
  */
-id_t create_branch_staff(const char full_name[], const char email[], const char phone_number[],
-                         const char gym_branch[], const char username[], const char password_hash[], staff_role_t role);
+id_t create_branch_staff(const char full_name[], const char email[], const char phone_number[], const char gym_branch[],
+                         const char username[], const char password_hash[], staff_role_t role);
 
 /**
  * Creates a new gym member with an auto-incremented id and persists the record.
@@ -82,6 +82,38 @@ id_t create_branch_staff(const char full_name[], const char email[], const char 
 id_t create_gym_member(const char full_name[], const char email[], const char phone_number[], const char gym_branch[],
                        const char username[], const char password_hash[], subscription_plan_t plan_payload,
                        membership_status_t status);
+
+/**
+ * Policy guard ensuring a gym member carries no outstanding dues.
+ *
+ * A member with unpaid dues can never be deleted so recorded debt is
+ * never silently erased.
+ *
+ * @param member_payload the member record to check
+ * @return true when the record is valid and due_amount is zero, false otherwise
+ */
+bool ensure_member_has_no_dues(const gym_member_t *member_payload);
+
+/**
+ * Removes a branch staff member from the persisted file and in-memory array.
+ *
+ * Sysadmins are never deletable: the single-admin invariant keeps the
+ * system loginable, so no delete function exists for them.
+ *
+ * @param id the staff member's id
+ * @return true if the staff member was deleted, false if not found
+ */
+bool delete_branch_staff(id_t id);
+
+/**
+ * Removes a gym member from the persisted file and in-memory array.
+ *
+ * Rejected when the member still owes dues (see ensure_member_has_no_dues).
+ *
+ * @param id the member's id
+ * @return true if the member was deleted, false if not found or indebted
+ */
+bool delete_gym_member(id_t id);
 
 /**
  * Checks whether a username exists in any of the three user tables.

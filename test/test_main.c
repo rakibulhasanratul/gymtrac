@@ -104,6 +104,10 @@ int main()
   test_branch_names_are_case_sensitive();
   test_get_branch_count();
   test_get_branch_name();
+  test_ensure_branch_has_no_users();
+  test_delete_branch_removes_and_persists();
+  test_delete_branch_rejects_missing_null_and_empty();
+  test_delete_branch_rejects_branch_with_users();
 
   /* user: sysadmin */
   test_create_sysadmin_and_get();
@@ -158,6 +162,13 @@ int main()
   /* user: cross-table uniqueness */
   test_staff_username_blocks_member_creation();
   test_member_username_blocks_staff_creation();
+
+  /* user: deletion */
+  test_ensure_member_has_no_dues();
+  test_delete_branch_staff_removes_and_persists();
+  test_delete_branch_staff_rejects_unknown_id();
+  test_delete_gym_member_removes_and_persists();
+  test_delete_gym_member_rejects_member_with_dues();
 
   printf("All tests passed.\n");
   return 0;

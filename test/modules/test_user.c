@@ -595,3 +595,162 @@ void test_delete_gym_member_rejects_member_with_dues()
   assert(delete_gym_member(id) == true);
   assert(get_gym_member_by_id(id) == NULL);
 }
+
+// ---- update tests ----
+
+void test_update_branch_staff_updates_fields_and_persists()
+{
+  cleanup_user_files();
+  load_sysadmins();
+  load_branch_staff();
+  load_gym_members();
+
+  id_t id = create_branch_staff("Old Name", "old@test.com", "0171111111", "B1", "updater1", "h1", TRAINER);
+  assert(id != 0);
+
+  assert(update_branch_staff(id, "New Name", "new@test.com", "0172222222") == true);
+
+  branch_staff_t *found = get_branch_staff_by_id(id);
+  assert(found != NULL);
+  assert(strcmp(found->full_name, "New Name") == 0);
+  assert(strcmp(found->email, "new@test.com") == 0);
+  assert(strcmp(found->phone_number, "0172222222") == 0);
+
+  // Verify persistence.
+  load_branch_staff();
+  found = get_branch_staff_by_id(id);
+  assert(found != NULL);
+  assert(strcmp(found->full_name, "New Name") == 0);
+}
+
+void test_update_branch_staff_rejects_unknown_id()
+{
+  cleanup_user_files();
+  load_sysadmins();
+  load_branch_staff();
+  load_gym_members();
+
+  assert(update_branch_staff(9999, "Name", "e@t.com", "0171111111") == false);
+}
+
+void test_update_branch_staff_rejects_empty_fields()
+{
+  cleanup_user_files();
+  load_sysadmins();
+  load_branch_staff();
+  load_gym_members();
+
+  id_t id = create_branch_staff("Name", "e@t.com", "0171111111", "B1", "updater2", "h1", TRAINER);
+  assert(id != 0);
+
+  assert(update_branch_staff(id, "", "e@t.com", "0171111111") == false);
+  assert(update_branch_staff(id, "Name", "", "0171111111") == false);
+  assert(update_branch_staff(id, "Name", "e@t.com", "") == false);
+}
+
+void test_update_gym_member_updates_fields_and_persists()
+{
+  cleanup_user_files();
+  load_sysadmins();
+  load_branch_staff();
+  load_gym_members();
+
+  subscription_plan_t plan;
+  plan.payable_amount = 1000;
+  plan.interval_days = 30;
+
+  id_t id =
+    create_gym_member("Old Name", "old@test.com", "0181111111", "B1", "mupdater1", "h1", plan, MEMBERSHIP_ACTIVE);
+  assert(id != 0);
+
+  assert(update_gym_member(id, "New Name", "new@test.com", "0182222222", "B2", "mupdater1_new") == true);
+
+  gym_member_t *found = get_gym_member_by_id(id);
+  assert(found != NULL);
+  assert(strcmp(found->full_name, "New Name") == 0);
+  assert(strcmp(found->email, "new@test.com") == 0);
+  assert(strcmp(found->phone_number, "0182222222") == 0);
+  assert(strcmp(found->gym_branch, "B2") == 0);
+  assert(strcmp(found->username, "mupdater1_new") == 0);
+
+  // Verify persistence.
+  load_gym_members();
+  found = get_gym_member_by_id(id);
+  assert(found != NULL);
+  assert(strcmp(found->full_name, "New Name") == 0);
+}
+
+void test_update_gym_member_rejects_unknown_id()
+{
+  cleanup_user_files();
+  load_sysadmins();
+  load_branch_staff();
+  load_gym_members();
+
+  assert(update_gym_member(9999, "Name", "e@t.com", "0171111111", "B1", "user") == false);
+}
+
+void test_update_gym_member_rejects_empty_fields()
+{
+  cleanup_user_files();
+  load_sysadmins();
+  load_branch_staff();
+  load_gym_members();
+
+  subscription_plan_t plan;
+  plan.payable_amount = 1000;
+  plan.interval_days = 30;
+
+  id_t id = create_gym_member("Name", "e@t.com", "0171111111", "B1", "mupdater2", "h1", plan, MEMBERSHIP_ON_HOLD);
+  assert(id != 0);
+
+  assert(update_gym_member(id, "", "e@t.com", "0171111111", "B1", "mupdater2") == false);
+  assert(update_gym_member(id, "Name", "", "0171111111", "B1", "mupdater2") == false);
+  assert(update_gym_member(id, "Name", "e@t.com", "", "B1", "mupdater2") == false);
+  assert(update_gym_member(id, "Name", "e@t.com", "0171111111", "", "mupdater2") == false);
+  assert(update_gym_member(id, "Name", "e@t.com", "0171111111", "B1", "") == false);
+}
+
+void test_update_gym_member_rejects_duplicate_username()
+{
+  cleanup_user_files();
+  load_sysadmins();
+  load_branch_staff();
+  load_gym_members();
+
+  subscription_plan_t plan;
+  plan.payable_amount = 1000;
+  plan.interval_days = 30;
+
+  create_gym_member("A", "a@t.com", "0171111111", "B1", "taken", "h1", plan, MEMBERSHIP_ON_HOLD);
+  id_t id2 = create_gym_member("B", "b@t.com", "0172222222", "B1", "other", "h2", plan, MEMBERSHIP_ON_HOLD);
+  assert(id2 != 0);
+
+  assert(update_gym_member(id2, "B", "b@t.com", "0172222222", "B1", "taken") == false);
+
+  // Original username unchanged.
+  gym_member_t *found = get_gym_member_by_id(id2);
+  assert(strcmp(found->username, "other") == 0);
+}
+
+void test_update_gym_member_allows_same_username()
+{
+  cleanup_user_files();
+  load_sysadmins();
+  load_branch_staff();
+  load_gym_members();
+
+  subscription_plan_t plan;
+  plan.payable_amount = 1000;
+  plan.interval_days = 30;
+
+  id_t id = create_gym_member("Name", "e@t.com", "0171111111", "B1", "keeper", "h1", plan, MEMBERSHIP_ACTIVE);
+  assert(id != 0);
+
+  // Updating other fields while keeping the same username should succeed.
+  assert(update_gym_member(id, "New Name", "new@t.com", "0172222222", "B2", "keeper") == true);
+
+  gym_member_t *found = get_gym_member_by_id(id);
+  assert(strcmp(found->username, "keeper") == 0);
+  assert(strcmp(found->full_name, "New Name") == 0);
+}

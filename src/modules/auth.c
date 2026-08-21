@@ -9,7 +9,10 @@
 #include <string.h>
 
 #include "../settings.h"
+#include "../types.h"
 #include "../utils/hash.h"
+#include "session.h"
+#include "user.h"
 
 // Buffer for the mixed salt+password string.
 #define MIXED_BUFFER_SIZE 128
@@ -65,4 +68,60 @@ bool verify_password(const char *password, const char *stored_hash)
   hash_t stored = parse_hash_value(stored_hash + SALT_BUFFER_SIZE - 1);
 
   return compare_hash(stored, computed);
+}
+
+bool auth_login(const char username[], const char password[], user_role_t *role_destination)
+{
+  if (username == NULL || password == NULL || role_destination == NULL)
+    return false;
+
+  // Check sysadmin table.
+  sysadmin_t *sysadmin = get_sysadmin_by_username(username);
+  if (sysadmin != NULL)
+  {
+    if (verify_password(password, sysadmin->password_hash))
+    {
+      *role_destination = USER_ROLE_SYSADMIN;
+      session_login(USER_ROLE_SYSADMIN, sysadmin->id, sysadmin->username, "");
+      return true;
+    }
+    return false;
+  }
+
+  // Check branch staff table.
+  branch_staff_t *staff = get_branch_staff_by_username(username);
+  if (staff != NULL)
+  {
+    if (verify_password(password, staff->password_hash))
+    {
+      if (staff->role == BRANCH_MANAGER)
+        *role_destination = USER_ROLE_BRANCH_MANAGER;
+      else
+        *role_destination = USER_ROLE_TRAINER;
+
+      session_login(*role_destination, staff->id, staff->username, staff->gym_branch);
+      return true;
+    }
+    return false;
+  }
+
+  // Check gym member table.
+  gym_member_t *member = get_gym_member_by_username(username);
+  if (member != NULL)
+  {
+    if (verify_password(password, member->password_hash))
+    {
+      *role_destination = USER_ROLE_MEMBER;
+      session_login(USER_ROLE_MEMBER, member->id, member->username, member->gym_branch);
+      return true;
+    }
+    return false;
+  }
+
+  return false;
+}
+
+void auth_logout()
+{
+  session_logout();
 }

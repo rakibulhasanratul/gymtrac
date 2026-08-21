@@ -5,7 +5,11 @@
 #include <string.h>
 
 #include "../../src/modules/auth.h"
+#include "../../src/modules/session.h"
+#include "../../src/modules/user.h"
 #include "../../src/settings.h"
+#include "../../src/types.h"
+#include "../../src/utils/file_util.h"
 #include "test_auth.h"
 
 /**
@@ -113,4 +117,193 @@ void test_hash_password_null_is_safe()
   hash_password(NULL, buffer);
   hash_password("test", NULL);
   hash_password(NULL, NULL);
+}
+
+// ---- auth_login / auth_logout tests ----
+
+static void cleanup_auth_test_files()
+{
+  char path[PATH_BUFFER_SIZE];
+  build_file_path(SYSDADMINS_FILENAME, path, PATH_BUFFER_SIZE);
+  remove(path);
+  build_file_path(BRANCH_STAFF_FILENAME, path, PATH_BUFFER_SIZE);
+  remove(path);
+  build_file_path(GYM_MEMBERS_FILENAME, path, PATH_BUFFER_SIZE);
+  remove(path);
+}
+
+/**
+ * Verifies that auth_login succeeds with correct sysadmin credentials
+ * and populates the session.
+ */
+void test_auth_login_sysadmin_success()
+{
+  cleanup_auth_test_files();
+  load_sysadmins();
+  load_branch_staff();
+  load_gym_members();
+  session_init();
+
+  char stored[PASSWORD_HASH_BUFFER_SIZE];
+  hash_password("adminpass", stored);
+  create_sysadmin("admin", stored);
+
+  user_role_t role;
+  bool result = auth_login("admin", "adminpass", &role);
+
+  assert(result == true);
+  assert(role == USER_ROLE_SYSADMIN);
+  assert(session_is_active() == true);
+  assert(session_is_sysadmin() == true);
+}
+
+/**
+ * Verifies that auth_login succeeds with correct branch manager credentials.
+ */
+void test_auth_login_branch_manager_success()
+{
+  cleanup_auth_test_files();
+  load_sysadmins();
+  load_branch_staff();
+  load_gym_members();
+  session_init();
+
+  char stored[PASSWORD_HASH_BUFFER_SIZE];
+  hash_password("mgrpass", stored);
+  create_branch_staff("Manager One", "m1@test.com", "0171111111", "Dhanmondi", "mgr1", stored, BRANCH_MANAGER);
+
+  user_role_t role;
+  bool result = auth_login("mgr1", "mgrpass", &role);
+
+  assert(result == true);
+  assert(role == USER_ROLE_BRANCH_MANAGER);
+  assert(session_is_branch_manager() == true);
+  assert(session_belongs_to_branch("Dhanmondi") == true);
+}
+
+/**
+ * Verifies that auth_login succeeds with correct trainer credentials.
+ */
+void test_auth_login_trainer_success()
+{
+  cleanup_auth_test_files();
+  load_sysadmins();
+  load_branch_staff();
+  load_gym_members();
+  session_init();
+
+  char stored[PASSWORD_HASH_BUFFER_SIZE];
+  hash_password("trpass", stored);
+  create_branch_staff("Trainer One", "t1@test.com", "0172222222", "Gulshan", "tr1", stored, TRAINER);
+
+  user_role_t role;
+  bool result = auth_login("tr1", "trpass", &role);
+
+  assert(result == true);
+  assert(role == USER_ROLE_TRAINER);
+  assert(session_is_trainer() == true);
+  assert(session_belongs_to_branch("Gulshan") == true);
+}
+
+/**
+ * Verifies that auth_login succeeds with correct gym member credentials.
+ */
+void test_auth_login_member_success()
+{
+  cleanup_auth_test_files();
+  load_sysadmins();
+  load_branch_staff();
+  load_gym_members();
+  session_init();
+
+  char stored[PASSWORD_HASH_BUFFER_SIZE];
+  hash_password("mempass", stored);
+
+  subscription_plan_t plan;
+  plan.payable_amount = 1000;
+  plan.interval_days = 30;
+  create_gym_member("Member One", "m1@test.com", "0181111111", "Uttara", "mem1", stored, plan, MEMBERSHIP_ACTIVE);
+
+  user_role_t role;
+  bool result = auth_login("mem1", "mempass", &role);
+
+  assert(result == true);
+  assert(role == USER_ROLE_MEMBER);
+  assert(session_is_member() == true);
+  assert(session_belongs_to_branch("Uttara") == true);
+}
+
+/**
+ * Verifies that auth_login rejects wrong password.
+ */
+void test_auth_login_wrong_password()
+{
+  cleanup_auth_test_files();
+  load_sysadmins();
+  load_branch_staff();
+  load_gym_members();
+  session_init();
+
+  char stored[PASSWORD_HASH_BUFFER_SIZE];
+  hash_password("correct", stored);
+  create_sysadmin("admin", stored);
+
+  user_role_t role;
+  bool result = auth_login("admin", "wrong", &role);
+
+  assert(result == false);
+  assert(session_is_active() == false);
+}
+
+/**
+ * Verifies that auth_login rejects non-existent username.
+ */
+void test_auth_login_unknown_username()
+{
+  cleanup_auth_test_files();
+  load_sysadmins();
+  load_branch_staff();
+  load_gym_members();
+  session_init();
+
+  user_role_t role;
+  bool result = auth_login("nobody", "pass", &role);
+
+  assert(result == false);
+  assert(session_is_active() == false);
+}
+
+/**
+ * Verifies that auth_login handles NULL inputs safely.
+ */
+void test_auth_login_null_inputs()
+{
+  user_role_t role;
+  assert(auth_login(NULL, "pass", &role) == false);
+  assert(auth_login("user", NULL, &role) == false);
+  assert(auth_login("user", "pass", NULL) == false);
+}
+
+/**
+ * Verifies that auth_logout clears the session.
+ */
+void test_auth_logout_clears_session()
+{
+  cleanup_auth_test_files();
+  load_sysadmins();
+  load_branch_staff();
+  load_gym_members();
+  session_init();
+
+  char stored[PASSWORD_HASH_BUFFER_SIZE];
+  hash_password("pass", stored);
+  create_sysadmin("admin", stored);
+
+  user_role_t role;
+  auth_login("admin", "pass", &role);
+  assert(session_is_active() == true);
+
+  auth_logout();
+  assert(session_is_active() == false);
+  assert(session_get_current() == NULL);
 }

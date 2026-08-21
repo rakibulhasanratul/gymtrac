@@ -65,4 +65,14 @@ void test_delete_branch_staff_rejects_unknown_id();
 void test_delete_gym_member_removes_and_persists();
 void test_delete_gym_member_rejects_member_with_dues();
 
+/* update */
+void test_update_branch_staff_updates_fields_and_persists();
+void test_update_branch_staff_rejects_unknown_id();
+void test_update_branch_staff_rejects_empty_fields();
+void test_update_gym_member_updates_fields_and_persists();
+void test_update_gym_member_rejects_unknown_id();
+void test_update_gym_member_rejects_empty_fields();
+void test_update_gym_member_rejects_duplicate_username();
+void test_update_gym_member_allows_same_username();
+
 #endif

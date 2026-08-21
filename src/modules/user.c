@@ -206,6 +206,70 @@ static bool rewrite_gym_members_file_without(int index)
   return true;
 }
 
+// Rewrites the entire branch staff file from memory.
+//
+// Used by update_branch_staff so the persisted file reflects the
+// modified record.
+static bool rewrite_branch_staff_file_all()
+{
+  char path[PATH_BUFFER_SIZE];
+  build_file_path(BRANCH_STAFF_FILENAME, path, PATH_BUFFER_SIZE);
+
+  FILE *file = fopen(path, "w");
+  if (file == NULL)
+  {
+    LOG_ERROR("Failed to open branch staff file for writing.");
+    return false;
+  }
+
+  char line[LINE_BUFFER_SIZE];
+  for (int i = 0; i < branch_staff_count; i++)
+  {
+    format_branch_staff_line(&branch_staff_list[i], line);
+    if (!write_line_to_file(file, line))
+    {
+      fclose(file);
+      LOG_ERROR("Failed to write branch staff record.");
+      return false;
+    }
+  }
+
+  fclose(file);
+  return true;
+}
+
+// Rewrites the entire gym members file from memory.
+//
+// Used by update_gym_member so the persisted file reflects the
+// modified record.
+static bool rewrite_gym_members_file_all()
+{
+  char path[PATH_BUFFER_SIZE];
+  build_file_path(GYM_MEMBERS_FILENAME, path, PATH_BUFFER_SIZE);
+
+  FILE *file = fopen(path, "w");
+  if (file == NULL)
+  {
+    LOG_ERROR("Failed to open gym members file for writing.");
+    return false;
+  }
+
+  char line[LINE_BUFFER_SIZE];
+  for (int i = 0; i < gym_member_count; i++)
+  {
+    format_gym_member_line(&gym_members[i], line);
+    if (!write_line_to_file(file, line))
+    {
+      fclose(file);
+      LOG_ERROR("Failed to write gym member record.");
+      return false;
+    }
+  }
+
+  fclose(file);
+  return true;
+}
+
 // Splits a pipe-delimited line into field buffers and returns the field count.
 static int split_record_line(const char line[], char parts_destination[][FIELD_BUFFER_SIZE])
 {
@@ -758,4 +822,124 @@ gym_member_t *get_gym_member_by_username(const char username[])
       return &gym_members[i];
   }
   return NULL;
+}
+
+bool update_branch_staff(id_t id, const char full_name[], const char email[], const char phone_number[])
+{
+  if (full_name == NULL || strlen(full_name) == 0)
+  {
+    LOG_ERROR("Error: Full name cannot be empty.");
+    return false;
+  }
+
+  if (email == NULL || strlen(email) == 0)
+  {
+    LOG_ERROR("Error: Email cannot be empty.");
+    return false;
+  }
+
+  if (phone_number == NULL || strlen(phone_number) == 0)
+  {
+    LOG_ERROR("Error: Phone number cannot be empty.");
+    return false;
+  }
+
+  int index = -1;
+  for (int i = 0; i < branch_staff_count; i++)
+  {
+    if (branch_staff_list[i].id == id)
+    {
+      index = i;
+      break;
+    }
+  }
+
+  if (index < 0)
+  {
+    LOG_ERROR("Error: No staff member found with id %lu.", (unsigned long)id);
+    return false;
+  }
+
+  strcpy(branch_staff_list[index].full_name, full_name);
+  strcpy(branch_staff_list[index].email, email);
+  strcpy(branch_staff_list[index].phone_number, phone_number);
+
+  if (!rewrite_branch_staff_file_all())
+  {
+    LOG_ERROR("Failed to persist branch staff update.");
+    return false;
+  }
+
+  return true;
+}
+
+bool update_gym_member(id_t id, const char full_name[], const char email[], const char phone_number[],
+                       const char gym_branch[], const char username[])
+{
+  if (full_name == NULL || strlen(full_name) == 0)
+  {
+    LOG_ERROR("Error: Full name cannot be empty.");
+    return false;
+  }
+
+  if (email == NULL || strlen(email) == 0)
+  {
+    LOG_ERROR("Error: Email cannot be empty.");
+    return false;
+  }
+
+  if (phone_number == NULL || strlen(phone_number) == 0)
+  {
+    LOG_ERROR("Error: Phone number cannot be empty.");
+    return false;
+  }
+
+  if (gym_branch == NULL || strlen(gym_branch) == 0)
+  {
+    LOG_ERROR("Error: Branch name cannot be empty.");
+    return false;
+  }
+
+  if (username == NULL || strlen(username) == 0)
+  {
+    LOG_ERROR("Error: Username cannot be empty.");
+    return false;
+  }
+
+  int index = -1;
+  for (int i = 0; i < gym_member_count; i++)
+  {
+    if (gym_members[i].id == id)
+    {
+      index = i;
+      break;
+    }
+  }
+
+  if (index < 0)
+  {
+    LOG_ERROR("Error: No gym member found with id %lu.", (unsigned long)id);
+    return false;
+  }
+
+  // If username is changing, check uniqueness.
+  if (strcmp(gym_members[index].username, username) != 0 && username_exists(username))
+  {
+    LOG_ERROR("Error: Username '%s' already exists.", username);
+    return false;
+  }
+
+  strcpy(gym_members[index].full_name, full_name);
+  strcpy(gym_members[index].email, email);
+  strcpy(gym_members[index].phone_number, phone_number);
+  strcpy(gym_members[index].gym_branch, gym_branch);
+  strcpy(gym_members[index].username, username);
+
+  if (!rewrite_gym_members_file_all())
+  {
+    LOG_ERROR("Failed to persist gym member update.");
+    return false;
+  }
+
+  return true;
 }

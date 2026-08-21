@@ -4,6 +4,7 @@
 #include <stdbool.h>
 
 #include "../settings.h"
+#include "../types.h"
 
 /**
  * Hashes a password with a generated salt and stores the result.
@@ -24,5 +25,24 @@ void hash_password(const char *password, char *destination);
  * @return true if the password matches, false otherwise
  */
 bool verify_password(const char *password, const char *stored_hash);
+
+/**
+ * Authenticates a user by username and password.
+ *
+ * Looks up the username across all three user tables, verifies the
+ * password against the stored salted hash, and populates the session
+ * on success.
+ *
+ * @param username the login name to look up
+ * @param password the plaintext password to verify
+ * @param role_destination receives the user's role on success
+ * @return true if authentication succeeded, false otherwise
+ */
+bool auth_login(const char username[], const char password[], user_role_t *role_destination);
+
+/**
+ * Logs out the current user by clearing the session.
+ */
+void auth_logout();
 
 #endif

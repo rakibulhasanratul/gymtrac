@@ -197,4 +197,35 @@ gym_member_t *get_gym_member_by_id(id_t id);
  */
 gym_member_t *get_gym_member_by_username(const char username[]);
 
+/**
+ * Updates a branch staff member's profile fields and persists the change.
+ *
+ * Only full_name, email, and phone_number can be updated. The record is
+ * looked up by id; the file is rewritten with the updated values.
+ *
+ * @param id the staff member's id
+ * @param full_name the new full name
+ * @param email the new email
+ * @param phone_number the new phone number
+ * @return true if the record was found and updated, false otherwise
+ */
+bool update_branch_staff(id_t id, const char full_name[], const char email[], const char phone_number[]);
+
+/**
+ * Updates a gym member's profile fields and persists the change.
+ *
+ * Full_name, email, phone_number, gym_branch, and username can be updated.
+ * The record is looked up by id; the file is rewritten with the updated values.
+ *
+ * @param id the member's id
+ * @param full_name the new full name
+ * @param email the new email
+ * @param phone_number the new phone number
+ * @param gym_branch the new branch name
+ * @param username the new username (must be globally unique)
+ * @return true if the record was found and updated, false otherwise
+ */
+bool update_gym_member(id_t id, const char full_name[], const char email[], const char phone_number[],
+                       const char gym_branch[], const char username[]);
+
 #endif

@@ -5,6 +5,7 @@
 #include "../src/utils/rng.h"
 #include "modules/test_auth.h"
 #include "modules/test_branch.h"
+#include "modules/test_session.h"
 #include "modules/test_user.h"
 #include "utils/test_date_util.h"
 #include "utils/test_file_util.h"
@@ -77,6 +78,14 @@ int main()
   test_verify_password_empty_password();
   test_verify_password_null_returns_false();
   test_hash_password_null_is_safe();
+  test_auth_login_sysadmin_success();
+  test_auth_login_branch_manager_success();
+  test_auth_login_trainer_success();
+  test_auth_login_member_success();
+  test_auth_login_wrong_password();
+  test_auth_login_unknown_username();
+  test_auth_login_null_inputs();
+  test_auth_logout_clears_session();
 
   /* date_util */
   test_time_t_to_string_formats_date();
@@ -169,6 +178,34 @@ int main()
   test_delete_branch_staff_rejects_unknown_id();
   test_delete_gym_member_removes_and_persists();
   test_delete_gym_member_rejects_member_with_dues();
+
+  /* user: update */
+  test_update_branch_staff_updates_fields_and_persists();
+  test_update_branch_staff_rejects_unknown_id();
+  test_update_branch_staff_rejects_empty_fields();
+  test_update_gym_member_updates_fields_and_persists();
+  test_update_gym_member_rejects_unknown_id();
+  test_update_gym_member_rejects_empty_fields();
+  test_update_gym_member_rejects_duplicate_username();
+  test_update_gym_member_allows_same_username();
+
+  /* session */
+  test_session_init_is_inactive();
+  test_session_login_sets_context();
+  test_session_logout_clears_context();
+  test_session_is_active_after_login();
+  test_session_is_active_after_logout();
+  test_session_is_sysadmin();
+  test_session_is_branch_manager();
+  test_session_is_trainer();
+  test_session_is_member();
+  test_session_belongs_to_branch_sysadmin_sees_all();
+  test_session_belongs_to_branch_matching();
+  test_session_belongs_to_branch_non_matching();
+  test_session_belongs_to_branch_inactive_returns_false();
+  test_session_belongs_to_branch_null_returns_false();
+  test_session_get_current_returns_null_when_inactive();
+  test_session_get_current_returns_record_when_active();
 
   printf("\n\nAll tests passed.\n\n");
   return 0;

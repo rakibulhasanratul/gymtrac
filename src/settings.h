@@ -52,6 +52,11 @@
 #define DEFAULT_SYSADMIN_PASSWORD "admin123"
 
 // Error logging macro. Prints to stderr with source location.
-#define LOG_ERROR(msg, ...) fprintf(stderr, "%s:%d: " msg "\n", __FILE__, __LINE__, ##__VA_ARGS__)
+// Wrapped in do-while(0) so it behaves as a single statement in if/else blocks.
+#define LOG_ERROR(msg, ...)                                                                                            \
+  do                                                                                                                   \
+  {                                                                                                                    \
+    fprintf(stderr, "%s:%d: " msg "\n", __FILE__, __LINE__, ##__VA_ARGS__);                                            \
+  } while (0)
 
 #endif

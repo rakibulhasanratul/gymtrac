@@ -14,9 +14,7 @@ typedef struct tm calendar_time_t;
 // Days in each month (non-leap year).
 static const int DAYS_IN_MONTH[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
-/**
- * Returns whether the given year is a leap year.
- */
+// Returns whether the given year is a leap year.
 static int is_leap_year(int year)
 {
   if (year % 400 == 0)
@@ -28,9 +26,7 @@ static int is_leap_year(int year)
   return 0;
 }
 
-/**
- * Returns the number of days in the given month (1-indexed).
- */
+// Returns the number of days in the given month (1-indexed).
 static int days_in_month(int year, int month)
 {
   if (month == 2 && is_leap_year(year))
@@ -38,9 +34,7 @@ static int days_in_month(int year, int month)
   return DAYS_IN_MONTH[month - 1];
 }
 
-/**
- * Normalizes a time_t to midnight UTC.
- */
+// Normalizes a timestamp to midnight of its own calendar day.
 static time_t normalize_to_midnight(time_t timestamp)
 {
   calendar_time_t calendar_time;
@@ -61,8 +55,8 @@ bool time_t_to_string(time_t timestamp, char *buffer, int buffer_capacity)
   localtime_r(&timestamp, &calendar_time);
 
   // Format as yyyy-mm-dd into the caller's buffer.
-  int written =
-    snprintf(buffer, (size_t)buffer_capacity, "%04d-%02d-%02d", calendar_time.tm_year + 1900, calendar_time.tm_mon + 1, calendar_time.tm_mday);
+  int written = snprintf(buffer, (size_t)buffer_capacity, "%04d-%02d-%02d", calendar_time.tm_year + 1900,
+                         calendar_time.tm_mon + 1, calendar_time.tm_mday);
 
   // Verify the full 10-character date was written.
   return (written == DATE_BUFFER_SIZE - 1);

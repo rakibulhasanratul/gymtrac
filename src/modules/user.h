@@ -97,8 +97,8 @@ bool ensure_member_has_no_dues(const gym_member_t *member_payload);
 /**
  * Removes a branch staff member from the persisted file and in-memory array.
  *
- * Sysadmins are never deletable: the single-admin invariant keeps the
- * system loginable, so no delete function exists for them.
+ * Sysadmins have no delete path because removing the sole admin would
+ * leave nobody able to log in.
  *
  * @param id the staff member's id
  * @return true if the staff member was deleted, false if not found

@@ -14,7 +14,7 @@
 #define DATE_BUFFER_SIZE 11         // yyyy-mm-dd + null terminator
 #define FIELD_BUFFER_SIZE 256       // buffer for a single field when splitting a pipe-delimited record line
 #define PATH_BUFFER_SIZE 256        // buffer for resolved file paths
-#define LINE_BUFFER_SIZE 1024       // one single line of a file, I think 1KB is large enough`
+#define LINE_BUFFER_SIZE 1024       // one full record line, large enough for any record
 
 // Hashing internals.
 #define SALT_BUFFER_SIZE 16        // 15 printable chars + null
@@ -33,9 +33,9 @@
 #define MAX_GYM_MEMBERS (BRANCH_COUNT_MAX * MAX_MEMBERS_PER_BRANCH)
 
 // File storage.
-// String form feeds format strings via literal concatenation; the char form
-// feeds split()/sanitize comparisons. main() rejects any delimiter whose
-// string form is not exactly one character long.
+// String form feeds format strings via literal concatenation, while the
+// char form feeds split()/sanitize comparisons. main() rejects any
+// delimiter whose string form is not exactly one character long.
 #define FIELD_DELIMITER_STRING "|"
 #define FIELD_DELIMITER FIELD_DELIMITER_STRING[0]
 #ifndef DEFAULT_DATA_DIRECTORY
@@ -47,7 +47,7 @@
 #define GYM_MEMBERS_FILENAME "gym_members.dat"
 #define MAX_RECORD_FIELDS 14 // maximum number of fields in any pipe-delimited record
 
-// some random unimportant stuffs! :p (not really)
+// Credentials for the sysadmin account seeded on first run.
 #define DEFAULT_SYSADMIN_USERNAME "admin"
 #define DEFAULT_SYSADMIN_PASSWORD "admin123"
 

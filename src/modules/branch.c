@@ -10,9 +10,7 @@
 static char branches[BRANCH_COUNT_MAX][BRANCH_NAME_BUFFER_SIZE];
 static int branch_count;
 
-/**
- * Removes the branch at index from memory by shifting later names left.
- */
+// Removes the branch at index from memory by shifting later names left.
 static void remove_branch_at(int index)
 {
   for (int i = index; i < branch_count - 1; i++)
@@ -21,12 +19,10 @@ static void remove_branch_at(int index)
   branch_count--;
 }
 
-/**
- * Rewrites the branches file from memory, skipping the branch at index.
- *
- * Used by delete_branch so the persisted file never contains the removed
- * branch, matching the file-first ordering of add_branch.
- */
+// Rewrites the branches file from memory, skipping the branch at index.
+//
+// Used by delete_branch so the persisted file never contains the removed
+// branch, matching the file-first ordering of add_branch.
 static bool rewrite_branches_file_without(int index)
 {
   char path[PATH_BUFFER_SIZE];

@@ -51,4 +51,7 @@
 #define DEFAULT_SYSADMIN_USERNAME "admin"
 #define DEFAULT_SYSADMIN_PASSWORD "admin123"
 
+// Error logging macro. Prints to stderr with source location.
+#define LOG_ERROR(msg, ...) fprintf(stderr, "%s:%d: " msg "\n", __FILE__, __LINE__, ##__VA_ARGS__)
+
 #endif

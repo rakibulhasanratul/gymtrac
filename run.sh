@@ -5,10 +5,10 @@ mkdir -p build
 
 if [ "${1:-}" = "test" ]; then
     mkdir -p test_data
-    gcc -Wall -Wextra -pedantic -g -DDEFAULT_DATA_DIRECTORY=\"test_data\" test/test_main.c test/modules/*.c test/utils/*.c src/modules/*.c src/utils/*.c -o build/test_runner -lm
+    gcc -Wall -Wextra -pedantic -g -fmacro-prefix-map=src/= -DDEFAULT_DATA_DIRECTORY=\"test_data\" test/*.c test/**/*.c src/**/*.c -o build/test_runner -lm
     build/test_runner
 else
     mkdir -p data
-    gcc -Wall -Wextra -pedantic -g src/main.c src/modules/*.c src/utils/*.c -o build/gymtrac -lm
+    gcc -Wall -Wextra -pedantic -g -fmacro-prefix-map=src/= src/*.c src/**/*.c -o build/gymtrac -lm
     build/gymtrac
 fi

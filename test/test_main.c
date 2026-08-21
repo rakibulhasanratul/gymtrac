@@ -170,6 +170,6 @@ int main()
   test_delete_gym_member_removes_and_persists();
   test_delete_gym_member_rejects_member_with_dues();
 
-  printf("All tests passed.\n");
+  printf("\n\nAll tests passed.\n\n");
   return 0;
 }

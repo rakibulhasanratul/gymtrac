@@ -11,7 +11,7 @@ int main()
 {
   if (strlen(FIELD_DELIMITER_STRING) != 1)
   {
-    fprintf(stderr, "FIELD_DELIMITER_STRING must be exactly one character long.\n");
+    LOG_ERROR("FIELD_DELIMITER_STRING must be exactly one character long.");
     return 1;
   }
 

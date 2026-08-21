@@ -30,13 +30,17 @@ static bool rewrite_branches_file_without(int index)
 
   FILE *file = fopen(path, "w");
   if (file == NULL)
+  {
+    LOG_ERROR("Failed to open branches file for writing.");
     return false;
+  }
 
   for (int i = 0; i < branch_count; i++)
   {
     if (i != index && !write_line_to_file(file, branches[i]))
     {
       fclose(file);
+      LOG_ERROR("Failed to write branch record.");
       return false;
     }
   }
@@ -87,20 +91,32 @@ bool branch_exists(const char branch_name[])
 bool add_branch(const char branch_name[])
 {
   if (branch_name == NULL || strlen(branch_name) == 0)
+  {
+    LOG_ERROR("Error: Branch name cannot be empty.");
     return false;
+  }
 
   if (branch_exists(branch_name))
+  {
+    LOG_ERROR("Error: Branch '%s' already exists.", branch_name);
     return false;
+  }
 
   if (branch_count >= BRANCH_COUNT_MAX)
+  {
+    LOG_ERROR("Error: Maximum branch count reached.");
     return false;
+  }
 
   char path[PATH_BUFFER_SIZE];
   build_file_path(GYM_BRANCHES_FILENAME, path, PATH_BUFFER_SIZE);
 
   FILE *file = fopen(path, "a");
   if (file == NULL)
+  {
+    LOG_ERROR("Failed to open branches file for appending.");
     return false;
+  }
 
   bool success = write_line_to_file(file, branch_name);
   fclose(file);
@@ -126,13 +142,22 @@ bool ensure_branch_has_no_users(const char branch_name[])
 bool delete_branch(const char branch_name[])
 {
   if (branch_name == NULL || strlen(branch_name) == 0)
+  {
+    LOG_ERROR("Error: Branch name cannot be empty.");
     return false;
+  }
 
   if (!branch_exists(branch_name))
+  {
+    LOG_ERROR("Error: Branch '%s' does not exist.", branch_name);
     return false;
+  }
 
   if (!ensure_branch_has_no_users(branch_name))
+  {
+    LOG_ERROR("Error: Branch '%s' still has assigned users.", branch_name);
     return false;
+  }
 
   int index = -1;
   for (int i = 0; i < branch_count; i++)
@@ -145,10 +170,16 @@ bool delete_branch(const char branch_name[])
   }
 
   if (index < 0)
+  {
+    LOG_ERROR("Error: Branch '%s' not found in memory.", branch_name);
     return false;
+  }
 
   if (!rewrite_branches_file_without(index))
+  {
+    LOG_ERROR("Failed to rewrite branches file.");
     return false;
+  }
 
   remove_branch_at(index);
   return true;
@@ -162,7 +193,10 @@ int get_branch_count()
 const char *get_branch_name(int index)
 {
   if (index < 0 || index >= branch_count)
+  {
+    LOG_ERROR("Error: Branch index %d is out of range.", index);
     return NULL;
+  }
 
   return branches[index];
 }

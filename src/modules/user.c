@@ -39,7 +39,10 @@ static bool persist_sysadmin(const sysadmin_t *record_payload)
 
   FILE *file = fopen(path, "a");
   if (file == NULL)
+  {
+    LOG_ERROR("Failed to open sysadmin data file.");
     return false;
+  }
 
   char line[LINE_BUFFER_SIZE];
   format_sysadmin_line(record_payload, line);
@@ -79,7 +82,10 @@ static bool persist_branch_staff(const branch_staff_t *record_payload)
 
   FILE *file = fopen(path, "a");
   if (file == NULL)
+  {
+    LOG_ERROR("Failed to open branch staff data file.");
     return false;
+  }
 
   char line[LINE_BUFFER_SIZE];
   format_branch_staff_line(record_payload, line);
@@ -97,7 +103,10 @@ static bool persist_gym_member(const gym_member_t *record_payload)
 
   FILE *file = fopen(path, "a");
   if (file == NULL)
+  {
+    LOG_ERROR("Failed to open gym member data file.");
     return false;
+  }
 
   char line[LINE_BUFFER_SIZE];
   format_gym_member_line(record_payload, line);
@@ -138,7 +147,10 @@ static bool rewrite_branch_staff_file_without(int index)
 
   FILE *file = fopen(path, "w");
   if (file == NULL)
+  {
+    LOG_ERROR("Failed to open branch staff file for writing.");
     return false;
+  }
 
   char line[LINE_BUFFER_SIZE];
   for (int i = 0; i < branch_staff_count; i++)
@@ -150,6 +162,7 @@ static bool rewrite_branch_staff_file_without(int index)
     if (!write_line_to_file(file, line))
     {
       fclose(file);
+      LOG_ERROR("Failed to write branch staff record.");
       return false;
     }
   }
@@ -169,7 +182,10 @@ static bool rewrite_gym_members_file_without(int index)
 
   FILE *file = fopen(path, "w");
   if (file == NULL)
+  {
+    LOG_ERROR("Failed to open gym members file for writing.");
     return false;
+  }
 
   char line[LINE_BUFFER_SIZE];
   for (int i = 0; i < gym_member_count; i++)
@@ -181,6 +197,7 @@ static bool rewrite_gym_members_file_without(int index)
     if (!write_line_to_file(file, line))
     {
       fclose(file);
+      LOG_ERROR("Failed to write gym member record.");
       return false;
     }
   }
@@ -344,16 +361,28 @@ int load_gym_members()
 id_t create_sysadmin(const char username[], const char password_hash[])
 {
   if (username == NULL || strlen(username) == 0)
+  {
+    LOG_ERROR("Error: Username cannot be empty.");
     return 0;
+  }
 
   if (password_hash == NULL || strlen(password_hash) == 0)
+  {
+    LOG_ERROR("Error: Password hash cannot be empty.");
     return 0;
+  }
 
   if (sysadmin_count >= MAX_SYSTEM_ADMINS)
+  {
+    LOG_ERROR("Error: Maximum sysadmin count reached.");
     return 0;
+  }
 
   if (username_exists(username))
+  {
+    LOG_ERROR("Error: Username '%s' already exists.", username);
     return 0;
+  }
 
   sysadmin_t record;
   record.id = next_sysadmin_id++;
@@ -361,7 +390,10 @@ id_t create_sysadmin(const char username[], const char password_hash[])
   strcpy(record.password_hash, password_hash);
 
   if (!persist_sysadmin(&record))
+  {
+    LOG_ERROR("Failed to persist sysadmin record.");
     return 0;
+  }
 
   sysadmins[sysadmin_count] = record;
   sysadmin_count++;
@@ -372,29 +404,53 @@ id_t create_branch_staff(const char full_name[], const char email[], const char 
                          const char username[], const char password_hash[], staff_role_t role)
 {
   if (full_name == NULL || strlen(full_name) == 0)
+  {
+    LOG_ERROR("Error: Full name cannot be empty.");
     return 0;
+  }
 
   if (email == NULL || strlen(email) == 0)
+  {
+    LOG_ERROR("Error: Email cannot be empty.");
     return 0;
+  }
 
   if (phone_number == NULL || strlen(phone_number) == 0)
+  {
+    LOG_ERROR("Error: Phone number cannot be empty.");
     return 0;
+  }
 
   if (gym_branch == NULL || strlen(gym_branch) == 0)
+  {
+    LOG_ERROR("Error: Branch name cannot be empty.");
     return 0;
+  }
 
   if (username == NULL || strlen(username) == 0)
+  {
+    LOG_ERROR("Error: Username cannot be empty.");
     return 0;
+  }
 
   if (password_hash == NULL || strlen(password_hash) == 0)
+  {
+    LOG_ERROR("Error: Password hash cannot be empty.");
     return 0;
+  }
 
   if (username_exists(username))
+  {
+    LOG_ERROR("Error: Username '%s' already exists.", username);
     return 0;
+  }
 
   int capacity = MAX_BRANCH_MANAGERS + MAX_TRAINERS;
   if (branch_staff_count >= capacity)
+  {
+    LOG_ERROR("Error: Maximum branch staff count reached.");
     return 0;
+  }
 
   branch_staff_t record;
   record.id = next_branch_staff_id++;
@@ -409,7 +465,10 @@ id_t create_branch_staff(const char full_name[], const char email[], const char 
   record.role = role;
 
   if (!persist_branch_staff(&record))
+  {
+    LOG_ERROR("Failed to persist branch staff record.");
     return 0;
+  }
 
   branch_staff_list[branch_staff_count] = record;
   branch_staff_count++;
@@ -421,28 +480,52 @@ id_t create_gym_member(const char full_name[], const char email[], const char ph
                        membership_status_t status)
 {
   if (full_name == NULL || strlen(full_name) == 0)
+  {
+    LOG_ERROR("Error: Full name cannot be empty.");
     return 0;
+  }
 
   if (email == NULL || strlen(email) == 0)
+  {
+    LOG_ERROR("Error: Email cannot be empty.");
     return 0;
+  }
 
   if (phone_number == NULL || strlen(phone_number) == 0)
+  {
+    LOG_ERROR("Error: Phone number cannot be empty.");
     return 0;
+  }
 
   if (gym_branch == NULL || strlen(gym_branch) == 0)
+  {
+    LOG_ERROR("Error: Branch name cannot be empty.");
     return 0;
+  }
 
   if (username == NULL || strlen(username) == 0)
+  {
+    LOG_ERROR("Error: Username cannot be empty.");
     return 0;
+  }
 
   if (password_hash == NULL || strlen(password_hash) == 0)
+  {
+    LOG_ERROR("Error: Password hash cannot be empty.");
     return 0;
+  }
 
   if (username_exists(username))
+  {
+    LOG_ERROR("Error: Username '%s' already exists.", username);
     return 0;
+  }
 
   if (gym_member_count >= MAX_GYM_MEMBERS)
+  {
+    LOG_ERROR("Error: Maximum gym member count reached.");
     return 0;
+  }
 
   gym_member_t record;
   record.id = next_gym_member_id++;
@@ -460,7 +543,10 @@ id_t create_gym_member(const char full_name[], const char email[], const char ph
   record.status = status;
 
   if (!persist_gym_member(&record))
+  {
+    LOG_ERROR("Failed to persist gym member record.");
     return 0;
+  }
 
   gym_members[gym_member_count] = record;
   gym_member_count++;
@@ -488,10 +574,16 @@ bool delete_branch_staff(id_t id)
   }
 
   if (index < 0)
+  {
+    LOG_ERROR("Error: No staff member found with id %lu.", (unsigned long)id);
     return false;
+  }
 
   if (!rewrite_branch_staff_file_without(index))
+  {
+    LOG_ERROR("Failed to rewrite branch staff file.");
     return false;
+  }
 
   remove_branch_staff_at(index);
   return true;
@@ -510,13 +602,22 @@ bool delete_gym_member(id_t id)
   }
 
   if (index < 0)
+  {
+    LOG_ERROR("Error: No gym member found with id %lu.", (unsigned long)id);
     return false;
+  }
 
   if (!ensure_member_has_no_dues(&gym_members[index]))
+  {
+    LOG_ERROR("Error: Member with id %lu has outstanding dues.", (unsigned long)id);
     return false;
+  }
 
   if (!rewrite_gym_members_file_without(index))
+  {
+    LOG_ERROR("Failed to rewrite gym members file.");
     return false;
+  }
 
   remove_gym_member_at(index);
   return true;

@@ -20,12 +20,12 @@ void session_init();
  * @param username the user's login name
  * @param branch_name the user's branch (empty string for sysadmin)
  */
-void session_login(user_role_t role, id_t user_id, const char username[], const char branch_name[]);
+void set_session_context(user_role_t role, id_t user_id, const char username[], const char branch_name[]);
 
 /**
  * Clears the session, marking the user as logged out.
  */
-void session_logout();
+void clear_session_context();
 
 /**
  * Returns whether a user is currently logged in.

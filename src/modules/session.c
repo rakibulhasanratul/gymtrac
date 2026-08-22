@@ -11,7 +11,7 @@ void session_init()
   memset(&current_session, 0, sizeof(session_t));
 }
 
-void session_login(user_role_t role, id_t user_id, const char username[], const char branch_name[])
+void set_session_context(user_role_t role, id_t user_id, const char username[], const char branch_name[])
 {
   current_session.role = role;
   current_session.user_id = user_id;
@@ -27,7 +27,7 @@ void session_login(user_role_t role, id_t user_id, const char username[], const 
     current_session.branch_name[0] = '\0';
 }
 
-void session_logout()
+void clear_session_context()
 {
   memset(&current_session, 0, sizeof(session_t));
 }

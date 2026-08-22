@@ -36,6 +36,13 @@ int main()
   test_read_drains_overlong_line();
   test_read_line_rejects_invalid_arguments();
   test_write_line_rejects_invalid_arguments();
+  test_write_read_lines_round_trip();
+  test_read_lines_skip_empty_lines();
+  test_write_lines_overwrite_existing_content();
+  test_read_lines_respects_max_lines();
+  test_read_lines_missing_file_returns_zero();
+  test_write_lines_rejects_invalid_arguments();
+  test_read_lines_rejects_invalid_arguments();
 
   /* input */
   test_input_string_reads_plain_lines();

@@ -10,61 +10,33 @@
 static char branches[BRANCH_COUNT_MAX][BRANCH_NAME_BUFFER_SIZE];
 static int branch_count;
 
-// Removes the branch at index from memory by shifting later names left.
-static void remove_branch_at(int index)
+// Persists the in-memory branch list to the branches file, one name per line.
+static bool save_branches_to_file()
 {
-  for (int i = index; i < branch_count - 1; i++)
-    strcpy(branches[i], branches[i + 1]);
+  // Map each row of branches to a pointer because write_lines_to_file
+  // reads lines through char pointers.
+  const char *line_maps[branch_count];
+  for (int i = 0; i < branch_count; i++)
+    line_maps[i] = branches[i];
 
-  branch_count--;
-}
-
-// Rewrites the branches file from memory, skipping the branch at index.
-//
-// Used by delete_branch so the persisted file never contains the removed
-// branch, matching the file-first ordering of add_branch.
-static bool rewrite_branches_file_without(int index)
-{
-  FILE *file = fopen(GYM_BRANCHES_FILE_PATH, "w");
-  if (file == NULL)
+  if (!write_lines_to_file(GYM_BRANCHES_FILE_PATH, line_maps, branch_count))
   {
-    LOG_ERROR("Error: Failed to open branches file for writing.");
+    LOG_ERROR("Error: Failed to rewrite branches file.");
     return false;
   }
 
-  for (int i = 0; i < branch_count; i++)
-  {
-    if (i != index && !write_line_to_file(file, branches[i]))
-    {
-      fclose(file);
-      LOG_ERROR("Error: Failed to write branch record.");
-      return false;
-    }
-  }
-
-  fclose(file);
   return true;
 }
 
 int load_branches()
 {
-  branch_count = 0;
+  // Map each row of branches to a pointer because read_lines_from_file
+  // fills lines through char pointers.
+  char *line_maps[BRANCH_COUNT_MAX];
+  for (int i = 0; i < BRANCH_COUNT_MAX; i++)
+    line_maps[i] = branches[i];
 
-  FILE *file = fopen(GYM_BRANCHES_FILE_PATH, "r");
-  if (file == NULL)
-    return 0;
-
-  char line[BRANCH_NAME_BUFFER_SIZE];
-  while (branch_count < BRANCH_COUNT_MAX && read_line_from_file(file, line, BRANCH_NAME_BUFFER_SIZE))
-  {
-    if (strlen(line) > 0)
-    {
-      strcpy(branches[branch_count], line);
-      branch_count++;
-    }
-  }
-
-  fclose(file);
+  branch_count = read_lines_from_file(GYM_BRANCHES_FILE_PATH, line_maps, BRANCH_COUNT_MAX, BRANCH_NAME_BUFFER_SIZE);
   return branch_count;
 }
 
@@ -150,30 +122,29 @@ bool delete_branch(const char branch_name[])
     return false;
   }
 
-  int index = -1;
+  // Single pass: locate the match, then shift every later name one slot
+  // left as the loop continues.
+  bool deleted = false;
   for (int i = 0; i < branch_count; i++)
   {
-    if (strcmp(branches[i], branch_name) == 0)
-    {
-      index = i;
-      break;
-    }
+    if (!deleted && strcmp(branches[i], branch_name) == 0)
+      deleted = true;
+
+    if (deleted && i < branch_count - 1)
+      strcpy(branches[i], branches[i + 1]);
   }
 
-  if (index < 0)
+  if (!deleted)
   {
     LOG_ERROR("Error: Branch '%s' not found in memory.", branch_name);
     return false;
   }
 
-  if (!rewrite_branches_file_without(index))
-  {
-    LOG_ERROR("Error: Failed to rewrite branches file.");
-    return false;
-  }
+  // Blank the vacated tail slot and shrink the count.
+  branches[branch_count - 1][0] = '\0';
+  branch_count--;
 
-  remove_branch_at(index);
-  return true;
+  return save_branches_to_file();
 }
 
 int get_branch_count()

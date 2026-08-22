@@ -6,7 +6,6 @@
 // memory allocation, bitwise operations, and proper hashing libraries.
 
 #include <stdbool.h>
-#include <string.h>
 
 #include "../settings.h"
 #include "../types.h"
@@ -76,46 +75,48 @@ bool auth_login(const char username[], const char password[], user_role_t *role_
     return false;
 
   // Check sysadmin table.
-  sysadmin_t *sysadmin = get_sysadmin_by_username(username);
-  if (sysadmin != NULL)
+  sysadmin_t sysadmin;
+  if (get_sysadmin_by_username(username, &sysadmin))
   {
-    if (verify_password(password, sysadmin->password_hash))
-    {
-      *role_destination = USER_ROLE_SYSADMIN;
-      session_login(USER_ROLE_SYSADMIN, sysadmin->id, sysadmin->username, "");
-      return true;
-    }
-    return false;
+    if (!verify_password(password, sysadmin.password_hash))
+      return false;
+
+    *role_destination = USER_ROLE_SYSADMIN;
+    set_session_context(USER_ROLE_SYSADMIN, sysadmin.id, sysadmin.username, "");
+    return true;
   }
 
   // Check branch staff table.
-  branch_staff_t *staff = get_branch_staff_by_username(username);
-  if (staff != NULL)
+  branch_staff_t staff;
+  if (get_branch_staff_by_username(username, &staff))
   {
-    if (verify_password(password, staff->password_hash))
-    {
-      if (staff->role == BRANCH_MANAGER)
-        *role_destination = USER_ROLE_BRANCH_MANAGER;
-      else
-        *role_destination = USER_ROLE_TRAINER;
+    if (!verify_password(password, staff.password_hash))
+      return false;
 
-      session_login(*role_destination, staff->id, staff->username, staff->gym_branch);
-      return true;
+    switch (staff.role)
+    {
+    case BRANCH_MANAGER:
+      *role_destination = USER_ROLE_BRANCH_MANAGER;
+      break;
+    default:
+      *role_destination = USER_ROLE_TRAINER;
+      break;
     }
-    return false;
+
+    set_session_context(*role_destination, staff.id, staff.username, staff.gym_branch);
+    return true;
   }
 
   // Check gym member table.
-  gym_member_t *member = get_gym_member_by_username(username);
-  if (member != NULL)
+  gym_member_t member;
+  if (get_gym_member_by_username(username, &member))
   {
-    if (verify_password(password, member->password_hash))
-    {
-      *role_destination = USER_ROLE_MEMBER;
-      session_login(USER_ROLE_MEMBER, member->id, member->username, member->gym_branch);
-      return true;
-    }
-    return false;
+    if (!verify_password(password, member.password_hash))
+      return false;
+
+    *role_destination = USER_ROLE_MEMBER;
+    set_session_context(USER_ROLE_MEMBER, member.id, member.username, member.gym_branch);
+    return true;
   }
 
   return false;
@@ -123,5 +124,5 @@ bool auth_login(const char username[], const char password[], user_role_t *role_
 
 void auth_logout()
 {
-  session_logout();
+  clear_session_context();
 }

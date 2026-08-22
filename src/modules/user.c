@@ -25,7 +25,7 @@ static int gym_member_count;
 static id_t next_gym_member_id;
 
 // Formats a sysadmin record as a delimiter-separated line.
-static void format_sysadmin_line(const sysadmin_t *record_payload, char line_destination[])
+static void format_sysadmin_line(const sysadmin_t *record_payload, char *line_destination)
 {
   snprintf(line_destination, LINE_BUFFER_SIZE, "%lu" SEP "%s" SEP "%s", (unsigned long)record_payload->id,
            record_payload->username, record_payload->password_hash);
@@ -50,7 +50,7 @@ static bool persist_sysadmin(const sysadmin_t *record_payload)
 }
 
 // Formats a branch staff record as a delimiter-separated line.
-static void format_branch_staff_line(const branch_staff_t *record_payload, char line_destination[])
+static void format_branch_staff_line(const branch_staff_t *record_payload, char *line_destination)
 {
   snprintf(line_destination, LINE_BUFFER_SIZE,
            "%lu" SEP "%s" SEP "%s" SEP "%s" SEP "%s" SEP "%s" SEP "%s" SEP "%ld" SEP "%d",
@@ -60,7 +60,7 @@ static void format_branch_staff_line(const branch_staff_t *record_payload, char 
 }
 
 // Formats a gym member record as a delimiter-separated line.
-static void format_gym_member_line(const gym_member_t *record_payload, char line_destination[])
+static void format_gym_member_line(const gym_member_t *record_payload, char *line_destination)
 {
   snprintf(
     line_destination, LINE_BUFFER_SIZE,
@@ -725,73 +725,100 @@ int branch_member_count(const char branch_name[])
   return count;
 }
 
-sysadmin_t *get_sysadmin_by_id(id_t id)
+bool get_sysadmin_by_id(id_t id, sysadmin_t *destination)
 {
+  if (destination == NULL)
+    return false;
+
   for (int i = 0; i < sysadmin_count; i++)
   {
     if (sysadmins[i].id == id)
-      return &sysadmins[i];
+    {
+      *destination = sysadmins[i];
+      return true;
+    }
   }
-  return NULL;
+  return false;
 }
 
-sysadmin_t *get_sysadmin_by_username(const char username[])
+bool get_sysadmin_by_username(const char username[], sysadmin_t *destination)
 {
-  if (username == NULL || strlen(username) == 0)
-    return NULL;
+  if (username == NULL || strlen(username) == 0 || destination == NULL)
+    return false;
 
   for (int i = 0; i < sysadmin_count; i++)
   {
     if (strcmp(sysadmins[i].username, username) == 0)
-      return &sysadmins[i];
+    {
+      *destination = sysadmins[i];
+      return true;
+    }
   }
-  return NULL;
+  return false;
 }
 
-branch_staff_t *get_branch_staff_by_id(id_t id)
+bool get_branch_staff_by_id(id_t id, branch_staff_t *destination)
 {
+  if (destination == NULL)
+    return false;
+
   for (int i = 0; i < branch_staff_count; i++)
   {
     if (branch_staff_list[i].id == id)
-      return &branch_staff_list[i];
+    {
+      *destination = branch_staff_list[i];
+      return true;
+    }
   }
-  return NULL;
+  return false;
 }
 
-branch_staff_t *get_branch_staff_by_username(const char username[])
+bool get_branch_staff_by_username(const char username[], branch_staff_t *destination)
 {
-  if (username == NULL || strlen(username) == 0)
-    return NULL;
+  if (username == NULL || strlen(username) == 0 || destination == NULL)
+    return false;
 
   for (int i = 0; i < branch_staff_count; i++)
   {
     if (strcmp(branch_staff_list[i].username, username) == 0)
-      return &branch_staff_list[i];
+    {
+      *destination = branch_staff_list[i];
+      return true;
+    }
   }
-  return NULL;
+  return false;
 }
 
-gym_member_t *get_gym_member_by_id(id_t id)
+bool get_gym_member_by_id(id_t id, gym_member_t *destination)
 {
+  if (destination == NULL)
+    return false;
+
   for (int i = 0; i < gym_member_count; i++)
   {
     if (gym_members[i].id == id)
-      return &gym_members[i];
+    {
+      *destination = gym_members[i];
+      return true;
+    }
   }
-  return NULL;
+  return false;
 }
 
-gym_member_t *get_gym_member_by_username(const char username[])
+bool get_gym_member_by_username(const char username[], gym_member_t *destination)
 {
-  if (username == NULL || strlen(username) == 0)
-    return NULL;
+  if (username == NULL || strlen(username) == 0 || destination == NULL)
+    return false;
 
   for (int i = 0; i < gym_member_count; i++)
   {
     if (strcmp(gym_members[i].username, username) == 0)
-      return &gym_members[i];
+    {
+      *destination = gym_members[i];
+      return true;
+    }
   }
-  return NULL;
+  return false;
 }
 
 bool update_branch_staff(id_t id, const char full_name[], const char email[], const char phone_number[])

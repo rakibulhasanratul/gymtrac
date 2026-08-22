@@ -150,52 +150,83 @@ int branch_trainer_count(const char branch_name[]);
 int branch_member_count(const char branch_name[]);
 
 /**
- * Finds a sysadmin by id.
+ * Finds a sysadmin by id and copies the record into destination.
+ *
+ * Callers work on their own snapshot so internal records can never be
+ * modified through the getter.
  *
  * @param id the sysadmin's id
- * @return pointer to the sysadmin record, or NULL if not found
+ * @param destination receives a copy of the record when found;
+ *                    must point to a valid sysadmin_t
+ * @return true when found and copied, false when not found or destination is NULL
  */
-sysadmin_t *get_sysadmin_by_id(id_t id);
+bool get_sysadmin_by_id(id_t id, sysadmin_t *destination);
 
 /**
- * Finds a sysadmin by username.
+ * Finds a sysadmin by username and copies the record into destination.
+ *
+ * Callers work on their own snapshot so internal records can never be
+ * modified through the getter.
  *
  * @param username the login name to look up
- * @return pointer to the sysadmin record, or NULL if not found
+ * @param destination receives a copy of the record when found;
+ *                    must point to a valid sysadmin_t
+ * @return true when found and copied, false when not found or arguments are invalid
  */
-sysadmin_t *get_sysadmin_by_username(const char username[]);
+bool get_sysadmin_by_username(const char username[], sysadmin_t *destination);
 
 /**
- * Finds a branch staff member by id.
+ * Finds a branch staff member by id and copies the record into destination.
+ *
+ * Callers work on their own snapshot so internal records can never be
+ * modified through the getter.
  *
  * @param id the staff member's id
- * @return pointer to the staff record, or NULL if not found
+ * @param destination receives a copy of the record when found;
+ *                    must point to a valid branch_staff_t
+ * @return true when found and copied, false when not found or destination is NULL
  */
-branch_staff_t *get_branch_staff_by_id(id_t id);
+bool get_branch_staff_by_id(id_t id, branch_staff_t *destination);
 
 /**
- * Finds a branch staff member by username.
+ * Finds a branch staff member by username and copies the record into
+ * destination.
+ *
+ * Callers work on their own snapshot so internal records can never be
+ * modified through the getter.
  *
  * @param username the login name to look up
- * @return pointer to the staff record, or NULL if not found
+ * @param destination receives a copy of the record when found;
+ *                    must point to a valid branch_staff_t
+ * @return true when found and copied, false when not found or arguments are invalid
  */
-branch_staff_t *get_branch_staff_by_username(const char username[]);
+bool get_branch_staff_by_username(const char username[], branch_staff_t *destination);
 
 /**
- * Finds a gym member by id.
+ * Finds a gym member by id and copies the record into destination.
+ *
+ * Callers work on their own snapshot so internal records can never be
+ * modified through the getter.
  *
  * @param id the member's id
- * @return pointer to the member record, or NULL if not found
+ * @param destination receives a copy of the record when found;
+ *                    must point to a valid gym_member_t
+ * @return true when found and copied, false when not found or destination is NULL
  */
-gym_member_t *get_gym_member_by_id(id_t id);
+bool get_gym_member_by_id(id_t id, gym_member_t *destination);
 
 /**
- * Finds a gym member by username.
+ * Finds a gym member by username and copies the record into destination.
+ *
+ * Callers work on their own snapshot so internal records can never be
+ * modified through the getter.
  *
  * @param username the login name to look up
- * @return pointer to the member record, or NULL if not found
+ * @param destination receives a copy of the record when found;
+ *                    must point to a valid gym_member_t
+ * @return true when found and copied, false when not found or arguments are invalid
  */
-gym_member_t *get_gym_member_by_username(const char username[]);
+bool get_gym_member_by_username(const char username[], gym_member_t *destination);
 
 /**
  * Updates a branch staff member's profile fields and persists the change.

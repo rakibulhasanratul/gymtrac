@@ -29,11 +29,11 @@ void test_create_sysadmin_and_get()
   id_t id = create_sysadmin("admin", "storedhash123");
   assert(id == 1);
 
-  sysadmin_t *found = get_sysadmin_by_id(id);
-  assert(found != NULL);
-  assert(found->id == 1);
-  assert(strcmp(found->username, "admin") == 0);
-  assert(strcmp(found->password_hash, "storedhash123") == 0);
+  sysadmin_t found;
+  assert(get_sysadmin_by_id(id, &found) == true);
+  assert(found.id == 1);
+  assert(strcmp(found.username, "admin") == 0);
+  assert(strcmp(found.password_hash, "storedhash123") == 0);
 }
 
 void test_create_sysadmin_rejects_second()
@@ -66,30 +66,34 @@ void test_create_sysadmin_rejects_empty_password()
 
 void test_get_sysadmin_by_username()
 {
-  sysadmin_t *found = get_sysadmin_by_username("admin");
-  assert(found != NULL);
-  assert(strcmp(found->username, "admin") == 0);
+  sysadmin_t found;
+  assert(get_sysadmin_by_username("admin", &found) == true);
+  assert(strcmp(found.username, "admin") == 0);
 
-  assert(get_sysadmin_by_username("nobody") == NULL);
+  assert(get_sysadmin_by_username("nobody", &found) == false);
 }
 
 void test_get_sysadmin_by_username_null()
 {
-  assert(get_sysadmin_by_username(NULL) == NULL);
+  sysadmin_t found;
+  assert(get_sysadmin_by_username(NULL, &found) == false);
+  assert(get_sysadmin_by_username("", &found) == false);
+  assert(get_sysadmin_by_username("admin", NULL) == false);
 }
 
 void test_get_sysadmin_by_id_not_found()
 {
-  assert(get_sysadmin_by_id(999) == NULL);
+  sysadmin_t found;
+  assert(get_sysadmin_by_id(999, &found) == false);
 }
 
 void test_load_sysadmins_roundtrip()
 {
   load_sysadmins();
 
-  sysadmin_t *found = get_sysadmin_by_username("admin");
-  assert(found != NULL);
-  assert(strcmp(found->password_hash, "storedhash123") == 0);
+  sysadmin_t found;
+  assert(get_sysadmin_by_username("admin", &found) == true);
+  assert(strcmp(found.password_hash, "storedhash123") == 0);
 }
 
 // ---- branch staff tests ----
@@ -104,16 +108,16 @@ void test_create_branch_staff_and_get()
   id_t id = create_branch_staff("Rahim Uddin", "rahim@test.com", "0171234567", "Dhanmondi", "rahim", "hash1", TRAINER);
   assert(id == 1);
 
-  branch_staff_t *found = get_branch_staff_by_id(id);
-  assert(found != NULL);
-  assert(found->id == 1);
-  assert(strcmp(found->full_name, "Rahim Uddin") == 0);
-  assert(strcmp(found->email, "rahim@test.com") == 0);
-  assert(strcmp(found->phone_number, "0171234567") == 0);
-  assert(strcmp(found->gym_branch, "Dhanmondi") == 0);
-  assert(strcmp(found->username, "rahim") == 0);
-  assert(strcmp(found->password_hash, "hash1") == 0);
-  assert(found->role == TRAINER);
+  branch_staff_t found;
+  assert(get_branch_staff_by_id(id, &found) == true);
+  assert(found.id == 1);
+  assert(strcmp(found.full_name, "Rahim Uddin") == 0);
+  assert(strcmp(found.email, "rahim@test.com") == 0);
+  assert(strcmp(found.phone_number, "0171234567") == 0);
+  assert(strcmp(found.gym_branch, "Dhanmondi") == 0);
+  assert(strcmp(found.username, "rahim") == 0);
+  assert(strcmp(found.password_hash, "hash1") == 0);
+  assert(found.role == TRAINER);
 }
 
 void test_create_branch_staff_auto_increment_id()
@@ -143,17 +147,18 @@ void test_create_branch_staff_rejects_empty_fields()
 
 void test_get_branch_staff_by_username()
 {
-  branch_staff_t *found = get_branch_staff_by_username("rahim");
-  assert(found != NULL);
-  assert(strcmp(found->gym_branch, "Dhanmondi") == 0);
-  assert(found->role == TRAINER);
+  branch_staff_t found;
+  assert(get_branch_staff_by_username("rahim", &found) == true);
+  assert(strcmp(found.gym_branch, "Dhanmondi") == 0);
+  assert(found.role == TRAINER);
 
-  assert(get_branch_staff_by_username("nobody") == NULL);
+  assert(get_branch_staff_by_username("nobody", &found) == false);
 }
 
 void test_get_branch_staff_by_id_not_found()
 {
-  assert(get_branch_staff_by_id(999) == NULL);
+  branch_staff_t found;
+  assert(get_branch_staff_by_id(999, &found) == false);
 }
 
 void test_load_branch_staff_roundtrip()
@@ -166,10 +171,10 @@ void test_load_branch_staff_roundtrip()
   create_branch_staff("Test", "t@t.com", "0171111111", "Gulshan", "tester", "hashval", BRANCH_MANAGER);
 
   load_branch_staff();
-  branch_staff_t *found = get_branch_staff_by_username("tester");
-  assert(found != NULL);
-  assert(found->role == BRANCH_MANAGER);
-  assert(strcmp(found->password_hash, "hashval") == 0);
+  branch_staff_t found;
+  assert(get_branch_staff_by_username("tester", &found) == true);
+  assert(found.role == BRANCH_MANAGER);
+  assert(strcmp(found.password_hash, "hashval") == 0);
 }
 
 // ---- gym member tests ----
@@ -189,19 +194,19 @@ void test_create_gym_member_and_get()
                               MEMBERSHIP_ON_HOLD);
   assert(id == 1);
 
-  gym_member_t *found = get_gym_member_by_id(id);
-  assert(found != NULL);
-  assert(found->id == 1);
-  assert(strcmp(found->full_name, "Nusrat Jahan") == 0);
-  assert(strcmp(found->email, "nusrat@test.com") == 0);
-  assert(strcmp(found->phone_number, "0181234567") == 0);
-  assert(strcmp(found->gym_branch, "Uttara") == 0);
-  assert(strcmp(found->username, "nusrat") == 0);
-  assert(found->plan.payable_amount == 1500);
-  assert(found->plan.interval_days == 30);
-  assert(found->status == MEMBERSHIP_ON_HOLD);
-  assert(found->due_amount == 0);
-  assert(found->last_payment_date == 0);
+  gym_member_t found;
+  assert(get_gym_member_by_id(id, &found) == true);
+  assert(found.id == 1);
+  assert(strcmp(found.full_name, "Nusrat Jahan") == 0);
+  assert(strcmp(found.email, "nusrat@test.com") == 0);
+  assert(strcmp(found.phone_number, "0181234567") == 0);
+  assert(strcmp(found.gym_branch, "Uttara") == 0);
+  assert(strcmp(found.username, "nusrat") == 0);
+  assert(found.plan.payable_amount == 1500);
+  assert(found.plan.interval_days == 30);
+  assert(found.status == MEMBERSHIP_ON_HOLD);
+  assert(found.due_amount == 0);
+  assert(found.last_payment_date == 0);
 }
 
 void test_create_gym_member_auto_increment_id()
@@ -242,17 +247,18 @@ void test_create_gym_member_rejects_empty_fields()
 
 void test_get_gym_member_by_username()
 {
-  gym_member_t *found = get_gym_member_by_username("nusrat");
-  assert(found != NULL);
-  assert(strcmp(found->gym_branch, "Uttara") == 0);
-  assert(found->status == MEMBERSHIP_ON_HOLD);
+  gym_member_t found;
+  assert(get_gym_member_by_username("nusrat", &found) == true);
+  assert(strcmp(found.gym_branch, "Uttara") == 0);
+  assert(found.status == MEMBERSHIP_ON_HOLD);
 
-  assert(get_gym_member_by_username("nobody") == NULL);
+  assert(get_gym_member_by_username("nobody", &found) == false);
 }
 
 void test_get_gym_member_by_id_not_found()
 {
-  assert(get_gym_member_by_id(999) == NULL);
+  gym_member_t found;
+  assert(get_gym_member_by_id(999, &found) == false);
 }
 
 void test_load_gym_members_roundtrip()
@@ -269,11 +275,11 @@ void test_load_gym_members_roundtrip()
   create_gym_member("Test", "t@t.com", "0171111111", "Banani", "tester_m", "hashval", plan, MEMBERSHIP_ACTIVE);
 
   load_gym_members();
-  gym_member_t *found = get_gym_member_by_username("tester_m");
-  assert(found != NULL);
-  assert(found->plan.payable_amount == 1500);
-  assert(found->plan.interval_days == 30);
-  assert(strcmp(found->password_hash, "hashval") == 0);
+  gym_member_t found;
+  assert(get_gym_member_by_username("tester_m", &found) == true);
+  assert(found.plan.payable_amount == 1500);
+  assert(found.plan.interval_days == 30);
+  assert(strcmp(found.password_hash, "hashval") == 0);
 }
 
 // ---- username_exists tests ----
@@ -495,14 +501,15 @@ void test_delete_branch_staff_removes_and_persists()
   id_t id2 = create_branch_staff("Staff Two", "s2@t.com", "0172222222", "B1", "staffdel2", "h2", BRANCH_MANAGER);
   assert(id1 != 0 && id2 != 0);
 
+  branch_staff_t found;
   assert(delete_branch_staff(id1) == true);
-  assert(get_branch_staff_by_id(id1) == NULL);
-  assert(get_branch_staff_by_username("staffdel1") == NULL);
-  assert(get_branch_staff_by_id(id2) != NULL);
+  assert(get_branch_staff_by_id(id1, &found) == false);
+  assert(get_branch_staff_by_username("staffdel1", &found) == false);
+  assert(get_branch_staff_by_id(id2, &found) == true);
 
   load_branch_staff();
-  assert(get_branch_staff_by_id(id1) == NULL);
-  assert(get_branch_staff_by_id(id2) != NULL);
+  assert(get_branch_staff_by_id(id1, &found) == false);
+  assert(get_branch_staff_by_id(id2, &found) == true);
 
   id_t reused = create_branch_staff("Staff Three", "s3@t.com", "0173333333", "B1", "staffdel1", "h3", TRAINER);
   assert(reused != 0);
@@ -542,14 +549,15 @@ void test_delete_gym_member_removes_and_persists()
     create_gym_member("Member Two", "m2@t.com", "0182222222", "B1", "memberdel2", "h2", plan, MEMBERSHIP_ON_HOLD);
   assert(id1 != 0 && id2 != 0);
 
+  gym_member_t found;
   assert(delete_gym_member(id1) == true);
-  assert(get_gym_member_by_id(id1) == NULL);
-  assert(get_gym_member_by_username("memberdel1") == NULL);
-  assert(get_gym_member_by_id(id2) != NULL);
+  assert(get_gym_member_by_id(id1, &found) == false);
+  assert(get_gym_member_by_username("memberdel1", &found) == false);
+  assert(get_gym_member_by_id(id2, &found) == true);
 
   load_gym_members();
-  assert(get_gym_member_by_id(id1) == NULL);
-  assert(get_gym_member_by_id(id2) != NULL);
+  assert(get_gym_member_by_id(id1, &found) == false);
+  assert(get_gym_member_by_id(id2, &found) == true);
 
   subscription_plan_t reuse_plan;
   reuse_plan.payable_amount = 500;
@@ -561,8 +569,10 @@ void test_delete_gym_member_removes_and_persists()
 }
 
 /**
- * Verifies that delete_gym_member rejects a member with outstanding dues
- * and accepts them once the dues are cleared.
+ * Verifies that delete_gym_member rejects a member with outstanding dues.
+ *
+ * The indebted record is written directly to the data file because creation
+ * always starts members with zero dues.
  */
 void test_delete_gym_member_rejects_member_with_dues()
 {
@@ -571,24 +581,17 @@ void test_delete_gym_member_rejects_member_with_dues()
   load_branch_staff();
   load_gym_members();
 
-  subscription_plan_t plan;
-  plan.payable_amount = 1000;
-  plan.interval_days = 30;
+  FILE *file = fopen(GYM_MEMBERS_FILE_PATH, "w");
+  assert(file != NULL);
+  fprintf(file, "1|Debtor Member|debt@t.com|0184444444|B1|debtor|h1|1704067200|0|750|1000|30|%d\n", MEMBERSHIP_ACTIVE);
+  fclose(file);
 
-  id_t id =
-    create_gym_member("Debtor Member", "debt@t.com", "0184444444", "B1", "debtor", "h1", plan, MEMBERSHIP_ACTIVE);
-  assert(id != 0);
+  assert(load_gym_members() == 1);
 
-  gym_member_t *member = get_gym_member_by_id(id);
-  assert(member != NULL);
-
-  member->due_amount = 750;
-  assert(delete_gym_member(id) == false);
-  assert(get_gym_member_by_id(id) != NULL);
-
-  member->due_amount = 0;
-  assert(delete_gym_member(id) == true);
-  assert(get_gym_member_by_id(id) == NULL);
+  gym_member_t found;
+  assert(delete_gym_member(1) == false);
+  assert(get_gym_member_by_id(1, &found) == true);
+  assert(found.due_amount == 750);
 }
 
 // ---- update tests ----
@@ -605,17 +608,18 @@ void test_update_branch_staff_updates_fields_and_persists()
 
   assert(update_branch_staff(id, "New Name", "new@test.com", "0172222222") == true);
 
-  branch_staff_t *found = get_branch_staff_by_id(id);
-  assert(found != NULL);
-  assert(strcmp(found->full_name, "New Name") == 0);
-  assert(strcmp(found->email, "new@test.com") == 0);
-  assert(strcmp(found->phone_number, "0172222222") == 0);
+  branch_staff_t found;
+  assert(update_branch_staff(id, "New Name", "new@test.com", "0172222222") == true);
+
+  assert(get_branch_staff_by_id(id, &found) == true);
+  assert(strcmp(found.full_name, "New Name") == 0);
+  assert(strcmp(found.email, "new@test.com") == 0);
+  assert(strcmp(found.phone_number, "0172222222") == 0);
 
   // Verify persistence.
   load_branch_staff();
-  found = get_branch_staff_by_id(id);
-  assert(found != NULL);
-  assert(strcmp(found->full_name, "New Name") == 0);
+  assert(get_branch_staff_by_id(id, &found) == true);
+  assert(strcmp(found.full_name, "New Name") == 0);
 }
 
 void test_update_branch_staff_rejects_unknown_id()
@@ -660,19 +664,20 @@ void test_update_gym_member_updates_fields_and_persists()
 
   assert(update_gym_member(id, "New Name", "new@test.com", "0182222222", "B2", "mupdater1_new") == true);
 
-  gym_member_t *found = get_gym_member_by_id(id);
-  assert(found != NULL);
-  assert(strcmp(found->full_name, "New Name") == 0);
-  assert(strcmp(found->email, "new@test.com") == 0);
-  assert(strcmp(found->phone_number, "0182222222") == 0);
-  assert(strcmp(found->gym_branch, "B2") == 0);
-  assert(strcmp(found->username, "mupdater1_new") == 0);
+  gym_member_t found;
+  assert(update_gym_member(id, "New Name", "new@test.com", "0182222222", "B2", "mupdater1_new") == true);
+
+  assert(get_gym_member_by_id(id, &found) == true);
+  assert(strcmp(found.full_name, "New Name") == 0);
+  assert(strcmp(found.email, "new@test.com") == 0);
+  assert(strcmp(found.phone_number, "0182222222") == 0);
+  assert(strcmp(found.gym_branch, "B2") == 0);
+  assert(strcmp(found.username, "mupdater1_new") == 0);
 
   // Verify persistence.
   load_gym_members();
-  found = get_gym_member_by_id(id);
-  assert(found != NULL);
-  assert(strcmp(found->full_name, "New Name") == 0);
+  assert(get_gym_member_by_id(id, &found) == true);
+  assert(strcmp(found.full_name, "New Name") == 0);
 }
 
 void test_update_gym_member_rejects_unknown_id()
@@ -724,8 +729,9 @@ void test_update_gym_member_rejects_duplicate_username()
   assert(update_gym_member(id2, "B", "b@t.com", "0172222222", "B1", "taken") == false);
 
   // Original username unchanged.
-  gym_member_t *found = get_gym_member_by_id(id2);
-  assert(strcmp(found->username, "other") == 0);
+  gym_member_t found;
+  assert(get_gym_member_by_id(id2, &found) == true);
+  assert(strcmp(found.username, "other") == 0);
 }
 
 void test_update_gym_member_allows_same_username()
@@ -745,7 +751,8 @@ void test_update_gym_member_allows_same_username()
   // Updating other fields while keeping the same username should succeed.
   assert(update_gym_member(id, "New Name", "new@t.com", "0172222222", "B2", "keeper") == true);
 
-  gym_member_t *found = get_gym_member_by_id(id);
-  assert(strcmp(found->username, "keeper") == 0);
-  assert(strcmp(found->full_name, "New Name") == 0);
+  gym_member_t found;
+  assert(get_gym_member_by_id(id, &found) == true);
+  assert(strcmp(found.username, "keeper") == 0);
+  assert(strcmp(found.full_name, "New Name") == 0);
 }

@@ -13,7 +13,6 @@
 #define TRX_ID_BUFFER_SIZE 64       // transaction id field
 #define DATE_BUFFER_SIZE 11         // yyyy-mm-dd + null terminator
 #define FIELD_BUFFER_SIZE 256       // buffer for a single field when splitting a pipe-delimited record line
-#define PATH_BUFFER_SIZE 256        // buffer for resolved file paths
 #define LINE_BUFFER_SIZE 1024       // one full record line, large enough for any record
 
 // Hashing internals.
@@ -33,18 +32,16 @@
 #define MAX_GYM_MEMBERS (BRANCH_COUNT_MAX * MAX_MEMBERS_PER_BRANCH)
 
 // File storage.
-// String form feeds format strings via literal concatenation, while the
-// char form feeds split()/sanitize comparisons. main() rejects any
-// delimiter whose string form is not exactly one character long.
+#ifndef DATA_DIRECTORY
+#define DATA_DIRECTORY "data"
+#endif
+// the delimiter needs to be verified to be 1 character long in main function
 #define FIELD_DELIMITER_STRING "|"
 #define FIELD_DELIMITER FIELD_DELIMITER_STRING[0]
-#ifndef DEFAULT_DATA_DIRECTORY
-#define DEFAULT_DATA_DIRECTORY "data"
-#endif
-#define GYM_BRANCHES_FILENAME "branches.txt"
-#define SYSDADMINS_FILENAME "sysadmins.dat"
-#define BRANCH_STAFF_FILENAME "branch_staff.dat"
-#define GYM_MEMBERS_FILENAME "gym_members.dat"
+#define GYM_BRANCHES_FILE_PATH DATA_DIRECTORY "/branches.txt"
+#define SYSADMINS_FILE_PATH DATA_DIRECTORY "/sysadmins.dat"
+#define BRANCH_STAFF_FILE_PATH DATA_DIRECTORY "/branch_staff.dat"
+#define GYM_MEMBERS_FILE_PATH DATA_DIRECTORY "/gym_members.dat"
 #define MAX_RECORD_FIELDS 14 // maximum number of fields in any pipe-delimited record
 
 // Credentials for the sysadmin account seeded on first run.

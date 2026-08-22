@@ -26,13 +26,4 @@ bool read_line_from_file(FILE *file, char buffer[], int buffer_capacity);
  */
 bool write_line_to_file(FILE *file, const char line[]);
 
-/**
- * Builds a full file path by joining the data directory with a filename.
- *
- * @param filename the bare file name (e.g. "branches.txt")
- * @param destination receives "DEFAULT_DATA_DIRECTORY/filename"
- * @param destination_capacity the number of characters destination can hold
- */
-void build_file_path(const char *filename, char *destination, int destination_capacity);
-
 #endif

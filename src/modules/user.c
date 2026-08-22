@@ -34,13 +34,10 @@ static void format_sysadmin_line(const sysadmin_t *record_payload, char line_des
 // Appends a sysadmin record as a delimiter-separated line to the data file.
 static bool persist_sysadmin(const sysadmin_t *record_payload)
 {
-  char path[PATH_BUFFER_SIZE];
-  build_file_path(SYSDADMINS_FILENAME, path, PATH_BUFFER_SIZE);
-
-  FILE *file = fopen(path, "a");
+  FILE *file = fopen(SYSADMINS_FILE_PATH, "a");
   if (file == NULL)
   {
-    LOG_ERROR("Failed to open sysadmin data file.");
+    LOG_ERROR("Error: Failed to open sysadmin data file.");
     return false;
   }
 
@@ -77,13 +74,10 @@ static void format_gym_member_line(const gym_member_t *record_payload, char line
 // Appends a branch staff record as a delimiter-separated line to the data file.
 static bool persist_branch_staff(const branch_staff_t *record_payload)
 {
-  char path[PATH_BUFFER_SIZE];
-  build_file_path(BRANCH_STAFF_FILENAME, path, PATH_BUFFER_SIZE);
-
-  FILE *file = fopen(path, "a");
+  FILE *file = fopen(BRANCH_STAFF_FILE_PATH, "a");
   if (file == NULL)
   {
-    LOG_ERROR("Failed to open branch staff data file.");
+    LOG_ERROR("Error: Failed to open branch staff data file.");
     return false;
   }
 
@@ -98,13 +92,10 @@ static bool persist_branch_staff(const branch_staff_t *record_payload)
 // Appends a gym member record as a delimiter-separated line to the data file.
 static bool persist_gym_member(const gym_member_t *record_payload)
 {
-  char path[PATH_BUFFER_SIZE];
-  build_file_path(GYM_MEMBERS_FILENAME, path, PATH_BUFFER_SIZE);
-
-  FILE *file = fopen(path, "a");
+  FILE *file = fopen(GYM_MEMBERS_FILE_PATH, "a");
   if (file == NULL)
   {
-    LOG_ERROR("Failed to open gym member data file.");
+    LOG_ERROR("Error: Failed to open gym member data file.");
     return false;
   }
 
@@ -142,13 +133,10 @@ static void remove_gym_member_at(int index)
 // removed record, matching the file-first ordering of creation.
 static bool rewrite_branch_staff_file_without(int index)
 {
-  char path[PATH_BUFFER_SIZE];
-  build_file_path(BRANCH_STAFF_FILENAME, path, PATH_BUFFER_SIZE);
-
-  FILE *file = fopen(path, "w");
+  FILE *file = fopen(BRANCH_STAFF_FILE_PATH, "w");
   if (file == NULL)
   {
-    LOG_ERROR("Failed to open branch staff file for writing.");
+    LOG_ERROR("Error: Failed to open branch staff file for writing.");
     return false;
   }
 
@@ -162,7 +150,7 @@ static bool rewrite_branch_staff_file_without(int index)
     if (!write_line_to_file(file, line))
     {
       fclose(file);
-      LOG_ERROR("Failed to write branch staff record.");
+      LOG_ERROR("Error: Failed to write branch staff record.");
       return false;
     }
   }
@@ -177,13 +165,10 @@ static bool rewrite_branch_staff_file_without(int index)
 // removed record, matching the file-first ordering of creation.
 static bool rewrite_gym_members_file_without(int index)
 {
-  char path[PATH_BUFFER_SIZE];
-  build_file_path(GYM_MEMBERS_FILENAME, path, PATH_BUFFER_SIZE);
-
-  FILE *file = fopen(path, "w");
+  FILE *file = fopen(GYM_MEMBERS_FILE_PATH, "w");
   if (file == NULL)
   {
-    LOG_ERROR("Failed to open gym members file for writing.");
+    LOG_ERROR("Error: Failed to open gym members file for writing.");
     return false;
   }
 
@@ -197,7 +182,7 @@ static bool rewrite_gym_members_file_without(int index)
     if (!write_line_to_file(file, line))
     {
       fclose(file);
-      LOG_ERROR("Failed to write gym member record.");
+      LOG_ERROR("Error: Failed to write gym member record.");
       return false;
     }
   }
@@ -212,13 +197,10 @@ static bool rewrite_gym_members_file_without(int index)
 // modified record.
 static bool rewrite_branch_staff_file_all()
 {
-  char path[PATH_BUFFER_SIZE];
-  build_file_path(BRANCH_STAFF_FILENAME, path, PATH_BUFFER_SIZE);
-
-  FILE *file = fopen(path, "w");
+  FILE *file = fopen(BRANCH_STAFF_FILE_PATH, "w");
   if (file == NULL)
   {
-    LOG_ERROR("Failed to open branch staff file for writing.");
+    LOG_ERROR("Error: Failed to open branch staff file for writing.");
     return false;
   }
 
@@ -229,7 +211,7 @@ static bool rewrite_branch_staff_file_all()
     if (!write_line_to_file(file, line))
     {
       fclose(file);
-      LOG_ERROR("Failed to write branch staff record.");
+      LOG_ERROR("Error: Failed to write branch staff record.");
       return false;
     }
   }
@@ -244,13 +226,10 @@ static bool rewrite_branch_staff_file_all()
 // modified record.
 static bool rewrite_gym_members_file_all()
 {
-  char path[PATH_BUFFER_SIZE];
-  build_file_path(GYM_MEMBERS_FILENAME, path, PATH_BUFFER_SIZE);
-
-  FILE *file = fopen(path, "w");
+  FILE *file = fopen(GYM_MEMBERS_FILE_PATH, "w");
   if (file == NULL)
   {
-    LOG_ERROR("Failed to open gym members file for writing.");
+    LOG_ERROR("Error: Failed to open gym members file for writing.");
     return false;
   }
 
@@ -261,7 +240,7 @@ static bool rewrite_gym_members_file_all()
     if (!write_line_to_file(file, line))
     {
       fclose(file);
-      LOG_ERROR("Failed to write gym member record.");
+      LOG_ERROR("Error: Failed to write gym member record.");
       return false;
     }
   }
@@ -347,10 +326,7 @@ int load_sysadmins()
 {
   sysadmin_count = 0;
 
-  char path[PATH_BUFFER_SIZE];
-  build_file_path(SYSDADMINS_FILENAME, path, PATH_BUFFER_SIZE);
-
-  FILE *file = fopen(path, "r");
+  FILE *file = fopen(SYSADMINS_FILE_PATH, "r");
   if (file == NULL)
   {
     next_sysadmin_id = 1;
@@ -373,10 +349,7 @@ int load_branch_staff()
 {
   branch_staff_count = 0;
 
-  char path[PATH_BUFFER_SIZE];
-  build_file_path(BRANCH_STAFF_FILENAME, path, PATH_BUFFER_SIZE);
-
-  FILE *file = fopen(path, "r");
+  FILE *file = fopen(BRANCH_STAFF_FILE_PATH, "r");
   if (file == NULL)
   {
     next_branch_staff_id = 1;
@@ -400,10 +373,7 @@ int load_gym_members()
 {
   gym_member_count = 0;
 
-  char path[PATH_BUFFER_SIZE];
-  build_file_path(GYM_MEMBERS_FILENAME, path, PATH_BUFFER_SIZE);
-
-  FILE *file = fopen(path, "r");
+  FILE *file = fopen(GYM_MEMBERS_FILE_PATH, "r");
   if (file == NULL)
   {
     next_gym_member_id = 1;
@@ -455,7 +425,7 @@ id_t create_sysadmin(const char username[], const char password_hash[])
 
   if (!persist_sysadmin(&record))
   {
-    LOG_ERROR("Failed to persist sysadmin record.");
+    LOG_ERROR("Error: Failed to persist sysadmin record.");
     return 0;
   }
 
@@ -530,7 +500,7 @@ id_t create_branch_staff(const char full_name[], const char email[], const char 
 
   if (!persist_branch_staff(&record))
   {
-    LOG_ERROR("Failed to persist branch staff record.");
+    LOG_ERROR("Error: Failed to persist branch staff record.");
     return 0;
   }
 
@@ -608,7 +578,7 @@ id_t create_gym_member(const char full_name[], const char email[], const char ph
 
   if (!persist_gym_member(&record))
   {
-    LOG_ERROR("Failed to persist gym member record.");
+    LOG_ERROR("Error: Failed to persist gym member record.");
     return 0;
   }
 
@@ -645,7 +615,7 @@ bool delete_branch_staff(id_t id)
 
   if (!rewrite_branch_staff_file_without(index))
   {
-    LOG_ERROR("Failed to rewrite branch staff file.");
+    LOG_ERROR("Error: Failed to rewrite branch staff file.");
     return false;
   }
 
@@ -679,7 +649,7 @@ bool delete_gym_member(id_t id)
 
   if (!rewrite_gym_members_file_without(index))
   {
-    LOG_ERROR("Failed to rewrite gym members file.");
+    LOG_ERROR("Error: Failed to rewrite gym members file.");
     return false;
   }
 
@@ -866,7 +836,7 @@ bool update_branch_staff(id_t id, const char full_name[], const char email[], co
 
   if (!rewrite_branch_staff_file_all())
   {
-    LOG_ERROR("Failed to persist branch staff update.");
+    LOG_ERROR("Error: Failed to persist branch staff update.");
     return false;
   }
 
@@ -937,7 +907,7 @@ bool update_gym_member(id_t id, const char full_name[], const char email[], cons
 
   if (!rewrite_gym_members_file_all())
   {
-    LOG_ERROR("Failed to persist gym member update.");
+    LOG_ERROR("Error: Failed to persist gym member update.");
     return false;
   }
 

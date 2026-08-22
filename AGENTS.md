@@ -80,7 +80,7 @@ src/
 │   └── menu.[ch]       login/register menus + one menu handler per role
 └── utils/
     ├── string_util.[ch] trim, split, parse numbers, case helpers, sanitize_field
-    ├── file_util.[ch]   read/write lines, build_file_path
+    ├── file_util.[ch]   read/write lines
     ├── input.[ch]       safe fgets/scanf wrappers with validation
     ├── hash.[ch]        polynomial hash (demo) + salt generation + mix_salt helpers
     ├── rng.[ch]         xoshiro128** PRNG (demo) + seed_rng + random_number

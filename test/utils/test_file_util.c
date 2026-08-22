@@ -6,7 +6,7 @@
 #include "../../src/utils/file_util.h"
 #include "test_file_util.h"
 
-#define TEST_FILE_PATH DEFAULT_DATA_DIRECTORY "/tmp_test_file_util.dat"
+#define TEST_FILE_PATH DATA_DIRECTORY "/tmp_test_file_util.dat"
 
 /**
  * Opens the test file for writing and returns the open file.
@@ -113,45 +113,4 @@ void test_write_line_rejects_invalid_arguments()
 {
   assert(write_line_to_file(NULL, "line") == false);
   assert(write_line_to_file(stdout, NULL) == false);
-}
-
-/**
- * Verifies that build_file_path correctly joins a directory and filename.
- */
-void test_build_file_path_joins_correctly()
-{
-  char path[260];
-  build_file_path("branches.txt", path, sizeof(path));
-  assert(strcmp(path, DEFAULT_DATA_DIRECTORY "/branches.txt") == 0);
-}
-
-/**
- * Verifies that build_file_path handles NULL inputs without crashing.
- */
-void test_build_file_path_null_inputs_are_safe()
-{
-  char path[260];
-  path[0] = '\0';
-
-  build_file_path(NULL, path, sizeof(path));
-  assert(strlen(path) == 0);
-
-  build_file_path("file.txt", NULL, 0);
-}
-
-/**
- * Verifies that build_file_path produces an empty string on overflow.
- */
-void test_build_file_path_overflow_produces_empty()
-{
-  char long_directory[260];
-  int index;
-
-  for (index = 0; index < 257; index++)
-    long_directory[index] = 'a';
-  long_directory[index] = '\0';
-
-  char path[260];
-  build_file_path(long_directory, path, sizeof(path));
-  assert(strlen(path) == 0);
 }

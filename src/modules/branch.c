@@ -25,13 +25,10 @@ static void remove_branch_at(int index)
 // branch, matching the file-first ordering of add_branch.
 static bool rewrite_branches_file_without(int index)
 {
-  char path[PATH_BUFFER_SIZE];
-  build_file_path(GYM_BRANCHES_FILENAME, path, PATH_BUFFER_SIZE);
-
-  FILE *file = fopen(path, "w");
+  FILE *file = fopen(GYM_BRANCHES_FILE_PATH, "w");
   if (file == NULL)
   {
-    LOG_ERROR("Failed to open branches file for writing.");
+    LOG_ERROR("Error: Failed to open branches file for writing.");
     return false;
   }
 
@@ -40,7 +37,7 @@ static bool rewrite_branches_file_without(int index)
     if (i != index && !write_line_to_file(file, branches[i]))
     {
       fclose(file);
-      LOG_ERROR("Failed to write branch record.");
+      LOG_ERROR("Error: Failed to write branch record.");
       return false;
     }
   }
@@ -53,10 +50,7 @@ int load_branches()
 {
   branch_count = 0;
 
-  char path[PATH_BUFFER_SIZE];
-  build_file_path(GYM_BRANCHES_FILENAME, path, PATH_BUFFER_SIZE);
-
-  FILE *file = fopen(path, "r");
+  FILE *file = fopen(GYM_BRANCHES_FILE_PATH, "r");
   if (file == NULL)
     return 0;
 
@@ -108,13 +102,10 @@ bool add_branch(const char branch_name[])
     return false;
   }
 
-  char path[PATH_BUFFER_SIZE];
-  build_file_path(GYM_BRANCHES_FILENAME, path, PATH_BUFFER_SIZE);
-
-  FILE *file = fopen(path, "a");
+  FILE *file = fopen(GYM_BRANCHES_FILE_PATH, "a");
   if (file == NULL)
   {
-    LOG_ERROR("Failed to open branches file for appending.");
+    LOG_ERROR("Error: Failed to open branches file for appending.");
     return false;
   }
 
@@ -177,7 +168,7 @@ bool delete_branch(const char branch_name[])
 
   if (!rewrite_branches_file_without(index))
   {
-    LOG_ERROR("Failed to rewrite branches file.");
+    LOG_ERROR("Error: Failed to rewrite branches file.");
     return false;
   }
 

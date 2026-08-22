@@ -6,7 +6,6 @@
 #include "../../src/modules/user.h"
 #include "../../src/settings.h"
 #include "../../src/types.h"
-#include "../../src/utils/file_util.h"
 #include "test_branch.h"
 
 /**
@@ -14,13 +13,9 @@
  */
 static void cleanup_user_data_files()
 {
-  char path[PATH_BUFFER_SIZE];
-  build_file_path(SYSDADMINS_FILENAME, path, PATH_BUFFER_SIZE);
-  remove(path);
-  build_file_path(BRANCH_STAFF_FILENAME, path, PATH_BUFFER_SIZE);
-  remove(path);
-  build_file_path(GYM_MEMBERS_FILENAME, path, PATH_BUFFER_SIZE);
-  remove(path);
+  remove(SYSADMINS_FILE_PATH);
+  remove(BRANCH_STAFF_FILE_PATH);
+  remove(GYM_MEMBERS_FILE_PATH);
 }
 
 /**
@@ -29,9 +24,7 @@ static void cleanup_user_data_files()
  */
 void cleanup_branches_file()
 {
-  char path[PATH_BUFFER_SIZE];
-  build_file_path(GYM_BRANCHES_FILENAME, path, PATH_BUFFER_SIZE);
-  remove(path);
+  remove(GYM_BRANCHES_FILE_PATH);
 }
 
 /**

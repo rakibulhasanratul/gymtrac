@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../settings.h"
 #include "file_util.h"
 
 bool read_line_from_file(FILE *file, char buffer[], int buffer_capacity)
@@ -46,15 +45,4 @@ bool write_line_to_file(FILE *file, const char line[])
   if (fputc('\n', file) == EOF)
     return false;
   return true;
-}
-
-void build_file_path(const char *filename, char *destination, int destination_capacity)
-{
-  if (filename == NULL || destination == NULL || destination_capacity < 1)
-    return;
-
-  destination[0] = '\0';
-  int written = snprintf(destination, destination_capacity, "%s/%s", DEFAULT_DATA_DIRECTORY, filename);
-  if (written < 0 || written >= destination_capacity)
-    destination[0] = '\0';
 }

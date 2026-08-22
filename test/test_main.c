@@ -36,9 +36,6 @@ int main()
   test_read_drains_overlong_line();
   test_read_line_rejects_invalid_arguments();
   test_write_line_rejects_invalid_arguments();
-  test_build_file_path_joins_correctly();
-  test_build_file_path_null_inputs_are_safe();
-  test_build_file_path_overflow_produces_empty();
 
   /* input */
   test_input_string_reads_plain_lines();

@@ -81,7 +81,8 @@ Work tracked per item; commit each with a Conventional Commit message (`feat:`, 
 - [x] Unit tests covering session predicates and branch-scope checks - `test:`
 - [x] Member lifecycle: approve `on_hold` members to active, suspend/unsuspend with a mandatory reason (recording dated suspension records), and auto-suspend members with 90+ days unpaid dues - `feat:`
 - [x] Unit tests covering approval, suspension records with optional unsuspension date, and the auto-suspend sweep - `test:`
-- [ ] Branch rename/update: renaming a branch requires cascading updates to all staff and member records referencing it - deferred (complex cross-module revision)
+- [x] Branch rename/update: renaming a branch requires cascading updates to all staff and member records referencing it - `feat:`
+- [x] Unit tests covering branch rename persistence and the cascade into staff and member records - `test:`
 - [ ] Payment module: record digital payments instantly, let trainers record cash payments directly, then reduce `due_amount` (clamped at 0) and update `last_payment_date` - `feat:`
 - [ ] Unit tests covering digital payment, trainer-recorded cash payment, due clamping, and date advancement - `test:`
 - [ ] Lost & Found module where members report lost/found items and managers/trainers list and resolve their branch's items - `feat:`

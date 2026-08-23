@@ -24,12 +24,14 @@ The name of the project is `Gymtrac` which is a gym management system, a `group 
 - Use `UPPERCASE` for macros.
 - DO NOT use constants, use macros instead.
 - Hex escapes in string literals and hex numeric constants are prohibited; use plain characters and decimal literals only. The persisted-record field delimiter is `|` (pipe); field values never contain `|`.
-- If a function takes struct as an argument and it is not being modified, add `_payload` suffix to the parameter name and make the parameter const type.
+- If a function takes struct as an argument and it is not being modified, add `_payload` suffix to the parameter name and make the parameter const type. Paylaods (names end with `_payload`) are always passed by value, never by pointer.
 - For policies, create a policy function to enforce the policy. Naming should follow the pattern: ensure_<policy_name>(...). Examples:
   - `ensure_username_is_available(...)`
   - `ensure_branch_has_no_manager(...)`
   - `ensure_branch_name_is_valid(...)`
 - DO NOT USE ensure_* names for function that just wraps one line conditional statement.
+  - An ensure_* policy function must enforce a real business rule spanning multiple checks or data lookups (scanning tables, counting records, cross-referencing other modules), e.g. `ensure_branch_has_no_users(...)` counts managers, trainers, and members of a branch.
+  - A single field comparison like `member_payload.status == MEMBERSHIP_SUSPENDED` is NOT a policy; write it inline at the call site as a guard clause and never wrap it in an ensure_* function.
 - Use self describing short names. Avoid using single letter names (except loops' iterators) or abbreviations.
   - bad name: `file_write_line(...)`
   - good name: `write_line_to_file(...)`

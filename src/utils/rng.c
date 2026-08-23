@@ -33,8 +33,7 @@ static inline unsigned int xor_32(unsigned int a, unsigned int b)
   {
     unsigned int bit_a = a % 2;
     unsigned int bit_b = b % 2;
-    if (bit_a != bit_b)
-      result += place;
+    if (bit_a != bit_b) result += place;
     a /= 2;
     b /= 2;
     place *= 2;

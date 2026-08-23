@@ -128,8 +128,7 @@ void test_write_read_lines_round_trip()
   const char *lines[] = {"alpha", "beta"};
   assert(write_lines_to_file(TEST_LINES_FILE_PATH, lines, 2) == true);
 
-  for (int i = 0; i < 4; i++)
-    maps[i] = storage[i];
+  for (int i = 0; i < 4; i++) maps[i] = storage[i];
 
   assert(read_lines_from_file(TEST_LINES_FILE_PATH, maps, 4, 64) == 2);
   assert(strcmp(storage[0], "alpha") == 0);
@@ -151,8 +150,7 @@ void test_read_lines_skip_empty_lines()
   assert(write_line_to_file(file, "beta"));
   fclose(file);
 
-  for (int i = 0; i < 4; i++)
-    maps[i] = storage[i];
+  for (int i = 0; i < 4; i++) maps[i] = storage[i];
 
   assert(read_lines_from_file(TEST_LINES_FILE_PATH, maps, 4, 64) == 2);
   assert(strcmp(storage[0], "alpha") == 0);
@@ -173,8 +171,7 @@ void test_write_lines_overwrite_existing_content()
   const char *second[] = {"only"};
   assert(write_lines_to_file(TEST_LINES_FILE_PATH, second, 1) == true);
 
-  for (int i = 0; i < 4; i++)
-    maps[i] = storage[i];
+  for (int i = 0; i < 4; i++) maps[i] = storage[i];
 
   assert(read_lines_from_file(TEST_LINES_FILE_PATH, maps, 4, 64) == 1);
   assert(strcmp(storage[0], "only") == 0);
@@ -191,8 +188,7 @@ void test_read_lines_respects_max_lines()
   const char *lines[] = {"one", "two", "three"};
   assert(write_lines_to_file(TEST_LINES_FILE_PATH, lines, 3) == true);
 
-  for (int i = 0; i < 4; i++)
-    maps[i] = storage[i];
+  for (int i = 0; i < 4; i++) maps[i] = storage[i];
 
   assert(read_lines_from_file(TEST_LINES_FILE_PATH, maps, 2, 64) == 2);
   assert(strcmp(storage[0], "one") == 0);
@@ -209,8 +205,7 @@ void test_read_lines_missing_file_returns_zero()
 
   remove(TEST_LINES_FILE_PATH);
 
-  for (int i = 0; i < 4; i++)
-    maps[i] = storage[i];
+  for (int i = 0; i < 4; i++) maps[i] = storage[i];
 
   assert(read_lines_from_file(TEST_LINES_FILE_PATH, maps, 4, 64) == 0);
 }
@@ -238,8 +233,7 @@ void test_read_lines_rejects_invalid_arguments()
   char storage[4][64];
   char *maps[4];
 
-  for (int i = 0; i < 4; i++)
-    maps[i] = storage[i];
+  for (int i = 0; i < 4; i++) maps[i] = storage[i];
 
   assert(read_lines_from_file(NULL, maps, 4, 64) == 0);
   assert(read_lines_from_file(TEST_LINES_FILE_PATH, NULL, 4, 64) == 0);

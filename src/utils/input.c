@@ -7,25 +7,21 @@
 static void discard_remaining_input()
 {
   int ch;
-  while ((ch = getchar()) != '\n' && ch != EOF)
-    ;
+  while ((ch = getchar()) != '\n' && ch != EOF);
 }
 
 bool input_string(char buffer[], int buffer_capacity)
 {
-  if (buffer == NULL || buffer_capacity < 2)
-    return false;
+  if (buffer == NULL || buffer_capacity < 2) return false;
 
-  if (fgets(buffer, buffer_capacity, stdin) == NULL)
-    return false;
+  if (fgets(buffer, buffer_capacity, stdin) == NULL) return false;
 
   int length = (int)strlen(buffer);
   // Strip the trailing newline and any preceding carriage return.
   if (length > 0 && buffer[length - 1] == '\n')
   {
     buffer[length - 1] = '\0';
-    if (length > 1 && buffer[length - 2] == '\r')
-      buffer[length - 2] = '\0';
+    if (length > 1 && buffer[length - 2] == '\r') buffer[length - 2] = '\0';
     return true;
   }
 
@@ -36,8 +32,7 @@ bool input_string(char buffer[], int buffer_capacity)
 
 bool input_integer(int *value)
 {
-  if (value == NULL)
-    return false;
+  if (value == NULL) return false;
 
   int matched = scanf("%d", value);
   if (matched != 1)
@@ -52,10 +47,8 @@ bool input_integer(int *value)
 
 bool input_positive_int(int *value)
 {
-  if (!input_integer(value))
-    return false;
+  if (!input_integer(value)) return false;
   // Reject zero and negative numbers so only a positive amount is kept.
-  if (*value <= 0)
-    return false;
+  if (*value <= 0) return false;
   return true;
 }

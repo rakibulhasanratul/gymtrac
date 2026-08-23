@@ -17,46 +17,38 @@
 
 void generate_salt(char *destination)
 {
-  if (destination == NULL)
-    return;
+  if (destination == NULL) return;
 
   // Fill 15 characters from the alphanumeric charset.
   int charset_size = (int)strlen(SALT_CHARSET);
-  for (int i = 0; i < SALT_BUFFER_SIZE - 1; i++)
-    destination[i] = SALT_CHARSET[random_number() % charset_size];
+  for (int i = 0; i < SALT_BUFFER_SIZE - 1; i++) destination[i] = SALT_CHARSET[random_number() % charset_size];
   destination[SALT_BUFFER_SIZE - 1] = '\0';
 }
 
 void mix_salt(const char *password, const char *salt, char *destination)
 {
-  if (password == NULL || salt == NULL || destination == NULL)
-    return;
+  if (password == NULL || salt == NULL || destination == NULL) return;
 
   int write_index = 0;
 
   // Copy first 7 characters of salt (indices 0-6).
-  for (int i = 0; i < 7 && salt[i] != '\0'; i++)
-    destination[write_index++] = salt[i];
+  for (int i = 0; i < 7 && salt[i] != '\0'; i++) destination[write_index++] = salt[i];
 
   // Copy the password.
-  for (int i = 0; password[i] != '\0'; i++)
-    destination[write_index++] = password[i];
+  for (int i = 0; password[i] != '\0'; i++) destination[write_index++] = password[i];
 
   // Copy salt characters 8 through 14 (skipping index 7).
-  for (int i = 8; i < 15 && salt[i] != '\0'; i++)
-    destination[write_index++] = salt[i];
+  for (int i = 8; i < 15 && salt[i] != '\0'; i++) destination[write_index++] = salt[i];
 
   destination[write_index] = '\0';
 }
 
 hash_t create_hash(const char *text)
 {
-  if (text == NULL)
-    return 0;
+  if (text == NULL) return 0;
 
   hash_t hash_value = 0;
-  for (int i = 0; text[i] != '\0'; i++)
-    hash_value = POLYNOMIAL_MULTIPLIER * hash_value + (unsigned char)text[i];
+  for (int i = 0; text[i] != '\0'; i++) hash_value = POLYNOMIAL_MULTIPLIER * hash_value + (unsigned char)text[i];
 
   return hash_value;
 }
@@ -68,8 +60,7 @@ bool compare_hash(hash_t stored, hash_t computed)
 
 void hash_value_to_string(hash_t value, char *destination)
 {
-  if (destination == NULL)
-    return;
+  if (destination == NULL) return;
 
   sprintf(destination, "%lu", value);
 }

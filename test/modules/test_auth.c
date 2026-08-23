@@ -24,12 +24,10 @@ void test_hash_password_valid_format()
   assert(strlen(stored) > 0);
 
   // First 15 characters must be alphanumeric (the salt).
-  for (int index = 0; index < SALT_BUFFER_SIZE - 1; index++)
-    assert(isalnum((unsigned char)stored[index]));
+  for (int index = 0; index < SALT_BUFFER_SIZE - 1; index++) assert(isalnum((unsigned char)stored[index]));
 
   // Remaining characters must be decimal digits (the hash string).
-  for (int index = SALT_BUFFER_SIZE - 1; stored[index] != '\0'; index++)
-    assert(isdigit((unsigned char)stored[index]));
+  for (int index = SALT_BUFFER_SIZE - 1; stored[index] != '\0'; index++) assert(isdigit((unsigned char)stored[index]));
 }
 
 /**

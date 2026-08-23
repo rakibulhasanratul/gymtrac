@@ -49,8 +49,7 @@ void test_split_copies_fields()
   int part_index;
   int part_count;
 
-  for (part_index = 0; part_index < 8; part_index++)
-    parts[part_index] = fields[part_index];
+  for (part_index = 0; part_index < 8; part_index++) parts[part_index] = fields[part_index];
 
   strcpy(buffer, "alpha|beta|gamma");
   part_count = split(buffer, '|', parts, 8, 64);

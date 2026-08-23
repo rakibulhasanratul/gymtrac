@@ -39,8 +39,7 @@ void test_generate_salt_length_and_charset()
 
   assert((int)strlen(salt) == SALT_BUFFER_SIZE - 1);
 
-  for (int index = 0; salt[index] != '\0'; index++)
-    assert(isalnum((unsigned char)salt[index]));
+  for (int index = 0; salt[index] != '\0'; index++) assert(isalnum((unsigned char)salt[index]));
 }
 
 /**

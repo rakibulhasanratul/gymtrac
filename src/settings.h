@@ -56,4 +56,9 @@
     fprintf(stderr, "%s:%d: " msg "\n", __FILE__, __LINE__, ##__VA_ARGS__);                                            \
   } while (0)
 
+// windows compatibility layer
+#if defined(_WIN32) || defined(_WIN64)
+#define localtime_r(timep, result) (localtime_s(result, timep) == 0 ? result : NULL)
+#endif
+
 #endif

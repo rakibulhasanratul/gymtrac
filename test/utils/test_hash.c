@@ -92,7 +92,8 @@ void test_compare_hash_equal()
 {
   assert(compare_hash(69609650, 69609650) == true);
   assert(compare_hash(0, 0) == true);
-  assert(compare_hash(3170902850203UL, 3170902850203UL) == true);
+  // 32-bit safe value so the test holds on both LLP64 and LP64 platforms.
+  assert(compare_hash(4294967290ul, 4294967290ul) == true);
 }
 
 /**
@@ -138,7 +139,7 @@ void test_parse_hash_value_decimal()
   assert(parse_hash_value("69609650") == 69609650);
   assert(parse_hash_value("0") == 0);
   assert(parse_hash_value("97") == 97);
-  assert(parse_hash_value("3170902850203") == 3170902850203UL);
+  assert(parse_hash_value("4294967290") == 4294967290ul);
 }
 
 /**

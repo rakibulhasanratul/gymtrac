@@ -126,10 +126,17 @@ void test_string_to_unsigned_int_converts_digits()
  */
 void test_string_to_unsigned_long_int_converts_digits()
 {
-  assert(string_to_unsigned_long_int("123") == 123ul);
-  assert(string_to_unsigned_long_int("18446744073709551615") == ULONG_MAX);
+  // Built at runtime because unsigned long width differs per platform.
+  char maximum[32];
+  char overflow[32];
 
-  assert(string_to_unsigned_long_int("18446744073709551616") == 0);
+  sprintf(maximum, "%lu", ULONG_MAX);
+  sprintf(overflow, "%lu0", ULONG_MAX);
+
+  assert(string_to_unsigned_long_int("123") == 123ul);
+  assert(string_to_unsigned_long_int(maximum) == ULONG_MAX);
+
+  assert(string_to_unsigned_long_int(overflow) == 0);
   assert(string_to_unsigned_long_int("abc") == 0);
   assert(string_to_unsigned_long_int("") == 0);
   assert(string_to_unsigned_long_int(NULL) == 0);

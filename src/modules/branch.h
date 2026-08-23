@@ -15,14 +15,14 @@
 int load_branches();
 
 /**
- * Checks whether a branch with the given name exists in the in-memory array.
+ * Finds a branch by its exact name in the in-memory array.
  *
  * The comparison is case-sensitive and matches the exact string stored.
  *
  * @param branch_name the name to look up
- * @return true if the branch exists, false otherwise
+ * @return the zero-based index of the matching branch, or -1 if not found
  */
-bool branch_exists(const char branch_name[]);
+int find_branch(const char branch_name[]);
 
 /**
  * Appends a new branch name to the persisted file and in-memory array.
@@ -56,6 +56,20 @@ bool ensure_branch_has_no_users(const char branch_name[]);
  * @return true if the branch was deleted, false otherwise
  */
 bool delete_branch(const char branch_name[]);
+
+/**
+ * Renames a branch across the in-memory array, the persisted branches file,
+ * and every staff or member record assigned to it.
+ *
+ * Rejected when either name is empty, the old name does not exist, or the
+ * new name is already taken. Staff and member records are cascaded first,
+ * then the branch list itself is updated at the matched index and rewritten.
+ *
+ * @param old_branch_name the branch to rename
+ * @param new_branch_name the replacement branch name
+ * @return true if the branch was renamed everywhere, false otherwise
+ */
+bool update_branch_name(const char old_branch_name[], const char new_branch_name[]);
 
 /**
  * Returns the number of branches currently loaded in memory.

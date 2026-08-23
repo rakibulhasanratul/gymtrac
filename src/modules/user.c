@@ -997,6 +997,94 @@ bool update_gym_member_lifecycle(
   return true;
 }
 
+// Renames the branch reference on every branch staff record assigned to the
+// old branch name, then rewrites the staff file from memory.
+//
+// Used by the branch rename flow so no staff record keeps pointing at a
+// branch name that no longer exists. Succeeds silently when no record
+// matches, since the persisted file is already correct.
+static bool rename_branch_for_branch_staffs(const char old_branch_name[], const char new_branch_name[])
+{
+  bool renamed = false;
+  for (int i = 0; i < branch_staff_count; i++)
+  {
+    if (strcmp(branch_staffs[i].gym_branch, old_branch_name) == 0)
+    {
+      strcpy(branch_staffs[i].gym_branch, new_branch_name);
+      renamed = true;
+    }
+  }
+
+  if (!renamed) return true;
+
+  if (!rewrite_all_branch_staffs_to_file())
+  {
+    LOG_ERROR("Error: Failed to persist staff branch rename.");
+    return false;
+  }
+
+  return true;
+}
+
+// Renames the branch reference on every gym member record assigned to the
+// old branch name, then rewrites the members file from memory.
+//
+// Used by the branch rename flow so no member record keeps pointing at a
+// branch name that no longer exists. Succeeds silently when no record
+// matches, since the persisted file is already correct.
+static bool rename_branch_for_gym_members(const char old_branch_name[], const char new_branch_name[])
+{
+  bool renamed = false;
+  for (int i = 0; i < gym_member_count; i++)
+  {
+    if (strcmp(gym_members[i].gym_branch, old_branch_name) == 0)
+    {
+      strcpy(gym_members[i].gym_branch, new_branch_name);
+      renamed = true;
+    }
+  }
+
+  if (!renamed) return true;
+
+  if (!rewrite_all_gym_members_to_file())
+  {
+    LOG_ERROR("Error: Failed to persist member branch rename.");
+    return false;
+  }
+
+  return true;
+}
+
+bool rename_branch_for_all_users(const char old_branch_name[], const char new_branch_name[])
+{
+  if (old_branch_name == NULL || strlen(old_branch_name) == 0)
+  {
+    LOG_ERROR("Error: Old branch name cannot be empty.");
+    return false;
+  }
+
+  if (new_branch_name == NULL || strlen(new_branch_name) == 0)
+  {
+    LOG_ERROR("Error: New branch name cannot be empty.");
+    return false;
+  }
+
+  // Cascade in two steps so a failed staff rewrite never touches members.
+  if (!rename_branch_for_branch_staffs(old_branch_name, new_branch_name))
+  {
+    LOG_ERROR("Error: Failed to move branch staff records to '%s'.", new_branch_name);
+    return false;
+  }
+
+  if (!rename_branch_for_gym_members(old_branch_name, new_branch_name))
+  {
+    LOG_ERROR("Error: Failed to move gym member records to '%s'.", new_branch_name);
+    return false;
+  }
+
+  return true;
+}
+
 int get_gym_member_ids_by_status(membership_status_t status, id_t ids_destination[], int destination_capacity)
 {
   if (ids_destination == NULL || destination_capacity <= 0) return 0;

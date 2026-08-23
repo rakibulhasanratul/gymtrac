@@ -38,16 +38,16 @@ int load_branches()
   return branch_count;
 }
 
-bool branch_exists(const char branch_name[])
+int find_branch(const char branch_name[])
 {
-  if (branch_name == NULL || strlen(branch_name) == 0) return false;
+  if (branch_name == NULL || strlen(branch_name) == 0) return -1;
 
   for (int i = 0; i < branch_count; i++)
   {
-    if (strcmp(branches[i], branch_name) == 0) return true;
+    if (strcmp(branches[i], branch_name) == 0) return i;
   }
 
-  return false;
+  return -1;
 }
 
 bool add_branch(const char branch_name[])
@@ -58,7 +58,7 @@ bool add_branch(const char branch_name[])
     return false;
   }
 
-  if (branch_exists(branch_name))
+  if (find_branch(branch_name) != -1)
   {
     LOG_ERROR("Error: Branch '%s' already exists.", branch_name);
     return false;
@@ -105,7 +105,8 @@ bool delete_branch(const char branch_name[])
     return false;
   }
 
-  if (!branch_exists(branch_name))
+  int index = find_branch(branch_name);
+  if (index < 0)
   {
     LOG_ERROR("Error: Branch '%s' does not exist.", branch_name);
     return false;
@@ -117,25 +118,52 @@ bool delete_branch(const char branch_name[])
     return false;
   }
 
-  // Single pass: locate the match, then shift every later name one slot
-  // left as the loop continues.
-  bool deleted = false;
-  for (int i = 0; i < branch_count; i++)
-  {
-    if (!deleted && strcmp(branches[i], branch_name) == 0) deleted = true;
-
-    if (deleted && i < branch_count - 1) strcpy(branches[i], branches[i + 1]);
-  }
-
-  if (!deleted)
-  {
-    LOG_ERROR("Error: Branch '%s' not found in memory.", branch_name);
-    return false;
-  }
+  // Shift every later name one slot left over the removed branch.
+  for (int i = index; i < branch_count - 1; i++) strcpy(branches[i], branches[i + 1]);
 
   // Blank the vacated tail slot and shrink the count.
   branches[branch_count - 1][0] = '\0';
   branch_count--;
+
+  return save_branches_to_file();
+}
+
+bool update_branch_name(const char old_branch_name[], const char new_branch_name[])
+{
+  if (old_branch_name == NULL || strlen(old_branch_name) == 0)
+  {
+    LOG_ERROR("Error: Old branch name cannot be empty.");
+    return false;
+  }
+
+  if (new_branch_name == NULL || strlen(new_branch_name) == 0)
+  {
+    LOG_ERROR("Error: New branch name cannot be empty.");
+    return false;
+  }
+
+  // Locate the match up front so the index is reused for the in-place
+  // rename instead of scanning a second time.
+  int index = find_branch(old_branch_name);
+  if (index < 0)
+  {
+    LOG_ERROR("Error: Branch '%s' does not exist.", old_branch_name);
+    return false;
+  }
+
+  // A rename onto any taken name, including the branch's own name, is
+  // rejected because find_branch already covers both cases.
+  if (find_branch(new_branch_name) != -1)
+  {
+    LOG_ERROR("Error: Branch '%s' already exists.", new_branch_name);
+    return false;
+  }
+
+  // Cascade the rename to every staff and member record referencing the
+  // branch before the branch list itself changes.
+  if (!rename_branch_for_all_users(old_branch_name, new_branch_name)) return false;
+
+  strcpy(branches[index], new_branch_name);
 
   return save_branches_to_file();
 }

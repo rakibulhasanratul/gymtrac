@@ -304,6 +304,20 @@ bool update_gym_member_lifecycle(
 );
 
 /**
+ * Moves every staff and member record from the old branch name to the new
+ * one, in memory and on disk.
+ *
+ * Used by the branch rename flow so records never reference a branch name
+ * that no longer exists. Sysadmins carry no branch and are untouched.
+ *
+ * @param old_branch_name the branch name to replace
+ * @param new_branch_name the replacement branch name
+ * @return true when every matching record was updated and persisted,
+ *         false otherwise
+ */
+bool rename_branch_for_all_users(const char old_branch_name[], const char new_branch_name[]);
+
+/**
  * Collects the ids of every loaded member carrying the given status.
  *
  * Copies at most destination_capacity ids; members beyond that are skipped.

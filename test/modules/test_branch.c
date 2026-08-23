@@ -28,7 +28,7 @@ void cleanup_branches_file()
 }
 
 /**
- * Verifies that add_branch adds a branch and branch_exists finds it.
+ * Verifies that add_branch adds a branch and find_branch locates it.
  */
 void test_add_branch_and_exists()
 {
@@ -36,7 +36,7 @@ void test_add_branch_and_exists()
   load_branches();
 
   assert(add_branch("Dhanmondi") == true);
-  assert(branch_exists("Dhanmondi") == true);
+  assert(find_branch("Dhanmondi") != -1);
 }
 
 /**
@@ -64,19 +64,19 @@ void test_add_branch_rejects_null()
 }
 
 /**
- * Verifies that branch_exists returns false for a non-existent branch.
+ * Verifies that find_branch returns -1 for a non-existent branch.
  */
-void test_branch_exists_returns_false_for_missing()
+void test_find_branch_returns_negative_for_missing()
 {
-  assert(branch_exists("NonExistent") == false);
+  assert(find_branch("NonExistent") == -1);
 }
 
 /**
- * Verifies that branch_exists returns false for NULL input.
+ * Verifies that find_branch returns -1 for NULL input.
  */
-void test_branch_exists_returns_false_for_null()
+void test_find_branch_returns_negative_for_null()
 {
-  assert(branch_exists(NULL) == false);
+  assert(find_branch(NULL) == -1);
 }
 
 /**
@@ -137,9 +137,9 @@ void test_branch_names_are_case_sensitive()
   load_branches();
 
   add_branch("Dhanmondi");
-  assert(branch_exists("Dhanmondi") == true);
-  assert(branch_exists("dhanmondi") == false);
-  assert(branch_exists("DHANMONDI") == false);
+  assert(find_branch("Dhanmondi") != -1);
+  assert(find_branch("dhanmondi") == -1);
+  assert(find_branch("DHANMONDI") == -1);
 }
 
 /**
@@ -217,16 +217,16 @@ void test_delete_branch_removes_and_persists()
   add_branch("Mohakhali");
 
   assert(delete_branch("Gulshan") == true);
-  assert(branch_exists("Gulshan") == false);
+  assert(find_branch("Gulshan") == -1);
   assert(get_branch_count() == 2);
   assert(strcmp(get_branch_name(0), "Uttara") == 0);
   assert(strcmp(get_branch_name(1), "Mohakhali") == 0);
 
   load_branches();
   assert(get_branch_count() == 2);
-  assert(branch_exists("Gulshan") == false);
-  assert(branch_exists("Uttara") == true);
-  assert(branch_exists("Mohakhali") == true);
+  assert(find_branch("Gulshan") == -1);
+  assert(find_branch("Uttara") != -1);
+  assert(find_branch("Mohakhali") != -1);
 }
 
 /**
@@ -242,7 +242,7 @@ void test_delete_branch_rejects_missing_null_and_empty()
   assert(delete_branch("NoSuchBranch") == false);
   assert(delete_branch(NULL) == false);
   assert(delete_branch("") == false);
-  assert(branch_exists("ExistingBranch") == true);
+  assert(find_branch("ExistingBranch") != -1);
 }
 
 /**
@@ -270,8 +270,138 @@ void test_delete_branch_rejects_branch_with_users()
   assert(member_id != 0);
 
   assert(delete_branch("BusyBranch") == false);
-  assert(branch_exists("BusyBranch") == true);
+  assert(find_branch("BusyBranch") != -1);
 
   assert(delete_gym_member(member_id) == true);
   assert(delete_branch("BusyBranch") == true);
+}
+
+/**
+ * Verifies that update_branch_name renames the branch in memory and on disk
+ * while keeping the other branches in order.
+ */
+void test_update_branch_name_renames_and_persists()
+{
+  cleanup_branches_file();
+  load_branches();
+
+  add_branch("Uttara");
+  add_branch("Gulshan");
+  add_branch("Mohakhali");
+
+  assert(update_branch_name("Gulshan", "Gulshan2") == true);
+  assert(find_branch("Gulshan") == -1);
+  assert(find_branch("Gulshan2") != -1);
+  // The rename must happen in place at the original index.
+  assert(find_branch("Uttara") == 0);
+  assert(find_branch("Gulshan2") == 1);
+  assert(find_branch("Mohakhali") == 2);
+  assert(get_branch_count() == 3);
+  assert(strcmp(get_branch_name(0), "Uttara") == 0);
+  assert(strcmp(get_branch_name(1), "Gulshan2") == 0);
+  assert(strcmp(get_branch_name(2), "Mohakhali") == 0);
+
+  load_branches();
+  assert(get_branch_count() == 3);
+  assert(find_branch("Gulshan") == -1);
+  assert(find_branch("Gulshan2") != -1);
+}
+
+/**
+ * Verifies that renaming a branch cascades into staff and member records so
+ * their gym_branch follows the new name, in memory and on disk, while
+ * records of untouched branches stay as they were.
+ */
+void test_update_branch_name_cascades_to_user_records()
+{
+  cleanup_branches_file();
+  cleanup_user_data_files();
+  load_branches();
+  load_sysadmins();
+  load_branch_staff();
+  load_gym_members();
+
+  add_branch("RenameOld");
+  add_branch("RenameOther");
+
+  subscription_plan_t plan;
+  plan.payable_amount = 1000;
+  plan.interval_days = 30;
+
+  id_t manager_id = create_branch_staff(
+    "Cascade Manager", "cm@t.com", "0171111111", "RenameOld", "cascademanager", "hash", BRANCH_MANAGER
+  );
+  id_t trainer_id =
+    create_branch_staff("Cascade Trainer", "ct@t.com", "0171111112", "RenameOld", "cascadetrainer", "hash", TRAINER);
+  id_t member_id = create_gym_member(
+    "Cascade Member", "cmem@t.com", "0172222222", "RenameOld", "cascademember", "hash", plan, MEMBERSHIP_ON_HOLD
+  );
+  id_t outsider_id = create_gym_member(
+    "Cascade Outsider", "co@t.com", "0173333333", "RenameOther", "cascadeoutsider", "hash", plan, MEMBERSHIP_ON_HOLD
+  );
+  assert(manager_id != 0 && trainer_id != 0 && member_id != 0 && outsider_id != 0);
+
+  assert(update_branch_name("RenameOld", "RenameNew") == true);
+
+  branch_staff_t manager;
+  branch_staff_t trainer;
+  gym_member_t member;
+  gym_member_t outsider;
+  assert(get_branch_staff_by_id(manager_id, &manager) == true);
+  assert(get_branch_staff_by_id(trainer_id, &trainer) == true);
+  assert(get_gym_member_by_id(member_id, &member) == true);
+  assert(get_gym_member_by_id(outsider_id, &outsider) == true);
+  assert(strcmp(manager.gym_branch, "RenameNew") == 0);
+  assert(strcmp(trainer.gym_branch, "RenameNew") == 0);
+  assert(strcmp(member.gym_branch, "RenameNew") == 0);
+  assert(strcmp(outsider.gym_branch, "RenameOther") == 0);
+
+  // Branch-scoped counts must follow the renamed records.
+  assert(branch_manager_count("RenameNew") == 1);
+  assert(branch_trainer_count("RenameNew") == 1);
+  assert(branch_member_count("RenameNew") == 1);
+  assert(branch_member_count("RenameOld") == 0);
+
+  // Reload everything from disk to verify the cascade persisted.
+  load_branches();
+  load_branch_staff();
+  load_gym_members();
+  assert(find_branch("RenameNew") != -1);
+  assert(find_branch("RenameOld") == -1);
+  assert(get_branch_staff_by_id(manager_id, &manager) == true);
+  assert(get_gym_member_by_id(member_id, &member) == true);
+  assert(strcmp(manager.gym_branch, "RenameNew") == 0);
+  assert(strcmp(member.gym_branch, "RenameNew") == 0);
+
+  // Remove created users so later user-table tests start from empty files.
+  assert(delete_branch_staff(manager_id) == true);
+  assert(delete_branch_staff(trainer_id) == true);
+  assert(delete_gym_member(member_id) == true);
+  assert(delete_gym_member(outsider_id) == true);
+}
+
+/**
+ * Verifies that update_branch_name rejects missing, empty, unknown old, and
+ * taken new names without touching any existing branch.
+ */
+void test_update_branch_name_rejects_invalid_names()
+{
+  cleanup_branches_file();
+  load_branches();
+
+  add_branch("KeepA");
+  add_branch("KeepB");
+
+  assert(update_branch_name(NULL, "Anything") == false);
+  assert(update_branch_name("KeepA", NULL) == false);
+  assert(update_branch_name("", "Anything") == false);
+  assert(update_branch_name("KeepA", "") == false);
+  assert(update_branch_name("NoSuchBranch", "Anything") == false);
+  assert(update_branch_name("KeepA", "KeepB") == false);
+  assert(update_branch_name("KeepA", "KeepA") == false);
+
+  assert(get_branch_count() == 2);
+  assert(find_branch("KeepA") != -1);
+  assert(find_branch("KeepB") != -1);
+  assert(find_branch("Anything") == -1);
 }

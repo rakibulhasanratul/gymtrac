@@ -111,8 +111,8 @@ int main()
   test_add_branch_rejects_duplicate();
   test_add_branch_rejects_empty();
   test_add_branch_rejects_null();
-  test_branch_exists_returns_false_for_missing();
-  test_branch_exists_returns_false_for_null();
+  test_find_branch_returns_negative_for_missing();
+  test_find_branch_returns_negative_for_null();
   test_load_branches();
   test_load_branches_returns_zero_when_empty();
   test_add_branch_respects_max_count();
@@ -123,6 +123,9 @@ int main()
   test_delete_branch_removes_and_persists();
   test_delete_branch_rejects_missing_null_and_empty();
   test_delete_branch_rejects_branch_with_users();
+  test_update_branch_name_renames_and_persists();
+  test_update_branch_name_cascades_to_user_records();
+  test_update_branch_name_rejects_invalid_names();
 
   /* user: sysadmin */
   test_create_sysadmin_and_get();

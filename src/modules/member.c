@@ -54,7 +54,7 @@ static bool persist_suspension(const suspension_record_t record_payload)
 //
 // Used by unsuspend_gym_member so the persisted record reflects the
 // stamped unsuspension date.
-static bool rewrite_suspension_file_all()
+static bool rewrite_all_suspension_to_file()
 {
   FILE *file = fopen(SUSPENSIONS_FILE_PATH, "w");
   if (file == NULL)
@@ -256,7 +256,7 @@ bool unsuspend_gym_member(id_t member_id)
   time_t previous_unsuspension_date = suspension_records[open_index].unsuspension_date;
   suspension_records[open_index].unsuspension_date = unsuspension_date;
 
-  if (!rewrite_suspension_file_all())
+  if (!rewrite_all_suspension_to_file())
   {
     suspension_records[open_index].unsuspension_date = previous_unsuspension_date;
     LOG_ERROR("Error: Failed to persist suspension record update.");

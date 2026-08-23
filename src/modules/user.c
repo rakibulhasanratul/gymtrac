@@ -16,7 +16,7 @@ static sysadmin_t sysadmins[MAX_SYSTEM_ADMINS];
 static int sysadmin_count;
 static id_t next_sysadmin_id;
 
-static branch_staff_t branch_staff_list[MAX_BRANCH_MANAGERS + MAX_TRAINERS];
+static branch_staff_t branch_staffs[MAX_BRANCH_MANAGERS + MAX_TRAINERS];
 static int branch_staff_count;
 static id_t next_branch_staff_id;
 
@@ -115,7 +115,7 @@ static bool persist_gym_member(const gym_member_t record_payload)
 // records left.
 static void remove_branch_staff_at(int index)
 {
-  for (int i = index; i < branch_staff_count - 1; i++) branch_staff_list[i] = branch_staff_list[i + 1];
+  for (int i = index; i < branch_staff_count - 1; i++) branch_staffs[i] = branch_staffs[i + 1];
 
   branch_staff_count--;
 }
@@ -133,7 +133,7 @@ static void remove_gym_member_at(int index)
 //
 // Used by delete_branch_staff so the persisted file never contains the
 // removed record, matching the file-first ordering of creation.
-static bool rewrite_branch_staff_file_without(int index)
+static bool rewrite_all_branch_staff_to_file_without_index(int index)
 {
   FILE *file = fopen(BRANCH_STAFF_FILE_PATH, "w");
   if (file == NULL)
@@ -147,7 +147,7 @@ static bool rewrite_branch_staff_file_without(int index)
   {
     if (i == index) continue;
 
-    format_branch_staff_line(branch_staff_list[i], line);
+    format_branch_staff_line(branch_staffs[i], line);
     if (!write_line_to_file(file, line))
     {
       fclose(file);
@@ -164,7 +164,7 @@ static bool rewrite_branch_staff_file_without(int index)
 //
 // Used by delete_gym_member so the persisted file never contains the
 // removed record, matching the file-first ordering of creation.
-static bool rewrite_gym_members_file_without(int index)
+static bool rewrite_all_gym_members_to_file_without_index(int index)
 {
   FILE *file = fopen(GYM_MEMBERS_FILE_PATH, "w");
   if (file == NULL)
@@ -195,7 +195,7 @@ static bool rewrite_gym_members_file_without(int index)
 //
 // Used by update_branch_staff so the persisted file reflects the
 // modified record.
-static bool rewrite_branch_staff_file_all()
+static bool rewrite_all_branch_staffs_to_file()
 {
   FILE *file = fopen(BRANCH_STAFF_FILE_PATH, "w");
   if (file == NULL)
@@ -207,7 +207,7 @@ static bool rewrite_branch_staff_file_all()
   char line[LINE_BUFFER_SIZE];
   for (int i = 0; i < branch_staff_count; i++)
   {
-    format_branch_staff_line(branch_staff_list[i], line);
+    format_branch_staff_line(branch_staffs[i], line);
     if (!write_line_to_file(file, line))
     {
       fclose(file);
@@ -224,7 +224,7 @@ static bool rewrite_branch_staff_file_all()
 //
 // Used by update_gym_member so the persisted file reflects the
 // modified record.
-static bool rewrite_gym_members_file_all()
+static bool rewrite_all_gym_members_to_file()
 {
   FILE *file = fopen(GYM_MEMBERS_FILE_PATH, "w");
   if (file == NULL)
@@ -355,11 +355,11 @@ int load_branch_staff()
   int capacity = MAX_BRANCH_MANAGERS + MAX_TRAINERS;
   while (branch_staff_count < capacity && read_line_from_file(file, line, LINE_BUFFER_SIZE))
   {
-    if (strlen(line) > 0 && parse_branch_staff_line(line, &branch_staff_list[branch_staff_count])) branch_staff_count++;
+    if (strlen(line) > 0 && parse_branch_staff_line(line, &branch_staffs[branch_staff_count])) branch_staff_count++;
   }
 
   fclose(file);
-  next_branch_staff_id = branch_staff_count > 0 ? branch_staff_list[branch_staff_count - 1].id + 1 : 1;
+  next_branch_staff_id = branch_staff_count > 0 ? branch_staffs[branch_staff_count - 1].id + 1 : 1;
   return branch_staff_count;
 }
 
@@ -504,7 +504,7 @@ id_t create_branch_staff(
     return 0;
   }
 
-  branch_staff_list[branch_staff_count] = record;
+  branch_staffs[branch_staff_count] = record;
   branch_staff_count++;
   return record.id;
 }
@@ -599,7 +599,7 @@ bool delete_branch_staff(id_t id)
   int index = -1;
   for (int i = 0; i < branch_staff_count; i++)
   {
-    if (branch_staff_list[i].id == id)
+    if (branch_staffs[i].id == id)
     {
       index = i;
       break;
@@ -612,7 +612,7 @@ bool delete_branch_staff(id_t id)
     return false;
   }
 
-  if (!rewrite_branch_staff_file_without(index))
+  if (!rewrite_all_branch_staff_to_file_without_index(index))
   {
     LOG_ERROR("Error: Failed to rewrite branch staff file.");
     return false;
@@ -646,7 +646,7 @@ bool delete_gym_member(id_t id)
     return false;
   }
 
-  if (!rewrite_gym_members_file_without(index))
+  if (!rewrite_all_gym_members_to_file_without_index(index))
   {
     LOG_ERROR("Error: Failed to rewrite gym members file.");
     return false;
@@ -667,7 +667,7 @@ bool username_exists(const char username[])
 
   for (int i = 0; i < branch_staff_count; i++)
   {
-    if (strcmp(branch_staff_list[i].username, username) == 0) return true;
+    if (strcmp(branch_staffs[i].username, username) == 0) return true;
   }
 
   for (int i = 0; i < gym_member_count; i++)
@@ -685,8 +685,7 @@ int branch_manager_count(const char branch_name[])
   int count = 0;
   for (int i = 0; i < branch_staff_count; i++)
   {
-    if (branch_staff_list[i].role == BRANCH_MANAGER && strcmp(branch_staff_list[i].gym_branch, branch_name) == 0)
-      count++;
+    if (branch_staffs[i].role == BRANCH_MANAGER && strcmp(branch_staffs[i].gym_branch, branch_name) == 0) count++;
   }
   return count;
 }
@@ -698,7 +697,7 @@ int branch_trainer_count(const char branch_name[])
   int count = 0;
   for (int i = 0; i < branch_staff_count; i++)
   {
-    if (branch_staff_list[i].role == TRAINER && strcmp(branch_staff_list[i].gym_branch, branch_name) == 0) count++;
+    if (branch_staffs[i].role == TRAINER && strcmp(branch_staffs[i].gym_branch, branch_name) == 0) count++;
   }
   return count;
 }
@@ -751,9 +750,9 @@ bool get_branch_staff_by_id(id_t id, branch_staff_t *destination)
 
   for (int i = 0; i < branch_staff_count; i++)
   {
-    if (branch_staff_list[i].id == id)
+    if (branch_staffs[i].id == id)
     {
-      *destination = branch_staff_list[i];
+      *destination = branch_staffs[i];
       return true;
     }
   }
@@ -766,9 +765,9 @@ bool get_branch_staff_by_username(const char username[], branch_staff_t *destina
 
   for (int i = 0; i < branch_staff_count; i++)
   {
-    if (strcmp(branch_staff_list[i].username, username) == 0)
+    if (strcmp(branch_staffs[i].username, username) == 0)
     {
-      *destination = branch_staff_list[i];
+      *destination = branch_staffs[i];
       return true;
     }
   }
@@ -828,7 +827,7 @@ bool update_branch_staff(id_t id, const char full_name[], const char email[], co
   int index = -1;
   for (int i = 0; i < branch_staff_count; i++)
   {
-    if (branch_staff_list[i].id == id)
+    if (branch_staffs[i].id == id)
     {
       index = i;
       break;
@@ -841,11 +840,11 @@ bool update_branch_staff(id_t id, const char full_name[], const char email[], co
     return false;
   }
 
-  strcpy(branch_staff_list[index].full_name, full_name);
-  strcpy(branch_staff_list[index].email, email);
-  strcpy(branch_staff_list[index].phone_number, phone_number);
+  strcpy(branch_staffs[index].full_name, full_name);
+  strcpy(branch_staffs[index].email, email);
+  strcpy(branch_staffs[index].phone_number, phone_number);
 
-  if (!rewrite_branch_staff_file_all())
+  if (!rewrite_all_branch_staffs_to_file())
   {
     LOG_ERROR("Error: Failed to persist branch staff update.");
     return false;
@@ -922,7 +921,7 @@ bool update_gym_member(
   strcpy(gym_members[index].gym_branch, gym_branch);
   strcpy(gym_members[index].username, username);
 
-  if (!rewrite_gym_members_file_all())
+  if (!rewrite_all_gym_members_to_file())
   {
     LOG_ERROR("Error: Failed to persist gym member update.");
     return false;
@@ -951,7 +950,7 @@ bool update_gym_member_status(id_t id, membership_status_t status)
 
   gym_members[index].status = status;
 
-  if (!rewrite_gym_members_file_all())
+  if (!rewrite_all_gym_members_to_file())
   {
     LOG_ERROR("Error: Failed to persist gym member status update.");
     return false;
@@ -989,7 +988,7 @@ bool update_gym_member_lifecycle(
   gym_members[index].due_amount = due_amount;
   gym_members[index].status = status;
 
-  if (!rewrite_gym_members_file_all())
+  if (!rewrite_all_gym_members_to_file())
   {
     LOG_ERROR("Error: Failed to persist gym member lifecycle update.");
     return false;

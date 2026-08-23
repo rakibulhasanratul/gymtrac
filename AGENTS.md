@@ -29,6 +29,7 @@ The name of the project is `Gymtrac` which is a gym management system, a `group 
   - `ensure_username_is_available(...)`
   - `ensure_branch_has_no_manager(...)`
   - `ensure_branch_name_is_valid(...)`
+- DO NOT USE ensure_* names for function that just wraps one line conditional statement.
 - Use self describing short names. Avoid using single letter names (except loops' iterators) or abbreviations.
   - bad name: `file_write_line(...)`
   - good name: `write_line_to_file(...)`
@@ -60,6 +61,7 @@ The name of the project is `Gymtrac` which is a gym management system, a `group 
 
 - Before you commit, format all files using clang-format.
 - Use one-line self explanatory commit messages unless you are explicitly told to write a long commit message.
+- DO NOT COMMIT UNTIL USER APPROVES
 
 ## Directory Structure
 

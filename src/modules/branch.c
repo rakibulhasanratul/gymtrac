@@ -16,8 +16,7 @@ static bool save_branches_to_file()
   // Map each row of branches to a pointer because write_lines_to_file
   // reads lines through char pointers.
   const char *line_maps[branch_count];
-  for (int i = 0; i < branch_count; i++)
-    line_maps[i] = branches[i];
+  for (int i = 0; i < branch_count; i++) line_maps[i] = branches[i];
 
   if (!write_lines_to_file(GYM_BRANCHES_FILE_PATH, line_maps, branch_count))
   {
@@ -33,8 +32,7 @@ int load_branches()
   // Map each row of branches to a pointer because read_lines_from_file
   // fills lines through char pointers.
   char *line_maps[BRANCH_COUNT_MAX];
-  for (int i = 0; i < BRANCH_COUNT_MAX; i++)
-    line_maps[i] = branches[i];
+  for (int i = 0; i < BRANCH_COUNT_MAX; i++) line_maps[i] = branches[i];
 
   branch_count = read_lines_from_file(GYM_BRANCHES_FILE_PATH, line_maps, BRANCH_COUNT_MAX, BRANCH_NAME_BUFFER_SIZE);
   return branch_count;
@@ -42,13 +40,11 @@ int load_branches()
 
 bool branch_exists(const char branch_name[])
 {
-  if (branch_name == NULL || strlen(branch_name) == 0)
-    return false;
+  if (branch_name == NULL || strlen(branch_name) == 0) return false;
 
   for (int i = 0; i < branch_count; i++)
   {
-    if (strcmp(branches[i], branch_name) == 0)
-      return true;
+    if (strcmp(branches[i], branch_name) == 0) return true;
   }
 
   return false;
@@ -95,8 +91,7 @@ bool add_branch(const char branch_name[])
 
 bool ensure_branch_has_no_users(const char branch_name[])
 {
-  if (branch_name == NULL || strlen(branch_name) == 0)
-    return false;
+  if (branch_name == NULL || strlen(branch_name) == 0) return false;
 
   return branch_manager_count(branch_name) == 0 && branch_trainer_count(branch_name) == 0 &&
          branch_member_count(branch_name) == 0;
@@ -127,11 +122,9 @@ bool delete_branch(const char branch_name[])
   bool deleted = false;
   for (int i = 0; i < branch_count; i++)
   {
-    if (!deleted && strcmp(branches[i], branch_name) == 0)
-      deleted = true;
+    if (!deleted && strcmp(branches[i], branch_name) == 0) deleted = true;
 
-    if (deleted && i < branch_count - 1)
-      strcpy(branches[i], branches[i + 1]);
+    if (deleted && i < branch_count - 1) strcpy(branches[i], branches[i + 1]);
   }
 
   if (!deleted)

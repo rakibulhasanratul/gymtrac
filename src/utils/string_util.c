@@ -7,22 +7,18 @@
 
 void trim(char destination[], int destination_capacity, const char text[])
 {
-  if (destination == NULL || text == NULL || destination_capacity < 2)
-    return;
+  if (destination == NULL || text == NULL || destination_capacity < 2) return;
 
   // Skip past leading whitespace.
   int start_index = 0;
-  while (text[start_index] != '\0' && isspace((unsigned char)text[start_index]))
-    start_index++;
+  while (text[start_index] != '\0' && isspace((unsigned char)text[start_index])) start_index++;
 
   // Scan to the end of the string.
   int end_index = start_index;
-  while (text[end_index] != '\0')
-    end_index++;
+  while (text[end_index] != '\0') end_index++;
 
   // Back up over trailing whitespace.
-  while (end_index > start_index && isspace((unsigned char)text[end_index - 1]))
-    end_index--;
+  while (end_index > start_index && isspace((unsigned char)text[end_index - 1])) end_index--;
 
   // Copy the trimmed slice into destination, capped by the buffer size.
   int write_index = 0;
@@ -37,8 +33,7 @@ void trim(char destination[], int destination_capacity, const char text[])
 
 int split(const char text[], char delimiter, char *parts[], int part_capacity, int field_capacity)
 {
-  if (text == NULL || parts == NULL || part_capacity < 1 || field_capacity < 2)
-    return 0;
+  if (text == NULL || parts == NULL || part_capacity < 1 || field_capacity < 2) return 0;
 
   int part_count = 0;
   int cursor_index = 0;
@@ -59,8 +54,7 @@ int split(const char text[], char delimiter, char *parts[], int part_capacity, i
     parts[part_count][field_index] = '\0';
     part_count++;
     // Stop once the string is exhausted.
-    if (text[cursor_index] == '\0')
-      break;
+    if (text[cursor_index] == '\0') break;
     // Skip the delimiter to reach the next field.
     cursor_index++;
   }
@@ -70,19 +64,16 @@ int split(const char text[], char delimiter, char *parts[], int part_capacity, i
 
 unsigned int string_to_unsigned_int(const char text[])
 {
-  if (text == NULL || text[0] == '\0')
-    return 0;
+  if (text == NULL || text[0] == '\0') return 0;
 
   unsigned int accumulated = 0;
   for (int i = 0; text[i] != '\0'; i++)
   {
     // Reject any non-digit character.
-    if (!isdigit((unsigned char)text[i]))
-      return 0;
+    if (!isdigit((unsigned char)text[i])) return 0;
     unsigned int digit = (unsigned int)(text[i] - '0');
     // Reject when the next digit would overflow the result.
-    if (accumulated > (UINT_MAX - digit) / 10u)
-      return 0;
+    if (accumulated > (UINT_MAX - digit) / 10u) return 0;
     accumulated = accumulated * 10u + digit;
   }
 
@@ -91,19 +82,16 @@ unsigned int string_to_unsigned_int(const char text[])
 
 unsigned long int string_to_unsigned_long_int(const char text[])
 {
-  if (text == NULL || text[0] == '\0')
-    return 0;
+  if (text == NULL || text[0] == '\0') return 0;
 
   unsigned long int accumulated = 0;
   for (int i = 0; text[i] != '\0'; i++)
   {
     // Reject any non-digit character.
-    if (!isdigit((unsigned char)text[i]))
-      return 0;
+    if (!isdigit((unsigned char)text[i])) return 0;
     unsigned long int digit = (unsigned long int)(text[i] - '0');
     // Reject when the next digit would overflow the result.
-    if (accumulated > (ULONG_MAX - digit) / 10ul)
-      return 0;
+    if (accumulated > (ULONG_MAX - digit) / 10ul) return 0;
     accumulated = accumulated * 10ul + digit;
   }
 
@@ -112,40 +100,34 @@ unsigned long int string_to_unsigned_long_int(const char text[])
 
 char *to_lowercase(char text[])
 {
-  if (text == NULL)
-    return NULL;
+  if (text == NULL) return NULL;
 
   // Fold every letter to lowercase in place.
-  for (int i = 0; text[i] != '\0'; i++)
-    text[i] = (char)tolower((unsigned char)text[i]);
+  for (int i = 0; text[i] != '\0'; i++) text[i] = (char)tolower((unsigned char)text[i]);
 
   return text;
 }
 
 char *to_uppercase(char text[])
 {
-  if (text == NULL)
-    return NULL;
+  if (text == NULL) return NULL;
 
   // Fold every letter to uppercase in place.
-  for (int i = 0; text[i] != '\0'; i++)
-    text[i] = (char)toupper((unsigned char)text[i]);
+  for (int i = 0; text[i] != '\0'; i++) text[i] = (char)toupper((unsigned char)text[i]);
 
   return text;
 }
 
 char *sanitize_field(char text[])
 {
-  if (text == NULL)
-    return NULL;
+  if (text == NULL) return NULL;
 
   int write_index = 0;
   for (int i = 0; text[i] != '\0'; i++)
   {
     unsigned char ch = (unsigned char)text[i];
     // Drop the field delimiter and any control character.
-    if (ch == (unsigned char)FIELD_DELIMITER || iscntrl(ch))
-      continue;
+    if (ch == (unsigned char)FIELD_DELIMITER || iscntrl(ch)) continue;
     // Compact the kept characters toward the front.
     text[write_index] = text[i];
     write_index++;

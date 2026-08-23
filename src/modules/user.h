@@ -60,8 +60,15 @@ id_t create_sysadmin(const char username[], const char password_hash[]);
  * @param role TRAINER or BRANCH_MANAGER
  * @return the new staff member's id, or 0 on failure
  */
-id_t create_branch_staff(const char full_name[], const char email[], const char phone_number[], const char gym_branch[],
-                         const char username[], const char password_hash[], staff_role_t role);
+id_t create_branch_staff(
+  const char full_name[],
+  const char email[],
+  const char phone_number[],
+  const char gym_branch[],
+  const char username[],
+  const char password_hash[],
+  staff_role_t role
+);
 
 /**
  * Creates a new gym member with an auto-incremented id and persists the record.
@@ -79,20 +86,16 @@ id_t create_branch_staff(const char full_name[], const char email[], const char 
  * @param status the membership status
  * @return the new member's id, or 0 on failure
  */
-id_t create_gym_member(const char full_name[], const char email[], const char phone_number[], const char gym_branch[],
-                       const char username[], const char password_hash[], subscription_plan_t plan_payload,
-                       membership_status_t status);
-
-/**
- * Policy guard ensuring a gym member carries no outstanding dues.
- *
- * A member with unpaid dues can never be deleted so recorded debt is
- * never silently erased.
- *
- * @param member_payload the member record to check
- * @return true when the record is valid and due_amount is zero, false otherwise
- */
-bool ensure_member_has_no_dues(const gym_member_t *member_payload);
+id_t create_gym_member(
+  const char full_name[],
+  const char email[],
+  const char phone_number[],
+  const char gym_branch[],
+  const char username[],
+  const char password_hash[],
+  subscription_plan_t plan_payload,
+  membership_status_t status
+);
 
 /**
  * Removes a branch staff member from the persisted file and in-memory array.
@@ -108,7 +111,8 @@ bool delete_branch_staff(id_t id);
 /**
  * Removes a gym member from the persisted file and in-memory array.
  *
- * Rejected when the member still owes dues (see ensure_member_has_no_dues).
+ * Rejected when the member still owes dues, so recorded debt is never
+ * silently erased.
  *
  * @param id the member's id
  * @return true if the member was deleted, false if not found or indebted
@@ -256,15 +260,33 @@ bool update_branch_staff(id_t id, const char full_name[], const char email[], co
  * @param username the new username (must be globally unique)
  * @return true if the record was found and updated, false otherwise
  */
-bool update_gym_member(id_t id, const char full_name[], const char email[], const char phone_number[],
-                       const char gym_branch[], const char username[]);
+bool update_gym_member(
+  id_t id,
+  const char full_name[],
+  const char email[],
+  const char phone_number[],
+  const char gym_branch[],
+  const char username[]
+);
+
+/**
+ * Updates a gym member's membership status and persists the change.
+ *
+ * The record is looked up by id; the file is rewritten with the updated
+ * value. For status-only transitions such as suspension and unsuspension.
+ *
+ * @param id the member's id
+ * @param status the membership status to store on the record
+ * @return true if the record was found and updated, false otherwise
+ */
+bool update_gym_member_status(id_t id, membership_status_t status);
 
 /**
  * Updates a gym member's lifecycle fields and persists the change.
  *
- * Covers the plan, billing date, dues, and membership status driven by the
- * approval, suspension, and payment flows. The record is looked up by id;
- * the file is rewritten with the updated values.
+ * Covers the plan, billing date, dues, and membership status in one write,
+ * as driven by the approval flow. The record is looked up by id; the file
+ * is rewritten with the updated values.
  *
  * @param id the member's id
  * @param plan_payload the subscription plan to store on the record
@@ -273,8 +295,13 @@ bool update_gym_member(id_t id, const char full_name[], const char email[], cons
  * @param status the membership status to store on the record
  * @return true if the record was found and updated, false otherwise
  */
-bool update_gym_member_lifecycle(id_t id, subscription_plan_t plan_payload, time_t last_payment_date,
-                                 unsigned int due_amount, membership_status_t status);
+bool update_gym_member_lifecycle(
+  id_t id,
+  subscription_plan_t plan_payload,
+  time_t last_payment_date,
+  unsigned int due_amount,
+  membership_status_t status
+);
 
 /**
  * Collects the ids of every loaded member carrying the given status.
@@ -286,6 +313,6 @@ bool update_gym_member_lifecycle(id_t id, subscription_plan_t plan_payload, time
  * @param destination_capacity the number of slots available in destination_ids
  * @return the number of ids copied
  */
-int get_gym_member_ids_by_status(membership_status_t status, id_t destination_ids[], int destination_capacity);
+int get_gym_member_ids_by_status(membership_status_t status, id_t ids_destination[], int destination_capacity);
 
 #endif

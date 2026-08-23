@@ -31,7 +31,7 @@ This project uses the [xoshiro128**](https://prng.di.unimi.it/xoshiro128starstar
   - Every suspension has a mandatory `reason`, stored in a dedicated suspension record with its date (and an optional unsuspension date).
 - Deletion rules:
   - A branch can only be deleted when no staff or member is assigned to it (`ensure_branch_has_no_users()`).
-  - Branch staff and gym members can be deleted; a member with outstanding dues is protected (`ensure_member_has_no_dues()`), and the system administrator account has no delete path.
+  - Branch staff and gym members can be deleted; a member with outstanding dues is protected and the system administrator account has no delete path.
 - Access control:
   - Members see only their own data.
   - Branch managers and trainers see only their own branch's resources (members, payments, requests, lost & found).
@@ -73,7 +73,7 @@ Work tracked per item; commit each with a Conventional Commit message (`feat:`, 
 - [x] Unit tests covering branch listing and existence validation - `test:`
 - [x] User module that creates/fetches each role with auto-incremented ids, enforces globally unique usernames across all roles, and enforces per-branch capacity limits via `branch_manager_count()`, `branch_trainer_count()`, `branch_member_count()` - `feat:`
 - [x] Branch deletion guarded by `ensure_branch_has_no_users()`, so a branch with assigned staff or members can never be removed - `feat:`
-- [x] User deletion for branch staff and gym members; `ensure_member_has_no_dues()` blocks deleting indebted members, and sysadmins have no delete path - `feat:`
+- [x] User deletion for branch staff and gym members; indebted members are blocked from deletion, and sysadmins have no delete path - `feat:`
 - [x] Unit tests covering both delete policies, memory+disk round-trips after deletion, and username reuse once a record is gone - `test:`
 - [x] Unit tests covering per-role CRUD, cross-role username uniqueness, and per-branch capacity enforcement - `test:`
 - [x] Auth module that verifies username + password against stored salted polynomial hashes on login and clears the session on logout, so only verified users get in - `feat:`

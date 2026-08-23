@@ -59,22 +59,18 @@ bool session_is_member()
 
 bool session_belongs_to_branch(const char branch_name[])
 {
-  if (!session_is_active())
-    return false;
+  if (!session_is_active()) return false;
 
-  if (branch_name == NULL || strlen(branch_name) == 0)
-    return false;
+  if (branch_name == NULL || strlen(branch_name) == 0) return false;
 
-  if (current_session.role == USER_ROLE_SYSADMIN)
-    return true;
+  if (current_session.role == USER_ROLE_SYSADMIN) return true;
 
   return strcmp(current_session.branch_name, branch_name) == 0;
 }
 
 const session_t *session_get_current()
 {
-  if (!session_is_active())
-    return NULL;
+  if (!session_is_active()) return NULL;
 
   return &current_session;
 }

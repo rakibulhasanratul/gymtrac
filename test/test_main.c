@@ -179,7 +179,6 @@ int main()
   test_member_username_blocks_staff_creation();
 
   /* user: deletion */
-  test_ensure_member_has_no_dues();
   test_delete_branch_staff_removes_and_persists();
   test_delete_branch_staff_rejects_unknown_id();
   test_delete_gym_member_removes_and_persists();

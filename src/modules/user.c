@@ -25,14 +25,16 @@ static int gym_member_count;
 static id_t next_gym_member_id;
 
 // Formats a sysadmin record as a delimiter-separated line.
-static void format_sysadmin_line(const sysadmin_t *record_payload, char *line_destination)
+static void format_sysadmin_line(const sysadmin_t record_payload, char *line_destination)
 {
-  snprintf(line_destination, LINE_BUFFER_SIZE, "%lu" SEP "%s" SEP "%s", (unsigned long)record_payload->id,
-           record_payload->username, record_payload->password_hash);
+  snprintf(
+    line_destination, LINE_BUFFER_SIZE, "%lu" SEP "%s" SEP "%s", (unsigned long)record_payload.id,
+    record_payload.username, record_payload.password_hash
+  );
 }
 
 // Appends a sysadmin record as a delimiter-separated line to the data file.
-static bool persist_sysadmin(const sysadmin_t *record_payload)
+static bool persist_sysadmin(const sysadmin_t record_payload)
 {
   FILE *file = fopen(SYSADMINS_FILE_PATH, "a");
   if (file == NULL)
@@ -50,29 +52,31 @@ static bool persist_sysadmin(const sysadmin_t *record_payload)
 }
 
 // Formats a branch staff record as a delimiter-separated line.
-static void format_branch_staff_line(const branch_staff_t *record_payload, char *line_destination)
+static void format_branch_staff_line(const branch_staff_t record_payload, char *line_destination)
 {
-  snprintf(line_destination, LINE_BUFFER_SIZE,
-           "%lu" SEP "%s" SEP "%s" SEP "%s" SEP "%s" SEP "%s" SEP "%s" SEP "%ld" SEP "%d",
-           (unsigned long)record_payload->id, record_payload->full_name, record_payload->email,
-           record_payload->phone_number, record_payload->gym_branch, record_payload->username,
-           record_payload->password_hash, (long)record_payload->joined_at, (int)record_payload->role);
+  snprintf(
+    line_destination, LINE_BUFFER_SIZE, "%lu" SEP "%s" SEP "%s" SEP "%s" SEP "%s" SEP "%s" SEP "%s" SEP "%ld" SEP "%d",
+    (unsigned long)record_payload.id, record_payload.full_name, record_payload.email, record_payload.phone_number,
+    record_payload.gym_branch, record_payload.username, record_payload.password_hash, (long)record_payload.joined_at,
+    (int)record_payload.role
+  );
 }
 
 // Formats a gym member record as a delimiter-separated line.
-static void format_gym_member_line(const gym_member_t *record_payload, char *line_destination)
+static void format_gym_member_line(const gym_member_t record_payload, char *line_destination)
 {
   snprintf(
     line_destination, LINE_BUFFER_SIZE,
     "%lu" SEP "%s" SEP "%s" SEP "%s" SEP "%s" SEP "%s" SEP "%s" SEP "%ld" SEP "%ld" SEP "%u" SEP "%u" SEP "%u" SEP "%d",
-    (unsigned long)record_payload->id, record_payload->full_name, record_payload->email, record_payload->phone_number,
-    record_payload->gym_branch, record_payload->username, record_payload->password_hash,
-    (long)record_payload->joined_at, (long)record_payload->last_payment_date, record_payload->due_amount,
-    record_payload->plan.payable_amount, record_payload->plan.interval_days, (int)record_payload->status);
+    (unsigned long)record_payload.id, record_payload.full_name, record_payload.email, record_payload.phone_number,
+    record_payload.gym_branch, record_payload.username, record_payload.password_hash, (long)record_payload.joined_at,
+    (long)record_payload.last_payment_date, record_payload.due_amount, record_payload.plan.payable_amount,
+    record_payload.plan.interval_days, (int)record_payload.status
+  );
 }
 
 // Appends a branch staff record as a delimiter-separated line to the data file.
-static bool persist_branch_staff(const branch_staff_t *record_payload)
+static bool persist_branch_staff(const branch_staff_t record_payload)
 {
   FILE *file = fopen(BRANCH_STAFF_FILE_PATH, "a");
   if (file == NULL)
@@ -90,7 +94,7 @@ static bool persist_branch_staff(const branch_staff_t *record_payload)
 }
 
 // Appends a gym member record as a delimiter-separated line to the data file.
-static bool persist_gym_member(const gym_member_t *record_payload)
+static bool persist_gym_member(const gym_member_t record_payload)
 {
   FILE *file = fopen(GYM_MEMBERS_FILE_PATH, "a");
   if (file == NULL)
@@ -111,8 +115,7 @@ static bool persist_gym_member(const gym_member_t *record_payload)
 // records left.
 static void remove_branch_staff_at(int index)
 {
-  for (int i = index; i < branch_staff_count - 1; i++)
-    branch_staff_list[i] = branch_staff_list[i + 1];
+  for (int i = index; i < branch_staff_count - 1; i++) branch_staff_list[i] = branch_staff_list[i + 1];
 
   branch_staff_count--;
 }
@@ -121,8 +124,7 @@ static void remove_branch_staff_at(int index)
 // records left.
 static void remove_gym_member_at(int index)
 {
-  for (int i = index; i < gym_member_count - 1; i++)
-    gym_members[i] = gym_members[i + 1];
+  for (int i = index; i < gym_member_count - 1; i++) gym_members[i] = gym_members[i + 1];
 
   gym_member_count--;
 }
@@ -143,10 +145,9 @@ static bool rewrite_branch_staff_file_without(int index)
   char line[LINE_BUFFER_SIZE];
   for (int i = 0; i < branch_staff_count; i++)
   {
-    if (i == index)
-      continue;
+    if (i == index) continue;
 
-    format_branch_staff_line(&branch_staff_list[i], line);
+    format_branch_staff_line(branch_staff_list[i], line);
     if (!write_line_to_file(file, line))
     {
       fclose(file);
@@ -175,10 +176,9 @@ static bool rewrite_gym_members_file_without(int index)
   char line[LINE_BUFFER_SIZE];
   for (int i = 0; i < gym_member_count; i++)
   {
-    if (i == index)
-      continue;
+    if (i == index) continue;
 
-    format_gym_member_line(&gym_members[i], line);
+    format_gym_member_line(gym_members[i], line);
     if (!write_line_to_file(file, line))
     {
       fclose(file);
@@ -207,7 +207,7 @@ static bool rewrite_branch_staff_file_all()
   char line[LINE_BUFFER_SIZE];
   for (int i = 0; i < branch_staff_count; i++)
   {
-    format_branch_staff_line(&branch_staff_list[i], line);
+    format_branch_staff_line(branch_staff_list[i], line);
     if (!write_line_to_file(file, line))
     {
       fclose(file);
@@ -236,7 +236,7 @@ static bool rewrite_gym_members_file_all()
   char line[LINE_BUFFER_SIZE];
   for (int i = 0; i < gym_member_count; i++)
   {
-    format_gym_member_line(&gym_members[i], line);
+    format_gym_member_line(gym_members[i], line);
     if (!write_line_to_file(file, line))
     {
       fclose(file);
@@ -255,8 +255,7 @@ static int split_record_line(const char line[], char parts_destination[][FIELD_B
   // Map each row of parts_destination to a pointer because split() fills
   // fields through char pointers.
   char *parts[MAX_RECORD_FIELDS];
-  for (int i = 0; i < MAX_RECORD_FIELDS; i++)
-    parts[i] = parts_destination[i];
+  for (int i = 0; i < MAX_RECORD_FIELDS; i++) parts[i] = parts_destination[i];
 
   return split(line, FIELD_DELIMITER, parts, MAX_RECORD_FIELDS, FIELD_BUFFER_SIZE);
 }
@@ -267,8 +266,7 @@ static bool parse_sysadmin_line(const char line[], sysadmin_t *destination)
 {
   char parts[MAX_RECORD_FIELDS][FIELD_BUFFER_SIZE];
   int count = split_record_line(line, parts);
-  if (count != 3)
-    return false;
+  if (count != 3) return false;
 
   destination->id = string_to_unsigned_long_int(parts[0]);
   strcpy(destination->username, parts[1]);
@@ -282,8 +280,7 @@ static bool parse_branch_staff_line(const char line[], branch_staff_t *destinati
 {
   char parts[MAX_RECORD_FIELDS][FIELD_BUFFER_SIZE];
   int count = split_record_line(line, parts);
-  if (count != 9)
-    return false;
+  if (count != 9) return false;
 
   destination->id = string_to_unsigned_long_int(parts[0]);
   strcpy(destination->full_name, parts[1]);
@@ -303,8 +300,7 @@ static bool parse_gym_member_line(const char line[], gym_member_t *destination)
 {
   char parts[MAX_RECORD_FIELDS][FIELD_BUFFER_SIZE];
   int count = split_record_line(line, parts);
-  if (count != 13)
-    return false;
+  if (count != 13) return false;
 
   destination->id = string_to_unsigned_long_int(parts[0]);
   strcpy(destination->full_name, parts[1]);
@@ -336,8 +332,7 @@ int load_sysadmins()
   char line[LINE_BUFFER_SIZE];
   while (sysadmin_count < MAX_SYSTEM_ADMINS && read_line_from_file(file, line, LINE_BUFFER_SIZE))
   {
-    if (strlen(line) > 0 && parse_sysadmin_line(line, &sysadmins[sysadmin_count]))
-      sysadmin_count++;
+    if (strlen(line) > 0 && parse_sysadmin_line(line, &sysadmins[sysadmin_count])) sysadmin_count++;
   }
 
   fclose(file);
@@ -360,8 +355,7 @@ int load_branch_staff()
   int capacity = MAX_BRANCH_MANAGERS + MAX_TRAINERS;
   while (branch_staff_count < capacity && read_line_from_file(file, line, LINE_BUFFER_SIZE))
   {
-    if (strlen(line) > 0 && parse_branch_staff_line(line, &branch_staff_list[branch_staff_count]))
-      branch_staff_count++;
+    if (strlen(line) > 0 && parse_branch_staff_line(line, &branch_staff_list[branch_staff_count])) branch_staff_count++;
   }
 
   fclose(file);
@@ -383,8 +377,7 @@ int load_gym_members()
   char line[LINE_BUFFER_SIZE];
   while (gym_member_count < MAX_GYM_MEMBERS && read_line_from_file(file, line, LINE_BUFFER_SIZE))
   {
-    if (strlen(line) > 0 && parse_gym_member_line(line, &gym_members[gym_member_count]))
-      gym_member_count++;
+    if (strlen(line) > 0 && parse_gym_member_line(line, &gym_members[gym_member_count])) gym_member_count++;
   }
 
   fclose(file);
@@ -423,7 +416,7 @@ id_t create_sysadmin(const char username[], const char password_hash[])
   strcpy(record.username, username);
   strcpy(record.password_hash, password_hash);
 
-  if (!persist_sysadmin(&record))
+  if (!persist_sysadmin(record))
   {
     LOG_ERROR("Error: Failed to persist sysadmin record.");
     return 0;
@@ -434,8 +427,15 @@ id_t create_sysadmin(const char username[], const char password_hash[])
   return record.id;
 }
 
-id_t create_branch_staff(const char full_name[], const char email[], const char phone_number[], const char gym_branch[],
-                         const char username[], const char password_hash[], staff_role_t role)
+id_t create_branch_staff(
+  const char full_name[],
+  const char email[],
+  const char phone_number[],
+  const char gym_branch[],
+  const char username[],
+  const char password_hash[],
+  staff_role_t role
+)
 {
   if (full_name == NULL || strlen(full_name) == 0)
   {
@@ -498,7 +498,7 @@ id_t create_branch_staff(const char full_name[], const char email[], const char 
   record.joined_at = time(NULL);
   record.role = role;
 
-  if (!persist_branch_staff(&record))
+  if (!persist_branch_staff(record))
   {
     LOG_ERROR("Error: Failed to persist branch staff record.");
     return 0;
@@ -509,9 +509,16 @@ id_t create_branch_staff(const char full_name[], const char email[], const char 
   return record.id;
 }
 
-id_t create_gym_member(const char full_name[], const char email[], const char phone_number[], const char gym_branch[],
-                       const char username[], const char password_hash[], subscription_plan_t plan_payload,
-                       membership_status_t status)
+id_t create_gym_member(
+  const char full_name[],
+  const char email[],
+  const char phone_number[],
+  const char gym_branch[],
+  const char username[],
+  const char password_hash[],
+  subscription_plan_t plan_payload,
+  membership_status_t status
+)
 {
   if (full_name == NULL || strlen(full_name) == 0)
   {
@@ -576,7 +583,7 @@ id_t create_gym_member(const char full_name[], const char email[], const char ph
   record.plan = plan_payload;
   record.status = status;
 
-  if (!persist_gym_member(&record))
+  if (!persist_gym_member(record))
   {
     LOG_ERROR("Error: Failed to persist gym member record.");
     return 0;
@@ -585,14 +592,6 @@ id_t create_gym_member(const char full_name[], const char email[], const char ph
   gym_members[gym_member_count] = record;
   gym_member_count++;
   return record.id;
-}
-
-bool ensure_member_has_no_dues(const gym_member_t *member_payload)
-{
-  if (member_payload == NULL)
-    return false;
-
-  return member_payload->due_amount == 0;
 }
 
 bool delete_branch_staff(id_t id)
@@ -641,7 +640,7 @@ bool delete_gym_member(id_t id)
     return false;
   }
 
-  if (!ensure_member_has_no_dues(&gym_members[index]))
+  if (gym_members[index].due_amount != 0)
   {
     LOG_ERROR("Error: Member with id %lu has outstanding dues.", (unsigned long)id);
     return false;
@@ -659,25 +658,21 @@ bool delete_gym_member(id_t id)
 
 bool username_exists(const char username[])
 {
-  if (username == NULL || strlen(username) == 0)
-    return false;
+  if (username == NULL || strlen(username) == 0) return false;
 
   for (int i = 0; i < sysadmin_count; i++)
   {
-    if (strcmp(sysadmins[i].username, username) == 0)
-      return true;
+    if (strcmp(sysadmins[i].username, username) == 0) return true;
   }
 
   for (int i = 0; i < branch_staff_count; i++)
   {
-    if (strcmp(branch_staff_list[i].username, username) == 0)
-      return true;
+    if (strcmp(branch_staff_list[i].username, username) == 0) return true;
   }
 
   for (int i = 0; i < gym_member_count; i++)
   {
-    if (strcmp(gym_members[i].username, username) == 0)
-      return true;
+    if (strcmp(gym_members[i].username, username) == 0) return true;
   }
 
   return false;
@@ -685,8 +680,7 @@ bool username_exists(const char username[])
 
 int branch_manager_count(const char branch_name[])
 {
-  if (branch_name == NULL || strlen(branch_name) == 0)
-    return 0;
+  if (branch_name == NULL || strlen(branch_name) == 0) return 0;
 
   int count = 0;
   for (int i = 0; i < branch_staff_count; i++)
@@ -699,36 +693,31 @@ int branch_manager_count(const char branch_name[])
 
 int branch_trainer_count(const char branch_name[])
 {
-  if (branch_name == NULL || strlen(branch_name) == 0)
-    return 0;
+  if (branch_name == NULL || strlen(branch_name) == 0) return 0;
 
   int count = 0;
   for (int i = 0; i < branch_staff_count; i++)
   {
-    if (branch_staff_list[i].role == TRAINER && strcmp(branch_staff_list[i].gym_branch, branch_name) == 0)
-      count++;
+    if (branch_staff_list[i].role == TRAINER && strcmp(branch_staff_list[i].gym_branch, branch_name) == 0) count++;
   }
   return count;
 }
 
 int branch_member_count(const char branch_name[])
 {
-  if (branch_name == NULL || strlen(branch_name) == 0)
-    return 0;
+  if (branch_name == NULL || strlen(branch_name) == 0) return 0;
 
   int count = 0;
   for (int i = 0; i < gym_member_count; i++)
   {
-    if (strcmp(gym_members[i].gym_branch, branch_name) == 0)
-      count++;
+    if (strcmp(gym_members[i].gym_branch, branch_name) == 0) count++;
   }
   return count;
 }
 
 bool get_sysadmin_by_id(id_t id, sysadmin_t *destination)
 {
-  if (destination == NULL)
-    return false;
+  if (destination == NULL) return false;
 
   for (int i = 0; i < sysadmin_count; i++)
   {
@@ -743,8 +732,7 @@ bool get_sysadmin_by_id(id_t id, sysadmin_t *destination)
 
 bool get_sysadmin_by_username(const char username[], sysadmin_t *destination)
 {
-  if (username == NULL || strlen(username) == 0 || destination == NULL)
-    return false;
+  if (username == NULL || strlen(username) == 0 || destination == NULL) return false;
 
   for (int i = 0; i < sysadmin_count; i++)
   {
@@ -759,8 +747,7 @@ bool get_sysadmin_by_username(const char username[], sysadmin_t *destination)
 
 bool get_branch_staff_by_id(id_t id, branch_staff_t *destination)
 {
-  if (destination == NULL)
-    return false;
+  if (destination == NULL) return false;
 
   for (int i = 0; i < branch_staff_count; i++)
   {
@@ -775,8 +762,7 @@ bool get_branch_staff_by_id(id_t id, branch_staff_t *destination)
 
 bool get_branch_staff_by_username(const char username[], branch_staff_t *destination)
 {
-  if (username == NULL || strlen(username) == 0 || destination == NULL)
-    return false;
+  if (username == NULL || strlen(username) == 0 || destination == NULL) return false;
 
   for (int i = 0; i < branch_staff_count; i++)
   {
@@ -791,8 +777,7 @@ bool get_branch_staff_by_username(const char username[], branch_staff_t *destina
 
 bool get_gym_member_by_id(id_t id, gym_member_t *destination)
 {
-  if (destination == NULL)
-    return false;
+  if (destination == NULL) return false;
 
   for (int i = 0; i < gym_member_count; i++)
   {
@@ -807,8 +792,7 @@ bool get_gym_member_by_id(id_t id, gym_member_t *destination)
 
 bool get_gym_member_by_username(const char username[], gym_member_t *destination)
 {
-  if (username == NULL || strlen(username) == 0 || destination == NULL)
-    return false;
+  if (username == NULL || strlen(username) == 0 || destination == NULL) return false;
 
   for (int i = 0; i < gym_member_count; i++)
   {
@@ -870,8 +854,14 @@ bool update_branch_staff(id_t id, const char full_name[], const char email[], co
   return true;
 }
 
-bool update_gym_member(id_t id, const char full_name[], const char email[], const char phone_number[],
-                       const char gym_branch[], const char username[])
+bool update_gym_member(
+  id_t id,
+  const char full_name[],
+  const char email[],
+  const char phone_number[],
+  const char gym_branch[],
+  const char username[]
+)
 {
   if (full_name == NULL || strlen(full_name) == 0)
   {
@@ -941,8 +931,42 @@ bool update_gym_member(id_t id, const char full_name[], const char email[], cons
   return true;
 }
 
-bool update_gym_member_lifecycle(id_t id, subscription_plan_t plan_payload, time_t last_payment_date,
-                                 unsigned int due_amount, membership_status_t status)
+bool update_gym_member_status(id_t id, membership_status_t status)
+{
+  int index = -1;
+  for (int i = 0; i < gym_member_count; i++)
+  {
+    if (gym_members[i].id == id)
+    {
+      index = i;
+      break;
+    }
+  }
+
+  if (index < 0)
+  {
+    LOG_ERROR("Error: No gym member found with id %lu.", (unsigned long)id);
+    return false;
+  }
+
+  gym_members[index].status = status;
+
+  if (!rewrite_gym_members_file_all())
+  {
+    LOG_ERROR("Error: Failed to persist gym member status update.");
+    return false;
+  }
+
+  return true;
+}
+
+bool update_gym_member_lifecycle(
+  id_t id,
+  subscription_plan_t plan_payload,
+  time_t last_payment_date,
+  unsigned int due_amount,
+  membership_status_t status
+)
 {
   int index = -1;
   for (int i = 0; i < gym_member_count; i++)
@@ -974,17 +998,16 @@ bool update_gym_member_lifecycle(id_t id, subscription_plan_t plan_payload, time
   return true;
 }
 
-int get_gym_member_ids_by_status(membership_status_t status, id_t destination_ids[], int destination_capacity)
+int get_gym_member_ids_by_status(membership_status_t status, id_t ids_destination[], int destination_capacity)
 {
-  if (destination_ids == NULL || destination_capacity <= 0)
-    return 0;
+  if (ids_destination == NULL || destination_capacity <= 0) return 0;
 
   int copied_count = 0;
   for (int i = 0; i < gym_member_count && copied_count < destination_capacity; i++)
   {
     if (gym_members[i].status == status)
     {
-      destination_ids[copied_count] = gym_members[i].id;
+      ids_destination[copied_count] = gym_members[i].id;
       copied_count++;
     }
   }

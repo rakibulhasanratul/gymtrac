@@ -190,8 +190,9 @@ void test_create_gym_member_and_get()
   plan.payable_amount = 1500;
   plan.interval_days = 30;
 
-  id_t id = create_gym_member("Nusrat Jahan", "nusrat@test.com", "0181234567", "Uttara", "nusrat", "hash1", plan,
-                              MEMBERSHIP_ON_HOLD);
+  id_t id = create_gym_member(
+    "Nusrat Jahan", "nusrat@test.com", "0181234567", "Uttara", "nusrat", "hash1", plan, MEMBERSHIP_ON_HOLD
+  );
   assert(id == 1);
 
   gym_member_t found;
@@ -470,23 +471,6 @@ void test_member_username_blocks_staff_creation()
 // ---- deletion ----
 
 /**
- * Verifies the no-dues policy accepts a cleared member and rejects an
- * indebted one or a NULL record.
- */
-void test_ensure_member_has_no_dues()
-{
-  gym_member_t member;
-  memset(&member, 0, sizeof(member));
-
-  assert(ensure_member_has_no_dues(&member) == true);
-
-  member.due_amount = 500;
-  assert(ensure_member_has_no_dues(&member) == false);
-
-  assert(ensure_member_has_no_dues(NULL) == false);
-}
-
-/**
  * Verifies that delete_branch_staff removes the record from memory and
  * disk and frees the username for reuse.
  */
@@ -563,8 +547,9 @@ void test_delete_gym_member_removes_and_persists()
   reuse_plan.payable_amount = 500;
   reuse_plan.interval_days = 15;
 
-  id_t reused = create_gym_member("Member Three", "m3@t.com", "0183333333", "B1", "memberdel1", "h3", reuse_plan,
-                                  MEMBERSHIP_ON_HOLD);
+  id_t reused = create_gym_member(
+    "Member Three", "m3@t.com", "0183333333", "B1", "memberdel1", "h3", reuse_plan, MEMBERSHIP_ON_HOLD
+  );
   assert(reused != 0);
 }
 

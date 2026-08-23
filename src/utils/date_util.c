@@ -17,20 +17,16 @@ static const int DAYS_IN_MONTH[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 
 // Returns whether the given year is a leap year.
 static int is_leap_year(int year)
 {
-  if (year % 400 == 0)
-    return 1;
-  if (year % 100 == 0)
-    return 0;
-  if (year % 4 == 0)
-    return 1;
+  if (year % 400 == 0) return 1;
+  if (year % 100 == 0) return 0;
+  if (year % 4 == 0) return 1;
   return 0;
 }
 
 // Returns the number of days in the given month (1-indexed).
 static int days_in_month(int year, int month)
 {
-  if (month == 2 && is_leap_year(year))
-    return 29;
+  if (month == 2 && is_leap_year(year)) return 29;
   return DAYS_IN_MONTH[month - 1];
 }
 
@@ -47,16 +43,17 @@ static time_t normalize_to_midnight(time_t timestamp)
 
 bool time_t_to_string(time_t timestamp, char *buffer, int buffer_capacity)
 {
-  if (buffer == NULL || buffer_capacity < DATE_BUFFER_SIZE)
-    return 0;
+  if (buffer == NULL || buffer_capacity < DATE_BUFFER_SIZE) return 0;
 
   // Extract calendar fields from the timestamp.
   calendar_time_t calendar_time;
   localtime_r(&timestamp, &calendar_time);
 
   // Format as yyyy-mm-dd into the caller's buffer.
-  int written = snprintf(buffer, (size_t)buffer_capacity, "%04d-%02d-%02d", calendar_time.tm_year + 1900,
-                         calendar_time.tm_mon + 1, calendar_time.tm_mday);
+  int written = snprintf(
+    buffer, (size_t)buffer_capacity, "%04d-%02d-%02d", calendar_time.tm_year + 1900, calendar_time.tm_mon + 1,
+    calendar_time.tm_mday
+  );
 
   // Verify the full 10-character date was written.
   return (written == DATE_BUFFER_SIZE - 1);
@@ -64,28 +61,22 @@ bool time_t_to_string(time_t timestamp, char *buffer, int buffer_capacity)
 
 time_t string_to_time_t(const char *date_string)
 {
-  if (date_string == NULL)
-    return (time_t)-1;
+  if (date_string == NULL) return (time_t)-1;
 
   // Enforce exactly 10 characters in yyyy-mm-dd format.
   int length = (int)strlen(date_string);
-  if (length != DATE_BUFFER_SIZE - 1)
-    return (time_t)-1;
-  if (date_string[4] != '-' || date_string[7] != '-')
-    return (time_t)-1;
+  if (length != DATE_BUFFER_SIZE - 1) return (time_t)-1;
+  if (date_string[4] != '-' || date_string[7] != '-') return (time_t)-1;
 
   int year = 0;
   int month = 0;
   int day = 0;
 
-  if (sscanf(date_string, "%4d-%2d-%2d", &year, &month, &day) != 3)
-    return (time_t)-1;
+  if (sscanf(date_string, "%4d-%2d-%2d", &year, &month, &day) != 3) return (time_t)-1;
 
   // Reject out-of-range month and day values.
-  if (month < 1 || month > 12)
-    return (time_t)-1;
-  if (day < 1 || day > days_in_month(year, month))
-    return (time_t)-1;
+  if (month < 1 || month > 12) return (time_t)-1;
+  if (day < 1 || day > days_in_month(year, month)) return (time_t)-1;
 
   // Populate a calendar_time_t and convert to a normalized time_t.
   calendar_time_t calendar_time;
@@ -119,8 +110,7 @@ time_t add_months(time_t date, int months)
   // Clamp the day to the last day of the target month.
   int max_day = days_in_month(target_year, target_month);
   int target_day = calendar_time.tm_mday;
-  if (target_day > max_day)
-    target_day = max_day;
+  if (target_day > max_day) target_day = max_day;
 
   // Build the result date and normalize to midnight.
   calendar_time_t result_calendar_time;

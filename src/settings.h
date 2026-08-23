@@ -8,7 +8,7 @@
 #define EMAIL_BUFFER_SIZE 64
 #define PHONE_BUFFER_SIZE 11        // phone number pattern: 01XXXXXXXXX
 #define BRANCH_NAME_BUFFER_SIZE 128 // should allow detailed location names
-#define REASON_BUFFER_SIZE 128      // suspension/request reason field
+#define REASON_BUFFER_SIZE 1024     // suspension/request reason field
 #define DESCRIPTION_BUFFER_SIZE 256 // description field for lost and found
 #define TRX_ID_BUFFER_SIZE 64       // transaction id field
 #define DATE_BUFFER_SIZE 11         // yyyy-mm-dd + null terminator

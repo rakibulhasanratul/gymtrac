@@ -264,8 +264,9 @@ void test_delete_branch_rejects_branch_with_users()
   plan.payable_amount = 1000;
   plan.interval_days = 30;
 
-  id_t member_id = create_gym_member("Busy Member", "busy@t.com", "0172222222", "BusyBranch", "busymember", "hash",
-                                     plan, MEMBERSHIP_ACTIVE);
+  id_t member_id = create_gym_member(
+    "Busy Member", "busy@t.com", "0172222222", "BusyBranch", "busymember", "hash", plan, MEMBERSHIP_ACTIVE
+  );
   assert(member_id != 0);
 
   assert(delete_branch("BusyBranch") == false);

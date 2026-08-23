@@ -22,34 +22,18 @@ static suspension_record_t suspension_records[MAX_SUSPENSION_RECORDS];
 static int suspension_count;
 static id_t next_suspension_id;
 
-// Policy guard ensuring a member is still awaiting manager approval.
-static bool ensure_member_is_on_hold(const gym_member_t *member_payload)
-{
-  return member_payload != NULL && member_payload->status == MEMBERSHIP_ON_HOLD;
-}
-
-// Policy guard ensuring a member can be suspended right now.
-static bool ensure_member_is_active(const gym_member_t *member_payload)
-{
-  return member_payload != NULL && member_payload->status == MEMBERSHIP_ACTIVE;
-}
-
-// Policy guard ensuring a member is currently under suspension.
-static bool ensure_member_is_suspended(const gym_member_t *member_payload)
-{
-  return member_payload != NULL && member_payload->status == MEMBERSHIP_SUSPENDED;
-}
-
 // Formats a suspension record as a delimiter-separated line.
-static void format_suspension_line(const suspension_record_t *record_payload, char *line_destination)
+static void format_suspension_line(const suspension_record_t record_payload, char *line_destination)
 {
-  snprintf(line_destination, LINE_BUFFER_SIZE, "%lu" SEP "%lu" SEP "%s" SEP "%ld" SEP "%ld",
-           (unsigned long)record_payload->id, (unsigned long)record_payload->gym_member_id, record_payload->reason,
-           (long)record_payload->suspension_date, (long)record_payload->unsuspension_date);
+  snprintf(
+    line_destination, LINE_BUFFER_SIZE, "%lu" SEP "%lu" SEP "%s" SEP "%ld" SEP "%ld", (unsigned long)record_payload.id,
+    (unsigned long)record_payload.gym_member_id, record_payload.reason, (long)record_payload.suspension_date,
+    (long)record_payload.unsuspension_date
+  );
 }
 
 // Appends a suspension record as a delimiter-separated line to the data file.
-static bool persist_suspension(const suspension_record_t *record_payload)
+static bool persist_suspension(const suspension_record_t record_payload)
 {
   FILE *file = fopen(SUSPENSIONS_FILE_PATH, "a");
   if (file == NULL)
@@ -82,7 +66,7 @@ static bool rewrite_suspension_file_all()
   char line[LINE_BUFFER_SIZE];
   for (int i = 0; i < suspension_count; i++)
   {
-    format_suspension_line(&suspension_records[i], line);
+    format_suspension_line(suspension_records[i], line);
     if (!write_line_to_file(file, line))
     {
       fclose(file);
@@ -95,26 +79,19 @@ static bool rewrite_suspension_file_all()
   return true;
 }
 
-// Splits a pipe-delimited line into field buffers and returns the field count.
-static int split_record_line(const char line[], char parts_destination[][FIELD_BUFFER_SIZE])
-{
-  // Map each row of parts_destination to a pointer because split() fills
-  // fields through char pointers.
-  char *parts[MAX_RECORD_FIELDS];
-  for (int i = 0; i < MAX_RECORD_FIELDS; i++)
-    parts[i] = parts_destination[i];
-
-  return split(line, FIELD_DELIMITER, parts, MAX_RECORD_FIELDS, FIELD_BUFFER_SIZE);
-}
-
 // Parses a pipe-delimited line into a suspension record.
 // Returns true on success, false if the field count is wrong.
 static bool parse_suspension_line(const char line[], suspension_record_t *destination)
 {
+  // Map each row of parts to a pointer because split() fills fields through
+  // char pointers.
   char parts[MAX_RECORD_FIELDS][FIELD_BUFFER_SIZE];
-  int count = split_record_line(line, parts);
-  if (count != 5)
-    return false;
+  char *part_maps[MAX_RECORD_FIELDS];
+
+  for (int i = 0; i < MAX_RECORD_FIELDS; i++) part_maps[i] = parts[i];
+
+  int count = split(line, FIELD_DELIMITER, part_maps, MAX_RECORD_FIELDS, FIELD_BUFFER_SIZE);
+  if (count != 5) return false;
 
   destination->id = string_to_unsigned_long_int(parts[0]);
   destination->gym_member_id = string_to_unsigned_long_int(parts[1]);
@@ -138,8 +115,7 @@ int load_suspensions()
   char line[LINE_BUFFER_SIZE];
   while (suspension_count < MAX_SUSPENSION_RECORDS && read_line_from_file(file, line, LINE_BUFFER_SIZE))
   {
-    if (strlen(line) > 0 && parse_suspension_line(line, &suspension_records[suspension_count]))
-      suspension_count++;
+    if (strlen(line) > 0 && parse_suspension_line(line, &suspension_records[suspension_count])) suspension_count++;
   }
 
   fclose(file);
@@ -147,7 +123,7 @@ int load_suspensions()
   return suspension_count;
 }
 
-bool approve_gym_member(id_t member_id, time_t approval_date)
+bool approve_gym_member(id_t member_id)
 {
   gym_member_t member;
   if (!get_gym_member_by_id(member_id, &member))
@@ -156,18 +132,20 @@ bool approve_gym_member(id_t member_id, time_t approval_date)
     return false;
   }
 
-  if (!ensure_member_is_on_hold(&member))
+  if (member.status != MEMBERSHIP_ON_HOLD)
   {
     LOG_ERROR("Error: Member with id %lu is not awaiting approval.", (unsigned long)member_id);
     return false;
   }
 
-  subscription_plan_t default_plan;
-  default_plan.payable_amount = DEFAULT_PLAN_AMOUNT;
-  default_plan.interval_days = DEFAULT_PLAN_INTERVAL_DAYS;
+  subscription_plan_t default_plan = {
+    .payable_amount = DEFAULT_PLAN_AMOUNT, .interval_days = DEFAULT_PLAN_INTERVAL_DAYS
+  };
+  time_t approval_date = get_today();
 
-  if (!update_gym_member_lifecycle(member_id, default_plan, approval_date, default_plan.payable_amount,
-                                   MEMBERSHIP_ACTIVE))
+  if (!update_gym_member_lifecycle(
+        member_id, default_plan, approval_date, default_plan.payable_amount, MEMBERSHIP_ACTIVE
+      ))
   {
     LOG_ERROR("Error: Failed to persist approval of member %lu.", (unsigned long)member_id);
     return false;
@@ -176,7 +154,7 @@ bool approve_gym_member(id_t member_id, time_t approval_date)
   return true;
 }
 
-bool suspend_gym_member(id_t member_id, const char reason[], time_t suspension_date)
+bool suspend_gym_member(id_t member_id, const char reason[])
 {
   if (reason == NULL || strlen(reason) == 0)
   {
@@ -197,7 +175,7 @@ bool suspend_gym_member(id_t member_id, const char reason[], time_t suspension_d
     return false;
   }
 
-  if (!ensure_member_is_active(&member))
+  if (member.status != MEMBERSHIP_ACTIVE)
   {
     LOG_ERROR("Error: Member with id %lu is not active and cannot be suspended.", (unsigned long)member_id);
     return false;
@@ -209,6 +187,8 @@ bool suspend_gym_member(id_t member_id, const char reason[], time_t suspension_d
     return false;
   }
 
+  time_t suspension_date = get_today();
+
   suspension_record_t record;
   record.id = next_suspension_id++;
   record.gym_member_id = member.id;
@@ -216,7 +196,7 @@ bool suspend_gym_member(id_t member_id, const char reason[], time_t suspension_d
   record.suspension_date = suspension_date;
   record.unsuspension_date = 0;
 
-  if (!persist_suspension(&record))
+  if (!persist_suspension(record))
   {
     LOG_ERROR("Error: Failed to persist suspension record.");
     return false;
@@ -225,8 +205,7 @@ bool suspend_gym_member(id_t member_id, const char reason[], time_t suspension_d
   suspension_records[suspension_count] = record;
   suspension_count++;
 
-  if (!update_gym_member_lifecycle(member_id, member.plan, member.last_payment_date, member.due_amount,
-                                   MEMBERSHIP_SUSPENDED))
+  if (!update_gym_member_status(member_id, MEMBERSHIP_SUSPENDED))
   {
     LOG_ERROR("Error: Failed to persist suspension of member %lu.", (unsigned long)member_id);
     return false;
@@ -235,7 +214,7 @@ bool suspend_gym_member(id_t member_id, const char reason[], time_t suspension_d
   return true;
 }
 
-bool unsuspend_gym_member(id_t member_id, time_t unsuspension_date)
+bool unsuspend_gym_member(id_t member_id)
 {
   gym_member_t member;
   if (!get_gym_member_by_id(member_id, &member))
@@ -244,13 +223,13 @@ bool unsuspend_gym_member(id_t member_id, time_t unsuspension_date)
     return false;
   }
 
-  if (!ensure_member_is_suspended(&member))
+  if (member.status != MEMBERSHIP_SUSPENDED)
   {
     LOG_ERROR("Error: Member with id %lu is not suspended.", (unsigned long)member_id);
     return false;
   }
 
-  if (!ensure_member_has_no_dues(&member))
+  if (member.due_amount != 0)
   {
     LOG_ERROR("Error: Member with id %lu still owes dues and cannot be unsuspended.", (unsigned long)member_id);
     return false;
@@ -272,6 +251,8 @@ bool unsuspend_gym_member(id_t member_id, time_t unsuspension_date)
     return false;
   }
 
+  time_t unsuspension_date = get_today();
+
   time_t previous_unsuspension_date = suspension_records[open_index].unsuspension_date;
   suspension_records[open_index].unsuspension_date = unsuspension_date;
 
@@ -282,8 +263,7 @@ bool unsuspend_gym_member(id_t member_id, time_t unsuspension_date)
     return false;
   }
 
-  if (!update_gym_member_lifecycle(member_id, member.plan, member.last_payment_date, member.due_amount,
-                                   MEMBERSHIP_ACTIVE))
+  if (!update_gym_member_status(member_id, MEMBERSHIP_ACTIVE))
   {
     LOG_ERROR("Error: Failed to persist unsuspension of member %lu.", (unsigned long)member_id);
     return false;
@@ -292,8 +272,10 @@ bool unsuspend_gym_member(id_t member_id, time_t unsuspension_date)
   return true;
 }
 
-int auto_suspend_overdue_members(time_t today)
+int auto_suspend_overdue_members()
 {
+  time_t today = get_today();
+
   id_t active_ids[MAX_GYM_MEMBERS];
   int active_count = get_gym_member_ids_by_status(MEMBERSHIP_ACTIVE, active_ids, MAX_GYM_MEMBERS);
 
@@ -301,16 +283,17 @@ int auto_suspend_overdue_members(time_t today)
   for (int i = 0; i < active_count; i++)
   {
     gym_member_t member;
-    if (!get_gym_member_by_id(active_ids[i], &member))
-      continue;
+    if (!get_gym_member_by_id(active_ids[i], &member)) continue;
 
     // The due date is one payment interval past the billing cycle start.
     time_t due_date = member.last_payment_date + (time_t)member.plan.interval_days * SECONDS_PER_DAY;
-    if (days_between(due_date, today) < MAX_UNPAID_DAYS)
-      continue;
+    if (days_between(due_date, today) < MAX_UNPAID_DAYS) continue;
 
-    if (!suspend_gym_member(active_ids[i], AUTO_SUSPENSION_REASON, today))
+    if (!suspend_gym_member(active_ids[i], AUTO_SUSPENSION_REASON))
+    {
+      LOG_ERROR("Error: Failed to auto-suspend overdue member %lu.", (unsigned long)active_ids[i]);
       continue;
+    }
 
     suspended_count++;
   }
@@ -318,10 +301,9 @@ int auto_suspend_overdue_members(time_t today)
   return suspended_count;
 }
 
-int get_suspensions_for_member(id_t gym_member_id, suspension_record_t destination_records[], int destination_capacity)
+int get_suspensions_for_member(id_t gym_member_id, suspension_record_t *destination_records, int destination_capacity)
 {
-  if (destination_records == NULL || destination_capacity <= 0)
-    return 0;
+  if (destination_records == NULL || destination_capacity <= 0) return 0;
 
   int copied_count = 0;
   for (int i = 0; i < suspension_count && copied_count < destination_capacity; i++)

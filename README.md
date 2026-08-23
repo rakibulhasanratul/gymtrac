@@ -79,8 +79,8 @@ Work tracked per item; commit each with a Conventional Commit message (`feat:`, 
 - [x] Auth module that verifies username + password against stored salted polynomial hashes on login and clears the session on logout, so only verified users get in - `feat:`
 - [x] Session module tracking role, user id, username, and branch per logged-in user, with predicates that gate actions by role and branch scope - `feat:`
 - [x] Unit tests covering session predicates and branch-scope checks - `test:`
-- [ ] Member lifecycle: approve `on_hold` members to active, suspend/unsuspend with a mandatory reason (recording dated suspension records), and auto-suspend members with 90+ days unpaid dues - `feat:`
-- [ ] Unit tests covering approval, suspension records with optional unsuspension date, and the auto-suspend sweep - `test:`
+- [x] Member lifecycle: approve `on_hold` members to active, suspend/unsuspend with a mandatory reason (recording dated suspension records), and auto-suspend members with 90+ days unpaid dues - `feat:`
+- [x] Unit tests covering approval, suspension records with optional unsuspension date, and the auto-suspend sweep - `test:`
 - [ ] Payment module: record digital payments instantly, let trainers record cash payments directly, then reduce `due_amount` (clamped at 0) and update `last_payment_date` - `feat:`
 - [ ] Unit tests covering digital payment, trainer-recorded cash payment, due clamping, and date advancement - `test:`
 - [ ] Lost & Found module where members report lost/found items and managers/trainers list and resolve their branch's items - `feat:`

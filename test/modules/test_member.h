@@ -1,0 +1,16 @@
+#ifndef GYMTRAC_TEST_MEMBER_H
+#define GYMTRAC_TEST_MEMBER_H
+
+void cleanup_member_files();
+
+void test_approve_on_hold_member_activates_with_default_plan();
+void test_approve_rejects_non_on_hold_and_unknown_members();
+void test_suspend_active_member_writes_dated_record();
+void test_suspend_rejects_missing_reason_and_invalid_state();
+void test_unsuspend_reactivates_member_and_closes_record();
+void test_unsuspend_rejects_indebted_and_invalid_members();
+void test_auto_suspend_sweeps_only_overdue_active_members();
+void test_auto_suspend_returns_zero_when_nobody_overdue();
+void test_get_suspensions_for_member_handles_history_and_capacity();
+
+#endif

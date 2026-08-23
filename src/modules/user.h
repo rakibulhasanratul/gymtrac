@@ -259,4 +259,33 @@ bool update_branch_staff(id_t id, const char full_name[], const char email[], co
 bool update_gym_member(id_t id, const char full_name[], const char email[], const char phone_number[],
                        const char gym_branch[], const char username[]);
 
+/**
+ * Updates a gym member's lifecycle fields and persists the change.
+ *
+ * Covers the plan, billing date, dues, and membership status driven by the
+ * approval, suspension, and payment flows. The record is looked up by id;
+ * the file is rewritten with the updated values.
+ *
+ * @param id the member's id
+ * @param plan_payload the subscription plan to store on the record
+ * @param last_payment_date the billing cycle start date
+ * @param due_amount the outstanding amount in whole Taka
+ * @param status the membership status to store on the record
+ * @return true if the record was found and updated, false otherwise
+ */
+bool update_gym_member_lifecycle(id_t id, subscription_plan_t plan_payload, time_t last_payment_date,
+                                 unsigned int due_amount, membership_status_t status);
+
+/**
+ * Collects the ids of every loaded member carrying the given status.
+ *
+ * Copies at most destination_capacity ids; members beyond that are skipped.
+ *
+ * @param status the membership status to filter by
+ * @param destination_ids receives the matching member ids
+ * @param destination_capacity the number of slots available in destination_ids
+ * @return the number of ids copied
+ */
+int get_gym_member_ids_by_status(membership_status_t status, id_t destination_ids[], int destination_capacity);
+
 #endif

@@ -940,3 +940,54 @@ bool update_gym_member(id_t id, const char full_name[], const char email[], cons
 
   return true;
 }
+
+bool update_gym_member_lifecycle(id_t id, subscription_plan_t plan_payload, time_t last_payment_date,
+                                 unsigned int due_amount, membership_status_t status)
+{
+  int index = -1;
+  for (int i = 0; i < gym_member_count; i++)
+  {
+    if (gym_members[i].id == id)
+    {
+      index = i;
+      break;
+    }
+  }
+
+  if (index < 0)
+  {
+    LOG_ERROR("Error: No gym member found with id %lu.", (unsigned long)id);
+    return false;
+  }
+
+  gym_members[index].plan = plan_payload;
+  gym_members[index].last_payment_date = last_payment_date;
+  gym_members[index].due_amount = due_amount;
+  gym_members[index].status = status;
+
+  if (!rewrite_gym_members_file_all())
+  {
+    LOG_ERROR("Error: Failed to persist gym member lifecycle update.");
+    return false;
+  }
+
+  return true;
+}
+
+int get_gym_member_ids_by_status(membership_status_t status, id_t destination_ids[], int destination_capacity)
+{
+  if (destination_ids == NULL || destination_capacity <= 0)
+    return 0;
+
+  int copied_count = 0;
+  for (int i = 0; i < gym_member_count && copied_count < destination_capacity; i++)
+  {
+    if (gym_members[i].status == status)
+    {
+      destination_ids[copied_count] = gym_members[i].id;
+      copied_count++;
+    }
+  }
+
+  return copied_count;
+}

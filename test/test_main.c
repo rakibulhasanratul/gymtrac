@@ -5,6 +5,7 @@
 #include "../src/utils/rng.h"
 #include "modules/test_auth.h"
 #include "modules/test_branch.h"
+#include "modules/test_member.h"
 #include "modules/test_session.h"
 #include "modules/test_user.h"
 #include "utils/test_date_util.h"
@@ -21,6 +22,7 @@ int main()
   /* Remove leftover test data files from any previous run. */
   cleanup_branches_file();
   cleanup_user_files();
+  cleanup_member_files();
 
   /* string_util */
   test_trim_strips_whitespace();
@@ -210,6 +212,25 @@ int main()
   test_session_belongs_to_branch_null_returns_false();
   test_session_get_current_returns_null_when_inactive();
   test_session_get_current_returns_record_when_active();
+
+  /* member: approval */
+  test_approve_on_hold_member_activates_with_default_plan();
+  test_approve_rejects_non_on_hold_and_unknown_members();
+
+  /* member: suspension */
+  test_suspend_active_member_writes_dated_record();
+  test_suspend_rejects_missing_reason_and_invalid_state();
+
+  /* member: unsuspension */
+  test_unsuspend_reactivates_member_and_closes_record();
+  test_unsuspend_rejects_indebted_and_invalid_members();
+
+  /* member: auto-suspend sweep */
+  test_auto_suspend_sweeps_only_overdue_active_members();
+  test_auto_suspend_returns_zero_when_nobody_overdue();
+
+  /* member: suspension history getter */
+  test_get_suspensions_for_member_handles_history_and_capacity();
 
   printf("\n\nAll tests passed.\n\n");
   return 0;

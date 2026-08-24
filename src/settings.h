@@ -11,9 +11,12 @@
 #define REASON_BUFFER_SIZE 1024     // suspension/request reason field
 #define DESCRIPTION_BUFFER_SIZE 256 // description field for lost and found
 #define TRX_ID_BUFFER_SIZE 64       // transaction id field
-#define DATE_BUFFER_SIZE 11         // yyyy-mm-dd + null terminator
+#define DATETIME_BUFFER_SIZE 20     // yyyy-mm-dd hh:mm:ss + null terminator
+#define TIMEZONE_OFFSET_HOURS 6     // hours added to UTC; Bangladesh Standard Time is UTC+6
 #define FIELD_BUFFER_SIZE 256       // buffer for a single field when splitting a pipe-delimited record line
-#define LINE_BUFFER_SIZE 1024       // one full record line, large enough for any record
+#define LINE_BUFFER_SIZE 2048       // one full record line.
+// the previous allocation was 1024 and I was getting warnings and overflows sometimes
+// fortunately 2048 is covering it
 
 // Hashing internals.
 #define SALT_BUFFER_SIZE 16        // 15 printable chars + null
@@ -63,10 +66,5 @@
   {                                                                                                                    \
     fprintf(stderr, "%s:%d: " msg "\n", __FILE__, __LINE__, ##__VA_ARGS__);                                            \
   } while (0)
-
-// windows compatibility layer
-#if defined(_WIN32) || defined(_WIN64)
-#define localtime_r(timep, result) (localtime_s(result, timep) == 0 ? result : NULL)
-#endif
 
 #endif

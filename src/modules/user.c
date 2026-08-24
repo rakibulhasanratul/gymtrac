@@ -4,6 +4,7 @@
 
 #include "../settings.h"
 #include "../types.h"
+#include "../utils/datetime_utils.h"
 #include "../utils/file_util.h"
 #include "../utils/string_util.h"
 #include "user.h"
@@ -55,10 +56,10 @@ static bool persist_sysadmin(const sysadmin_t record_payload)
 static void format_branch_staff_line(const branch_staff_t record_payload, char *line_destination)
 {
   snprintf(
-    line_destination, LINE_BUFFER_SIZE, "%lu" SEP "%s" SEP "%s" SEP "%s" SEP "%s" SEP "%s" SEP "%s" SEP "%ld" SEP "%d",
+    line_destination, LINE_BUFFER_SIZE, "%lu" SEP "%s" SEP "%s" SEP "%s" SEP "%s" SEP "%s" SEP "%s" SEP "%lld" SEP "%d",
     (unsigned long)record_payload.id, record_payload.full_name, record_payload.email, record_payload.phone_number,
-    record_payload.gym_branch, record_payload.username, record_payload.password_hash, (long)record_payload.joined_at,
-    (int)record_payload.role
+    record_payload.gym_branch, record_payload.username, record_payload.password_hash,
+    datetime_to_seconds(record_payload.joined_at), (int)record_payload.role
   );
 }
 
@@ -67,11 +68,13 @@ static void format_gym_member_line(const gym_member_t record_payload, char *line
 {
   snprintf(
     line_destination, LINE_BUFFER_SIZE,
-    "%lu" SEP "%s" SEP "%s" SEP "%s" SEP "%s" SEP "%s" SEP "%s" SEP "%ld" SEP "%ld" SEP "%u" SEP "%u" SEP "%u" SEP "%d",
+    "%lu" SEP "%s" SEP "%s" SEP "%s" SEP "%s" SEP "%s" SEP "%s" SEP "%lld" SEP "%lld" SEP "%u" SEP "%u" SEP "%u" SEP
+    "%d",
     (unsigned long)record_payload.id, record_payload.full_name, record_payload.email, record_payload.phone_number,
-    record_payload.gym_branch, record_payload.username, record_payload.password_hash, (long)record_payload.joined_at,
-    (long)record_payload.last_payment_date, record_payload.due_amount, record_payload.plan.payable_amount,
-    record_payload.plan.interval_days, (int)record_payload.status
+    record_payload.gym_branch, record_payload.username, record_payload.password_hash,
+    datetime_to_seconds(record_payload.joined_at), datetime_to_seconds(record_payload.last_payment_date),
+    record_payload.due_amount, record_payload.plan.payable_amount, record_payload.plan.interval_days,
+    (int)record_payload.status
   );
 }
 
@@ -289,7 +292,7 @@ static bool parse_branch_staff_line(const char line[], branch_staff_t *destinati
   strcpy(destination->gym_branch, parts[4]);
   strcpy(destination->username, parts[5]);
   strcpy(destination->password_hash, parts[6]);
-  destination->joined_at = (time_t)string_to_unsigned_long_int(parts[7]);
+  destination->joined_at = datetime_from_seconds((long long)string_to_unsigned_long_int(parts[7]));
   destination->role = (staff_role_t)string_to_unsigned_int(parts[8]);
   return true;
 }
@@ -309,8 +312,8 @@ static bool parse_gym_member_line(const char line[], gym_member_t *destination)
   strcpy(destination->gym_branch, parts[4]);
   strcpy(destination->username, parts[5]);
   strcpy(destination->password_hash, parts[6]);
-  destination->joined_at = (time_t)string_to_unsigned_long_int(parts[7]);
-  destination->last_payment_date = (time_t)string_to_unsigned_long_int(parts[8]);
+  destination->joined_at = datetime_from_seconds((long long)string_to_unsigned_long_int(parts[7]));
+  destination->last_payment_date = datetime_from_seconds((long long)string_to_unsigned_long_int(parts[8]));
   destination->due_amount = string_to_unsigned_int(parts[9]);
   destination->plan.payable_amount = string_to_unsigned_int(parts[10]);
   destination->plan.interval_days = string_to_unsigned_int(parts[11]);
@@ -495,7 +498,7 @@ id_t create_branch_staff(
   strcpy(record.gym_branch, gym_branch);
   strcpy(record.username, username);
   strcpy(record.password_hash, password_hash);
-  record.joined_at = time(NULL);
+  record.joined_at = now_datetime();
   record.role = role;
 
   if (!persist_branch_staff(record))
@@ -577,8 +580,8 @@ id_t create_gym_member(
   strcpy(record.gym_branch, gym_branch);
   strcpy(record.username, username);
   strcpy(record.password_hash, password_hash);
-  record.joined_at = time(NULL);
-  record.last_payment_date = 0;
+  record.joined_at = now_datetime();
+  record.last_payment_date = EMPTY_DATETIME;
   record.due_amount = 0;
   record.plan = plan_payload;
   record.status = status;
@@ -962,7 +965,7 @@ bool update_gym_member_status(id_t id, membership_status_t status)
 bool update_gym_member_lifecycle(
   id_t id,
   subscription_plan_t plan_payload,
-  time_t last_payment_date,
+  const datetime_t last_payment_date_payload,
   unsigned int due_amount,
   membership_status_t status
 )
@@ -984,7 +987,7 @@ bool update_gym_member_lifecycle(
   }
 
   gym_members[index].plan = plan_payload;
-  gym_members[index].last_payment_date = last_payment_date;
+  gym_members[index].last_payment_date = last_payment_date_payload;
   gym_members[index].due_amount = due_amount;
   gym_members[index].status = status;
 

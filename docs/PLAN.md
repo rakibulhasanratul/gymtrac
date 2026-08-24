@@ -15,7 +15,7 @@ Gymtrac is a CLI-only gym management system for CSE115L (North South University)
 
 ## Data Storage
 
-Field delimiter is `|` (pipe). Input is sanitized to strip control characters and the delimiter from field values before writing, so records stay unambiguous with no escaping logic. One record per line. Passwords are stored as `salt:hash_value` strings (polynomial hash, similar to Java's `String.hashCode()`, demo only -- not cryptographically secure; salted so identical passwords do not produce identical stored values). The salt is 16 alphanumeric characters; the hash is a decimal `unsigned int` (max 10 digits). The hash utility provides `generate_salt`, `polynomial_hash`, and `mix_salt`; the auth module composes these into `hash_password` and `verify_password`. Time fields use `time_t`; `date_util` normalizes them to whole days (midnight) for due-date and suspension math, and tests inject an explicit `today` as a `time_t`. Amounts are whole Taka (`unsigned int`). Enumeration values are `#define` constants; each enumeration is a `typedef unsigned char` alias, so enum-backed fields take one byte and read as their semantic type.
+Field delimiter is `|` (pipe). Input is sanitized to strip control characters and the delimiter from field values before writing, so records stay unambiguous with no escaping logic. One record per line. Passwords are stored as `salt:hash_value` strings (polynomial hash, similar to Java's `String.hashCode()`, demo only -- not cryptographically secure; salted so identical passwords do not produce identical stored values). The salt is 16 alphanumeric characters; the hash is a decimal `unsigned int` (max 10 digits). The hash utility provides `generate_salt`, `polynomial_hash`, and `mix_salt`; the auth module composes these into `hash_password` and `verify_password`. Time fields use `datetime_t` (`year`, `month`, `day`, `hour`, `minute`, `second` as plain ints) and persist as one epoch-second number each; `datetime_utils` converts both ways with loop-based calendar math, no `localtime_r`/`localtime_s`, and shifts UTC by `TIMEZONE_OFFSET_HOURS` (+6, BST). An unrecorded datetime is the `EMPTY_DATETIME` sentinel (epoch zero), which survives save/load round-trips. Amounts are whole Taka (`unsigned int`). Enumeration values are `#define` constants; each enumeration is a `typedef unsigned char` alias, so enum-backed fields take one byte and read as their semantic type.
 
 ## Type aliases and size caps
 
@@ -140,11 +140,11 @@ Precise assert-based tests, one file per unit, run via `build/test_runner`:
 
 - `hash`: known polynomial hash vectors, salt generation, mix_salt correctness.
 - `string_util` / `file_util`: trim, split, sanitize_field, roundtrip read/write.
-- `date_util`: time_t <-> yyyy-mm-dd roundtrip, day normalization, leap years, month-end arithmetic (add_months).
+- `datetime_utils`: datetime_t <-> epoch seconds roundtrip against known vectors, leap years, month-end arithmetic (add_months), day arithmetic (add_days), formatting/parsing "yyyy-mm-dd hh:mm:ss".
 - `branch`: add/list names, existence validation.
 - `user`: sysadmin/staff/member create/get, credential helpers, username_exists() across all three tables, branch_manager_count() / branch_trainer_count() / branch_member_count() (per-branch capacity enforcement).
 - `payment`: digital recorded by member, cash recorded by trainer, status handling (only PAYMENT_COMPLETED applies), due amount clamp, last_payment_date update.
-- `member`: self-registration -> MEMBERSHIP_ON_HOLD, MEMBERSHIP_ON_HOLD to MEMBERSHIP_ACTIVE approval (plan assignment, due amount, last_payment_date), suspension records with nullable unsuspension date, auto-suspend sweep with an explicit `today` (as `time_t`).
+- `member`: self-registration -> MEMBERSHIP_ON_HOLD, MEMBERSHIP_ON_HOLD to MEMBERSHIP_ACTIVE approval (plan assignment, due amount, last_payment_date), suspension records with an open `EMPTY_DATETIME` unsuspension date, auto-suspend sweep against the real clock (tests bracket stamped times between before/after reads).
 - `request`: status-change (trainer -> manager), plan-change, and profile-edit flows.
 - `lost_found`: report by username, resolve by staff id.
 

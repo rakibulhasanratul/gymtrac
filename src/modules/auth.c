@@ -6,6 +6,7 @@
 // memory allocation, bitwise operations, and proper hashing libraries.
 
 #include <stdbool.h>
+#include <string.h>
 
 #include "../settings.h"
 #include "../types.h"

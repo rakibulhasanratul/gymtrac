@@ -13,7 +13,7 @@ The name of the project is `Gymtrac` which is a gym management system, a `group 
 - Modularity is preferred, although not a hard requirement. If modularity is applied, each module should serve only one purpose.
 - The project should be implemented in `functional programming` manner.
 - The project should ONLY UTILIZE standard C libraries (.h). The use is LIMITED to following headers: `stdio.h`, `string.h`, `math.h`, `time.h`, `stdbool.h`, `limits.h`, `ctype.h`.
-- Variables, struct fields, parameters, and return values use only primitive data types (`int`, `char`, `float`, `double`, and their `signed`/`unsigned`/`short`/`long` variants). Fixed-width types from `stdint.h` are prohibited. Structs and typedef aliases to primitive types are allowed for record modeling; `time_t` is permitted for time fields.
+- Variables, struct fields, parameters, and return values use only primitive data types (`int`, `char`, `float`, `double`, and their `signed`/`unsigned`/`short`/`long` variants). Fixed-width types from `stdint.h` are prohibited. Structs and typedef aliases to primitive types are allowed for record modeling; timestamps use the custom `datetime_t` struct from `types.h`, never `time_t`.
 - Tests are fine but those should be extremely precise, not bloated.
 
 ## Coding Standards
@@ -57,7 +57,7 @@ The name of the project is `Gymtrac` which is a gym management system, a `group 
 - Do not introduce new blocks for single statements in `if`, `else`, `switch`, `case`, `for`, `while`, and function bodies. Use `{}` only when there are multiple statements in the block.
 - Prefer `strcpy()` over `strncpy()` when dealing with string copies. Use `strncpy()` only when there is no ther option but to use it.
 - Wildly use is* functions from `ctype.h` to reduce lines of codes and improve readability.
-- Every function that returns an error state (`false`, `0`, `NULL`) must log a message via `LOG_ERROR(...)` before returning. The callee prints, the caller handles the flow silently. Loader functions (`load_*`), getter functions (`get_*`), and predicate functions (`*_exists`, `ensure_*`) are exceptions and stay silent. Utility layer functions (`file_util`, `string_util`, `date_util`, `hash`, `input`) are also exceptions, the caller handles their errors.
+- Every function that returns an error state (`false`, `0`, `NULL`) must log a message via `LOG_ERROR(...)` before returning. The callee prints, the caller handles the flow silently. Loader functions (`load_*`), getter functions (`get_*`), and predicate functions (`*_exists`, `ensure_*`) are exceptions and stay silent. Utility layer functions (`file_util`, `string_util`, `datetime_utils`, `hash`, `input`) are also exceptions, the caller handles their errors.
 
 ## Committing Changes
 
@@ -88,7 +88,7 @@ src/
     ├── input.[ch]       safe fgets/scanf wrappers with validation
     ├── hash.[ch]        polynomial hash (demo) + salt generation + mix_salt helpers
     ├── rng.[ch]         xoshiro128** PRNG (demo) + seed_rng + random_number
-    └── date_util.[ch]   time_t <-> yyyy-mm-dd conversion (day-normalized) + add_months()
+    └── datetime_utils.[ch] datetime_t <-> epoch seconds conversion, formatting/parsing, add_days()/add_months()
 ```
 
 The main.c should include modules as `#include "modules/module_name.h"` and utils as `#include "utils/util_name.h"`. The test_main.c should include modules as `#include "../src/modules/module_name.h"` and utils as `#include "../src/utils/util_name.h"`.

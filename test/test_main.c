@@ -8,7 +8,7 @@
 #include "modules/test_member.h"
 #include "modules/test_session.h"
 #include "modules/test_user.h"
-#include "utils/test_date_util.h"
+#include "utils/test_datetime_utils.h"
 #include "utils/test_file_util.h"
 #include "utils/test_hash.h"
 #include "utils/test_input.h"
@@ -93,18 +93,22 @@ int main()
   test_auth_login_null_inputs();
   test_auth_logout_clears_session();
 
-  /* date_util */
-  test_time_t_to_string_formats_date();
-  test_time_t_to_string_invalid_input();
-  test_string_to_time_t_parses_valid_dates();
-  test_string_to_time_t_rejects_invalid();
-  test_date_round_trip();
-  test_leap_year_dates();
+  /* datetime_utils */
+  test_format_datetime_writes_expected_text();
+  test_format_datetime_rejects_invalid_arguments();
+  test_parse_datetime_reads_valid_text();
+  test_parse_datetime_rejects_invalid();
+  test_format_parse_round_trip();
+  test_datetime_to_seconds_known_values();
+  test_seconds_round_trip();
+  test_leap_year_handling();
+  test_add_days_crosses_month_and_year_boundaries();
   test_add_months_clamps_day();
   test_add_months_year_boundary();
-  test_add_months_preserves_day();
+  test_compare_datetime_orders_fields();
   test_days_between_calculates_difference();
-  test_add_months_zero_returns_same();
+  test_now_datetime_returns_current_time();
+  test_is_empty_datetime_checks_all_fields();
 
   /* branch */
   test_add_branch_and_exists();

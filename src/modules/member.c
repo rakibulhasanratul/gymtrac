@@ -5,7 +5,7 @@
 
 #include "../settings.h"
 #include "../types.h"
-#include "../utils/date_util.h"
+#include "../utils/datetime_utils.h"
 #include "../utils/file_util.h"
 #include "../utils/string_util.h"
 #include "member.h"
@@ -15,9 +15,6 @@
 // repeating the full FIELD_DELIMITER_STRING macro at every field boundary.
 #define SEP FIELD_DELIMITER_STRING
 
-// Seconds in a single day, used to project the next due date forward.
-#define SECONDS_PER_DAY 86400
-
 static suspension_record_t suspension_records[MAX_SUSPENSION_RECORDS];
 static int suspension_count;
 static id_t next_suspension_id;
@@ -26,9 +23,9 @@ static id_t next_suspension_id;
 static void format_suspension_line(const suspension_record_t record_payload, char *line_destination)
 {
   snprintf(
-    line_destination, LINE_BUFFER_SIZE, "%lu" SEP "%lu" SEP "%s" SEP "%ld" SEP "%ld", (unsigned long)record_payload.id,
-    (unsigned long)record_payload.gym_member_id, record_payload.reason, (long)record_payload.suspension_date,
-    (long)record_payload.unsuspension_date
+    line_destination, LINE_BUFFER_SIZE, "%lu" SEP "%lu" SEP "%s" SEP "%lld" SEP "%lld",
+    (unsigned long)record_payload.id, (unsigned long)record_payload.gym_member_id, record_payload.reason,
+    datetime_to_seconds(record_payload.suspension_date), datetime_to_seconds(record_payload.unsuspension_date)
   );
 }
 
@@ -96,8 +93,8 @@ static bool parse_suspension_line(const char line[], suspension_record_t *destin
   destination->id = string_to_unsigned_long_int(parts[0]);
   destination->gym_member_id = string_to_unsigned_long_int(parts[1]);
   strcpy(destination->reason, parts[2]);
-  destination->suspension_date = (time_t)string_to_unsigned_long_int(parts[3]);
-  destination->unsuspension_date = (time_t)string_to_unsigned_long_int(parts[4]);
+  destination->suspension_date = datetime_from_seconds((long long)string_to_unsigned_long_int(parts[3]));
+  destination->unsuspension_date = datetime_from_seconds((long long)string_to_unsigned_long_int(parts[4]));
   return true;
 }
 
@@ -141,7 +138,7 @@ bool approve_gym_member(id_t member_id)
   subscription_plan_t default_plan = {
     .payable_amount = DEFAULT_PLAN_AMOUNT, .interval_days = DEFAULT_PLAN_INTERVAL_DAYS
   };
-  time_t approval_date = get_today();
+  datetime_t approval_date = now_datetime();
 
   if (!update_gym_member_lifecycle(
         member_id, default_plan, approval_date, default_plan.payable_amount, MEMBERSHIP_ACTIVE
@@ -187,14 +184,14 @@ bool suspend_gym_member(id_t member_id, const char reason[])
     return false;
   }
 
-  time_t suspension_date = get_today();
+  datetime_t suspension_date = now_datetime();
 
   suspension_record_t record;
   record.id = next_suspension_id++;
   record.gym_member_id = member.id;
   strcpy(record.reason, reason);
   record.suspension_date = suspension_date;
-  record.unsuspension_date = 0;
+  record.unsuspension_date = EMPTY_DATETIME;
 
   if (!persist_suspension(record))
   {
@@ -238,7 +235,7 @@ bool unsuspend_gym_member(id_t member_id)
   int open_index = -1;
   for (int i = 0; i < suspension_count; i++)
   {
-    if (suspension_records[i].gym_member_id == member_id && suspension_records[i].unsuspension_date == 0)
+    if (suspension_records[i].gym_member_id == member_id && is_empty_datetime(suspension_records[i].unsuspension_date))
     {
       open_index = i;
       break;
@@ -251,9 +248,9 @@ bool unsuspend_gym_member(id_t member_id)
     return false;
   }
 
-  time_t unsuspension_date = get_today();
+  datetime_t unsuspension_date = now_datetime();
 
-  time_t previous_unsuspension_date = suspension_records[open_index].unsuspension_date;
+  datetime_t previous_unsuspension_date = suspension_records[open_index].unsuspension_date;
   suspension_records[open_index].unsuspension_date = unsuspension_date;
 
   if (!rewrite_all_suspension_to_file())
@@ -274,7 +271,7 @@ bool unsuspend_gym_member(id_t member_id)
 
 int auto_suspend_overdue_members()
 {
-  time_t today = get_today();
+  datetime_t today = now_datetime();
 
   id_t active_ids[MAX_GYM_MEMBERS];
   int active_count = get_gym_member_ids_by_status(MEMBERSHIP_ACTIVE, active_ids, MAX_GYM_MEMBERS);
@@ -286,7 +283,7 @@ int auto_suspend_overdue_members()
     if (!get_gym_member_by_id(active_ids[i], &member)) continue;
 
     // The due date is one payment interval past the billing cycle start.
-    time_t due_date = member.last_payment_date + (time_t)member.plan.interval_days * SECONDS_PER_DAY;
+    datetime_t due_date = add_days(member.last_payment_date, (int)member.plan.interval_days);
     if (days_between(due_date, today) < MAX_UNPAID_DAYS) continue;
 
     if (!suspend_gym_member(active_ids[i], AUTO_SUSPENSION_REASON))

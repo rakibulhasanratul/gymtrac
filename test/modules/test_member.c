@@ -1,17 +1,13 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
-#include <time.h>
 
 #include "../../src/modules/member.h"
 #include "../../src/modules/user.h"
 #include "../../src/settings.h"
 #include "../../src/types.h"
-#include "../../src/utils/date_util.h"
+#include "../../src/utils/datetime_utils.h"
 #include "test_member.h"
-
-// Seconds in a single day, used to backdate payment dates in raw records.
-#define SECONDS_PER_DAY 86400
 
 /**
  * Removes the member and suspension data files from the test_data directory.
@@ -21,6 +17,33 @@ void cleanup_member_files()
 {
   remove(GYM_MEMBERS_FILE_PATH);
   remove(SUSPENSIONS_FILE_PATH);
+}
+
+/**
+ * Helper: builds a datetime from explicit calendar components.
+ */
+static datetime_t make_datetime(int year, int month, int day, int hour, int minute, int second)
+{
+  datetime_t result;
+  result.year = year;
+  result.month = month;
+  result.day = day;
+  result.hour = hour;
+  result.minute = minute;
+  result.second = second;
+  return result;
+}
+
+/**
+ * Helper: asserts that actual falls inside [start_payload, end_payload].
+ *
+ * The wall clock keeps running while a module stamps its own now_datetime,
+ * so exact equality is flaky at second precision; a bracket is not.
+ */
+static void assert_datetime_between(datetime_t start_payload, datetime_t actual_payload, datetime_t end_payload)
+{
+  assert(compare_datetime(start_payload, actual_payload) <= 0);
+  assert(compare_datetime(actual_payload, end_payload) <= 0);
 }
 
 // Appends one raw line to the members data file for full record control.
@@ -36,18 +59,19 @@ static void write_member_line(const char line[])
 static void write_raw_member(
   id_t member_id,
   const char username[],
-  time_t last_payment_date,
+  datetime_t last_payment_date_payload,
   unsigned int due_amount,
   unsigned int payable_amount,
   unsigned int interval_days,
   membership_status_t status
 )
 {
+  long long joined_seconds = datetime_to_seconds(make_datetime(2024, 1, 1, 0, 0, 0));
   char line[LINE_BUFFER_SIZE];
   snprintf(
-    line, LINE_BUFFER_SIZE, "%lu|%s|%s@test.com|0181234567|Dhanmondi|%s|h|1704067200|%ld|%u|%u|%u|%d",
-    (unsigned long)member_id, username, username, username, (long)last_payment_date, due_amount, payable_amount,
-    interval_days, (int)status
+    line, LINE_BUFFER_SIZE, "%lu|%s|%s@test.com|0181234567|Dhanmondi|%s|h|%lld|%lld|%u|%u|%u|%d",
+    (unsigned long)member_id, username, username, username, joined_seconds,
+    datetime_to_seconds(last_payment_date_payload), due_amount, payable_amount, interval_days, (int)status
   );
   write_member_line(line);
 }
@@ -91,24 +115,26 @@ void test_approve_on_hold_member_activates_with_default_plan()
   id_t member_id = create_on_hold_member("approveme");
   assert(member_id != 0);
 
-  time_t approval_date = get_today();
+  datetime_t before = now_datetime();
   assert(approve_gym_member(member_id) == true);
+  datetime_t after = now_datetime();
 
   gym_member_t found;
   assert(get_gym_member_by_id(member_id, &found) == true);
   assert(found.status == MEMBERSHIP_ACTIVE);
   assert(found.plan.payable_amount == DEFAULT_PLAN_AMOUNT);
   assert(found.plan.interval_days == DEFAULT_PLAN_INTERVAL_DAYS);
-  assert(found.last_payment_date == approval_date);
+  assert_datetime_between(before, found.last_payment_date, after);
   assert(found.due_amount == DEFAULT_PLAN_AMOUNT);
 
   // Reload and confirm the approval persisted to disk.
+  datetime_t stamped = found.last_payment_date;
   load_gym_members();
   assert(get_gym_member_by_id(member_id, &found) == true);
   assert(found.status == MEMBERSHIP_ACTIVE);
   assert(found.plan.payable_amount == DEFAULT_PLAN_AMOUNT);
-  assert(found.last_payment_date == approval_date);
   assert(found.due_amount == DEFAULT_PLAN_AMOUNT);
+  assert(compare_datetime(found.last_payment_date, stamped) == 0);
 }
 
 /**
@@ -118,7 +144,7 @@ void test_approve_on_hold_member_activates_with_default_plan()
 void test_approve_rejects_non_on_hold_and_unknown_members()
 {
   cleanup_member_files();
-  write_raw_member(77, "suspme", 1704067200, 0, 1000, 30, MEMBERSHIP_SUSPENDED);
+  write_raw_member(77, "suspme", make_datetime(2024, 1, 1, 0, 0, 0), 0, 1000, 30, MEMBERSHIP_SUSPENDED);
   assert(load_gym_members() == 1);
   load_suspensions();
 
@@ -151,7 +177,9 @@ void test_suspend_active_member_writes_dated_record()
   id_t member_id = create_active_member("suspendee");
   assert(member_id != 0);
 
+  datetime_t before = now_datetime();
   assert(suspend_gym_member(member_id, "Repeated late payments") == true);
+  datetime_t after = now_datetime();
 
   gym_member_t found;
   assert(get_gym_member_by_id(member_id, &found) == true);
@@ -161,17 +189,18 @@ void test_suspend_active_member_writes_dated_record()
   assert(get_suspensions_for_member(member_id, records, 4) == 1);
   assert(records[0].gym_member_id == member_id);
   assert(strcmp(records[0].reason, "Repeated late payments") == 0);
-  assert(records[0].suspension_date == get_today());
-  assert(records[0].unsuspension_date == 0);
+  assert_datetime_between(before, records[0].suspension_date, after);
+  assert(is_empty_datetime(records[0].unsuspension_date));
 
   // Reload both stores and confirm the suspension persisted.
+  datetime_t stamped = records[0].suspension_date;
   load_gym_members();
   load_suspensions();
   assert(get_gym_member_by_id(member_id, &found) == true);
   assert(found.status == MEMBERSHIP_SUSPENDED);
   assert(get_suspensions_for_member(member_id, records, 4) == 1);
   assert(strcmp(records[0].reason, "Repeated late payments") == 0);
-  assert(records[0].suspension_date == get_today());
+  assert(compare_datetime(records[0].suspension_date, stamped) == 0);
 }
 
 /**
@@ -218,9 +247,12 @@ void test_unsuspend_reactivates_member_and_closes_record()
   id_t member_id = create_active_member("reinstate");
   assert(member_id != 0);
 
-  time_t suspension_date = get_today();
+  datetime_t suspend_start = now_datetime();
   assert(suspend_gym_member(member_id, "Unpaid dues") == true);
+  datetime_t suspend_end = now_datetime();
+  datetime_t unsuspend_start = now_datetime();
   assert(unsuspend_gym_member(member_id) == true);
+  datetime_t unsuspend_end = now_datetime();
 
   gym_member_t found;
   assert(get_gym_member_by_id(member_id, &found) == true);
@@ -228,17 +260,18 @@ void test_unsuspend_reactivates_member_and_closes_record()
 
   suspension_record_t records[4];
   assert(get_suspensions_for_member(member_id, records, 4) == 1);
-  assert(records[0].suspension_date == suspension_date);
-  assert(records[0].unsuspension_date == suspension_date);
+  assert_datetime_between(suspend_start, records[0].suspension_date, suspend_end);
+  assert_datetime_between(unsuspend_start, records[0].unsuspension_date, unsuspend_end);
 
   // Reload both stores and confirm the closed record persisted.
+  suspension_record_t stamped = records[0];
   load_gym_members();
   load_suspensions();
   assert(get_gym_member_by_id(member_id, &found) == true);
   assert(found.status == MEMBERSHIP_ACTIVE);
   assert(get_suspensions_for_member(member_id, records, 4) == 1);
-  assert(records[0].suspension_date == suspension_date);
-  assert(records[0].unsuspension_date == suspension_date);
+  assert(compare_datetime(records[0].suspension_date, stamped.suspension_date) == 0);
+  assert(compare_datetime(records[0].unsuspension_date, stamped.unsuspension_date) == 0);
 }
 
 /**
@@ -249,13 +282,16 @@ void test_unsuspend_rejects_indebted_and_invalid_members()
 {
   cleanup_member_files();
   // Indebted suspended member written raw because creation starts at zero dues.
-  write_raw_member(5, "debtor", 1704067200, 900, 1000, 30, MEMBERSHIP_SUSPENDED);
+  write_raw_member(5, "debtor", make_datetime(2024, 1, 1, 0, 0, 0), 900, 1000, 30, MEMBERSHIP_SUSPENDED);
   assert(load_gym_members() == 1);
 
   // Open suspension record for member 5, written directly into the store file.
   FILE *file = fopen(SUSPENSIONS_FILE_PATH, "w");
   assert(file != NULL);
-  fprintf(file, "1|5|Unpaid dues|%ld|0\n", (long)string_to_time_t("2026-04-01"));
+  fprintf(
+    file, "1|5|Unpaid dues|%lld|%lld\n", datetime_to_seconds(make_datetime(2026, 4, 1, 0, 0, 0)),
+    datetime_to_seconds(EMPTY_DATETIME)
+  );
   fclose(file);
   assert(load_suspensions() == 1);
 
@@ -267,7 +303,7 @@ void test_unsuspend_rejects_indebted_and_invalid_members()
 
   suspension_record_t records[2];
   assert(get_suspensions_for_member(5, records, 2) == 1);
-  assert(records[0].unsuspension_date == 0);
+  assert(is_empty_datetime(records[0].unsuspension_date));
 
   id_t active_id = create_active_member("notsuspended");
   assert(active_id != 0);
@@ -286,24 +322,24 @@ void test_auto_suspend_sweeps_only_overdue_active_members()
 {
   cleanup_member_files();
 
-  time_t today = get_today();
+  datetime_t today = now_datetime();
 
   // Due 100 days ago: beyond the grace period.
-  write_raw_member(1, "overdue100", today - (time_t)((30 + 100) * SECONDS_PER_DAY), 1000, 1000, 30, MEMBERSHIP_ACTIVE);
+  write_raw_member(1, "overdue100", add_days(today, -(30 + 100)), 1000, 1000, 30, MEMBERSHIP_ACTIVE);
   // Due 89 days ago: still inside the grace period.
-  write_raw_member(2, "overdue89", today - (time_t)((30 + 89) * SECONDS_PER_DAY), 500, 1000, 30, MEMBERSHIP_ACTIVE);
+  write_raw_member(2, "overdue89", add_days(today, -(30 + 89)), 500, 1000, 30, MEMBERSHIP_ACTIVE);
   // Due exactly 90 days ago: right on the grace limit.
-  write_raw_member(3, "overdue90", today - (time_t)((30 + 90) * SECONDS_PER_DAY), 1000, 1000, 30, MEMBERSHIP_ACTIVE);
+  write_raw_member(3, "overdue90", add_days(today, -(30 + 90)), 1000, 1000, 30, MEMBERSHIP_ACTIVE);
   // On-hold and already suspended members never sweep regardless of age.
-  write_raw_member(4, "onhold", 0, 0, 1000, 30, MEMBERSHIP_ON_HOLD);
-  write_raw_member(
-    5, "alreadysusp", today - (time_t)((30 + 200) * SECONDS_PER_DAY), 700, 1000, 30, MEMBERSHIP_SUSPENDED
-  );
+  write_raw_member(4, "onhold", EMPTY_DATETIME, 0, 1000, 30, MEMBERSHIP_ON_HOLD);
+  write_raw_member(5, "alreadysusp", add_days(today, -(30 + 200)), 700, 1000, 30, MEMBERSHIP_SUSPENDED);
 
   assert(load_gym_members() == 5);
   load_suspensions();
 
+  datetime_t before = now_datetime();
   assert(auto_suspend_overdue_members() == 2);
+  datetime_t after = now_datetime();
 
   gym_member_t found;
   assert(get_gym_member_by_id(1, &found) == true);
@@ -320,10 +356,10 @@ void test_auto_suspend_sweeps_only_overdue_active_members()
   suspension_record_t records[4];
   assert(get_suspensions_for_member(1, records, 4) == 1);
   assert(strcmp(records[0].reason, AUTO_SUSPENSION_REASON) == 0);
-  assert(records[0].suspension_date == today);
+  assert_datetime_between(before, records[0].suspension_date, after);
   assert(get_suspensions_for_member(3, records, 4) == 1);
   assert(strcmp(records[0].reason, AUTO_SUSPENSION_REASON) == 0);
-  assert(records[0].suspension_date == today);
+  assert_datetime_between(before, records[0].suspension_date, after);
   assert(get_suspensions_for_member(2, records, 4) == 0);
   assert(get_suspensions_for_member(4, records, 4) == 0);
   assert(get_suspensions_for_member(5, records, 4) == 0);
@@ -345,8 +381,8 @@ void test_auto_suspend_returns_zero_when_nobody_overdue()
 {
   cleanup_member_files();
 
-  time_t today = get_today();
-  write_raw_member(1, "freshpayer", today - (time_t)(10 * SECONDS_PER_DAY), 1000, 1000, 30, MEMBERSHIP_ACTIVE);
+  datetime_t today = now_datetime();
+  write_raw_member(1, "freshpayer", add_days(today, -10), 1000, 1000, 30, MEMBERSHIP_ACTIVE);
   assert(load_gym_members() == 1);
   load_suspensions();
 
@@ -373,19 +409,22 @@ void test_get_suspensions_for_member_handles_history_and_capacity()
   id_t member_id = create_active_member("twicestop");
   assert(member_id != 0);
 
-  time_t suspension_date = get_today();
+  datetime_t first_suspend_start = now_datetime();
   assert(suspend_gym_member(member_id, "Late fees") == true);
+  datetime_t first_suspend_end = now_datetime();
+  datetime_t unsuspend_start = now_datetime();
   assert(unsuspend_gym_member(member_id) == true);
+  datetime_t unsuspend_end = now_datetime();
   assert(suspend_gym_member(member_id, "Again late") == true);
 
   suspension_record_t records[2];
   assert(get_suspensions_for_member(member_id, records, 2) == 2);
   assert(records[0].id < records[1].id);
   assert(strcmp(records[0].reason, "Late fees") == 0);
-  assert(records[0].suspension_date == suspension_date);
-  assert(records[0].unsuspension_date == suspension_date);
+  assert_datetime_between(first_suspend_start, records[0].suspension_date, first_suspend_end);
+  assert_datetime_between(unsuspend_start, records[0].unsuspension_date, unsuspend_end);
   assert(strcmp(records[1].reason, "Again late") == 0);
-  assert(records[1].unsuspension_date == 0);
+  assert(is_empty_datetime(records[1].unsuspension_date));
 
   // A smaller destination only receives the oldest records.
   assert(get_suspensions_for_member(member_id, records, 1) == 1);

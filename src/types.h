@@ -1,12 +1,27 @@
 #ifndef GYMTRAC_TYPES_H
 #define GYMTRAC_TYPES_H
 
-#include <time.h>
-
 #include "settings.h"
 
 // Common numeric id type shared by every record.
 typedef unsigned long int id_t;
+
+// Calendar timestamp with second precision.
+typedef struct
+{
+  int year;   // full year, e.g. 2026; must be at least EPOCH_YEAR
+  int month;  // 1-12
+  int day;    // 1-31, valid for the month
+  int hour;   // 0-23
+  int minute; // 0-59
+  int second; // 0-59
+} datetime_t;
+
+// Datetime meaning "nothing recorded yet", e.g. an open suspension has no
+// unsuspension date until the member is unsuspended. It deliberately
+// matches epoch second count 0, the value an unrecorded datetime keeps in
+// the numeric data files, so the sentinel survives save/load round-trips.
+#define EMPTY_DATETIME ((datetime_t){1970, 1, 1, 0, 0, 0})
 
 // System administrator record, seeded on first run.
 typedef struct
@@ -31,7 +46,7 @@ typedef struct
   char gym_branch[BRANCH_NAME_BUFFER_SIZE];
   char username[USERNAME_BUFFER_SIZE];
   char password_hash[PASSWORD_HASH_BUFFER_SIZE];
-  time_t joined_at;
+  datetime_t joined_at;
   staff_role_t role;
 } branch_staff_t;
 
@@ -59,8 +74,8 @@ typedef struct
   char gym_branch[BRANCH_NAME_BUFFER_SIZE];
   char username[USERNAME_BUFFER_SIZE];
   char password_hash[PASSWORD_HASH_BUFFER_SIZE];
-  time_t joined_at;
-  time_t last_payment_date;
+  datetime_t joined_at;
+  datetime_t last_payment_date;
   unsigned int due_amount;
   subscription_plan_t plan;
   membership_status_t status;
@@ -83,7 +98,7 @@ typedef struct
 {
   id_t id;
   unsigned int amount;
-  time_t transaction_time;
+  datetime_t transaction_time;
   transaction_t transaction_type;
   char transaction_id[TRX_ID_BUFFER_SIZE];
   payment_status_t status;
@@ -102,7 +117,7 @@ typedef struct
   id_t request_id;
   id_t gym_member_id;
   unsigned int amount;
-  time_t transaction_time;
+  datetime_t transaction_time;
   char transaction_id[TRX_ID_BUFFER_SIZE];
   payment_status_t status;
 } digital_payment_request_t;
@@ -123,7 +138,7 @@ typedef struct
   char reason[REASON_BUFFER_SIZE];
   membership_status_t new_membership_status;
   request_status_t status;
-  time_t created_at;
+  datetime_t created_at;
 } membership_status_change_request_t;
 
 // Member request to change their plan, resolved by branch staff.
@@ -133,7 +148,7 @@ typedef struct
   id_t gym_member_id;
   subscription_plan_t new_plan;
   request_status_t status;
-  time_t created_at;
+  datetime_t created_at;
 } subscription_plan_change_request_t;
 
 // Member request to edit profile fields, approved or rejected by staff.
@@ -156,7 +171,7 @@ typedef struct
   char phone_number[PHONE_BUFFER_SIZE];
   char gym_branch[BRANCH_NAME_BUFFER_SIZE];
   char username[USERNAME_BUFFER_SIZE];
-  time_t joined_at;
+  datetime_t joined_at;
   subscription_plan_t plan;
 } gym_member_profile_t;
 
@@ -166,8 +181,8 @@ typedef struct
   id_t id;
   id_t gym_member_id;
   char reason[REASON_BUFFER_SIZE];
-  time_t suspension_date;
-  time_t unsuspension_date;
+  datetime_t suspension_date;
+  datetime_t unsuspension_date;
 } suspension_record_t;
 
 // Lost or found item report, resolved by staff.
@@ -176,7 +191,7 @@ typedef struct
   id_t id;
   char description[DESCRIPTION_BUFFER_SIZE];
   char reported_by_username[USERNAME_BUFFER_SIZE];
-  time_t reported_at;
+  datetime_t reported_at;
   id_t resolved_by_staff_id;
 } lost_and_found_record_t;
 

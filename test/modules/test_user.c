@@ -5,6 +5,7 @@
 #include "../../src/modules/user.h"
 #include "../../src/settings.h"
 #include "../../src/types.h"
+#include "../../src/utils/datetime_utils.h"
 #include "test_user.h"
 
 /**
@@ -207,7 +208,7 @@ void test_create_gym_member_and_get()
   assert(found.plan.interval_days == 30);
   assert(found.status == MEMBERSHIP_ON_HOLD);
   assert(found.due_amount == 0);
-  assert(found.last_payment_date == 0);
+  assert(is_empty_datetime(found.last_payment_date));
 }
 
 void test_create_gym_member_auto_increment_id()

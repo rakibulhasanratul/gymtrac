@@ -290,7 +290,7 @@ bool update_gym_member_status(id_t id, membership_status_t status);
  *
  * @param id the member's id
  * @param plan_payload the subscription plan to store on the record
- * @param last_payment_date the billing cycle start date
+ * @param last_payment_date_payload the billing cycle start datetime
  * @param due_amount the outstanding amount in whole Taka
  * @param status the membership status to store on the record
  * @return true if the record was found and updated, false otherwise
@@ -298,7 +298,7 @@ bool update_gym_member_status(id_t id, membership_status_t status);
 bool update_gym_member_lifecycle(
   id_t id,
   subscription_plan_t plan_payload,
-  time_t last_payment_date,
+  const datetime_t last_payment_date_payload,
   unsigned int due_amount,
   membership_status_t status
 );

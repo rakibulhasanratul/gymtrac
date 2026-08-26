@@ -252,15 +252,11 @@ static bool rewrite_all_gym_members_to_file()
   return true;
 }
 
-// Splits a pipe-delimited line into field buffers and returns the field count.
+// Splits a pipe-delimited record line into field buffers and returns the
+// field count.
 static int split_record_line(const char line[], char parts_destination[][FIELD_BUFFER_SIZE])
 {
-  // Map each row of parts_destination to a pointer because split() fills
-  // fields through char pointers.
-  char *parts[MAX_RECORD_FIELDS];
-  for (int i = 0; i < MAX_RECORD_FIELDS; i++) parts[i] = parts_destination[i];
-
-  return split(line, FIELD_DELIMITER, parts, MAX_RECORD_FIELDS, FIELD_BUFFER_SIZE);
+  return split(line, FIELD_DELIMITER, parts_destination, MAX_RECORD_FIELDS);
 }
 
 // Parses a pipe-delimited line into a sysadmin record.

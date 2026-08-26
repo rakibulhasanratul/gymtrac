@@ -34,11 +34,8 @@ static void format_payment_line(const payment_t record_payload, char *line_desti
 static bool parse_payment_line(const char line[], payment_t *destination)
 {
   char parts[MAX_RECORD_FIELDS][FIELD_BUFFER_SIZE];
-  char *part_maps[MAX_RECORD_FIELDS];
 
-  for (int i = 0; i < MAX_RECORD_FIELDS; i++) part_maps[i] = parts[i];
-
-  int count = split(line, FIELD_DELIMITER, part_maps, MAX_RECORD_FIELDS, FIELD_BUFFER_SIZE);
+  int count = split(line, FIELD_DELIMITER, parts, MAX_RECORD_FIELDS);
   if (count != 7) return false;
 
   destination->id = string_to_unsigned_long_int(parts[0]);

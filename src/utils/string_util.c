@@ -31,9 +31,9 @@ void trim(char destination[], int destination_capacity, const char text[])
   destination[write_index] = '\0';
 }
 
-int split(const char text[], char delimiter, char *parts[], int part_capacity, int field_capacity)
+int split(const char text[], char delimiter, char parts[][FIELD_BUFFER_SIZE], int part_capacity)
 {
-  if (text == NULL || parts == NULL || part_capacity < 1 || field_capacity < 2) return 0;
+  if (text == NULL || parts == NULL || part_capacity < 1) return 0;
 
   int part_count = 0;
   int cursor_index = 0;
@@ -44,7 +44,7 @@ int split(const char text[], char delimiter, char *parts[], int part_capacity, i
     while (text[cursor_index] != '\0' && text[cursor_index] != delimiter)
     {
       // Write only the characters that fit in the buffer.
-      if (field_index < field_capacity - 1)
+      if (field_index < FIELD_BUFFER_SIZE - 1)
       {
         parts[part_count][field_index] = text[cursor_index];
         field_index++;

@@ -3,6 +3,8 @@
 
 #include <stdbool.h>
 
+#include "../settings.h"
+
 /**
  * Copies text into destination with leading and trailing whitespace removed.
  *
@@ -19,20 +21,20 @@ void trim(char destination[], int destination_capacity, const char text[]);
  * Splits text on delimiter, copying each field into its own part buffer.
  *
  * Each field is copied as a null-terminated string of up to
- * field_capacity - 1 characters. Consecutive delimiters and a trailing
- * delimiter produce empty fields, so the part count is one more than the
- * number of delimiters seen before the capacity is reached.
+ * FIELD_BUFFER_SIZE - 1 characters; longer fields are truncated. Consecutive
+ * delimiters and a trailing delimiter produce empty fields, so the part count
+ * is one more than the number of delimiters seen before the capacity is
+ * reached.
  *
  * @param text the string to split; not modified
  * @param delimiter the character that separates fields
- * @param parts the array of buffers that receive each captured field; every
- *              buffer must hold at least field_capacity characters
- * @param part_capacity the number of buffers available in parts
- * @param field_capacity the number of characters each buffer can hold
+ * @param parts the 2D array that receives each captured field; every row must
+ *              hold exactly FIELD_BUFFER_SIZE characters, enforced by the type
+ * @param part_capacity the number of rows available in parts
  * @return the number of parts captured; when this equals part_capacity, text
  *         may still hold more unsplit fields
  */
-int split(const char text[], char delimiter, char *parts[], int part_capacity, int field_capacity);
+int split(const char text[], char delimiter, char parts[][FIELD_BUFFER_SIZE], int part_capacity);
 
 /**
  * Converts text to a non-negative decimal number.

@@ -43,16 +43,14 @@ void test_trim_strips_whitespace()
  */
 void test_split_copies_fields()
 {
-  char buffer[64];
-  char fields[8][64];
-  char *parts[8];
+  char buffer[LINE_BUFFER_SIZE];
+  char parts[MAX_RECORD_FIELDS][FIELD_BUFFER_SIZE];
+  char long_field[FIELD_BUFFER_SIZE + 2];
   int part_index;
   int part_count;
 
-  for (part_index = 0; part_index < 8; part_index++) parts[part_index] = fields[part_index];
-
   strcpy(buffer, "alpha|beta|gamma");
-  part_count = split(buffer, '|', parts, 8, 64);
+  part_count = split(buffer, '|', parts, MAX_RECORD_FIELDS);
   assert(part_count == 3);
   assert(strcmp(parts[0], "alpha") == 0);
   assert(strcmp(parts[1], "beta") == 0);
@@ -60,45 +58,52 @@ void test_split_copies_fields()
   assert(strcmp(buffer, "alpha|beta|gamma") == 0);
 
   strcpy(buffer, "a||c");
-  part_count = split(buffer, '|', parts, 8, 64);
+  part_count = split(buffer, '|', parts, MAX_RECORD_FIELDS);
   assert(part_count == 3);
   assert(strcmp(parts[0], "a") == 0);
   assert(strcmp(parts[1], "") == 0);
   assert(strcmp(parts[2], "c") == 0);
 
   strcpy(buffer, "a|b|c|d");
-  part_count = split(buffer, '|', parts, 2, 64);
+  part_count = split(buffer, '|', parts, 2);
   assert(part_count == 2);
   assert(strcmp(parts[0], "a") == 0);
   assert(strcmp(parts[1], "b") == 0);
 
   strcpy(buffer, "solo");
-  part_count = split(buffer, '|', parts, 8, 64);
+  part_count = split(buffer, '|', parts, MAX_RECORD_FIELDS);
   assert(part_count == 1);
   assert(strcmp(parts[0], "solo") == 0);
 
   strcpy(buffer, "trailing|");
-  part_count = split(buffer, '|', parts, 8, 64);
+  part_count = split(buffer, '|', parts, MAX_RECORD_FIELDS);
   assert(part_count == 2);
   assert(strcmp(parts[0], "trailing") == 0);
   assert(strcmp(parts[1], "") == 0);
 
   strcpy(buffer, "salt:hash");
-  part_count = split(buffer, ':', parts, 8, 64);
+  part_count = split(buffer, ':', parts, MAX_RECORD_FIELDS);
   assert(part_count == 2);
   assert(strcmp(parts[0], "salt") == 0);
   assert(strcmp(parts[1], "hash") == 0);
 
-  strcpy(buffer, "abcdef|g");
-  part_count = split(buffer, '|', parts, 8, 4);
+  // Truncation: a field longer than FIELD_BUFFER_SIZE - 1 characters is cut.
+  for (part_index = 0; part_index < FIELD_BUFFER_SIZE + 1; part_index++) long_field[part_index] = 'x';
+  long_field[FIELD_BUFFER_SIZE + 1] = '\0';
+  strcpy(buffer, long_field);
+  strcat(buffer, "|g");
+  part_count = split(buffer, '|', parts, MAX_RECORD_FIELDS);
   assert(part_count == 2);
-  assert(strcmp(parts[0], "abc") == 0);
+  assert(strlen(parts[0]) == FIELD_BUFFER_SIZE - 1);
+  for (part_index = 0; part_index < FIELD_BUFFER_SIZE - 1; part_index++)
+  {
+    assert(parts[0][part_index] == 'x');
+  }
   assert(strcmp(parts[1], "g") == 0);
 
-  assert(split(NULL, '|', parts, 8, 64) == 0);
-  assert(split(buffer, '|', NULL, 8, 64) == 0);
-  assert(split(buffer, '|', parts, 0, 64) == 0);
-  assert(split(buffer, '|', parts, 8, 1) == 0);
+  assert(split(NULL, '|', parts, MAX_RECORD_FIELDS) == 0);
+  assert(split(buffer, '|', NULL, MAX_RECORD_FIELDS) == 0);
+  assert(split(buffer, '|', parts, 0) == 0);
 }
 
 /**

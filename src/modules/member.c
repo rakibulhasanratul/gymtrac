@@ -80,14 +80,9 @@ static bool rewrite_all_suspension_to_file()
 // Returns true on success, false if the field count is wrong.
 static bool parse_suspension_line(const char line[], suspension_record_t *destination)
 {
-  // Map each row of parts to a pointer because split() fills fields through
-  // char pointers.
   char parts[MAX_RECORD_FIELDS][FIELD_BUFFER_SIZE];
-  char *part_maps[MAX_RECORD_FIELDS];
 
-  for (int i = 0; i < MAX_RECORD_FIELDS; i++) part_maps[i] = parts[i];
-
-  int count = split(line, FIELD_DELIMITER, part_maps, MAX_RECORD_FIELDS, FIELD_BUFFER_SIZE);
+  int count = split(line, FIELD_DELIMITER, parts, MAX_RECORD_FIELDS);
   if (count != 5) return false;
 
   destination->id = string_to_unsigned_long_int(parts[0]);

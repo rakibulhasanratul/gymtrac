@@ -48,7 +48,7 @@ bool input_integer(int *value)
 bool input_positive_int(int *value)
 {
   if (!input_integer(value)) return false;
-  // Reject zero and negative numbers so only a positive amount is kept.
+  // Reject anything but positives.
   if (*value <= 0) return false;
   return true;
 }

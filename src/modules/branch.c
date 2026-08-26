@@ -13,8 +13,7 @@ static int branch_count;
 // Persists the in-memory branch list to the branches file, one name per line.
 static bool save_branches_to_file()
 {
-  // Map each row of branches to a pointer because write_lines_to_file
-  // reads lines through char pointers.
+  // Map rows to pointers because write_lines_to_file reads through char pointers.
   const char *line_maps[branch_count];
   for (int i = 0; i < branch_count; i++) line_maps[i] = branches[i];
 
@@ -29,8 +28,7 @@ static bool save_branches_to_file()
 
 int load_branches()
 {
-  // Map each row of branches to a pointer because read_lines_from_file
-  // fills lines through char pointers.
+  // Map rows to pointers because read_lines_from_file fills through char pointers.
   char *line_maps[BRANCH_COUNT_MAX];
   for (int i = 0; i < BRANCH_COUNT_MAX; i++) line_maps[i] = branches[i];
 
@@ -142,8 +140,7 @@ bool update_branch_name(const char old_branch_name[], const char new_branch_name
     return false;
   }
 
-  // Locate the match up front so the index is reused for the in-place
-  // rename instead of scanning a second time.
+  // Find the match up front so the rename reuses the index without rescanning.
   int index = find_branch(old_branch_name);
   if (index < 0)
   {
@@ -151,16 +148,14 @@ bool update_branch_name(const char old_branch_name[], const char new_branch_name
     return false;
   }
 
-  // A rename onto any taken name, including the branch's own name, is
-  // rejected because find_branch already covers both cases.
+  // Any taken new name is rejected here, including a rename to the same name.
   if (find_branch(new_branch_name) != -1)
   {
     LOG_ERROR("Error: Branch '%s' already exists.", new_branch_name);
     return false;
   }
 
-  // Cascade the rename to every staff and member record referencing the
-  // branch before the branch list itself changes.
+  // Cascade the rename to staff and member records before changing the branch list.
   if (!rename_branch_for_all_users(old_branch_name, new_branch_name)) return false;
 
   strcpy(branches[index], new_branch_name);

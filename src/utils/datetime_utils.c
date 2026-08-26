@@ -55,13 +55,11 @@ long long datetime_to_seconds(const datetime_t datetime_payload)
 {
   long long total_seconds = 0;
 
-  // Every full year between the epoch year and the given year counts its
-  // own full length in seconds.
+  // Each full year between EPOCH_YEAR and the target adds its length.
   for (int year = EPOCH_YEAR; year < datetime_payload.year; year++)
     total_seconds += (long long)days_in_year(year) * SECONDS_PER_DAY;
 
-  // Every full month before the given month counts its own length, which
-  // depends on the leap-ness of the given year.
+  // Full months before the target add their length, leap-aware for the year.
   for (int month = 1; month < datetime_payload.month; month++)
     total_seconds += (long long)days_in_month(datetime_payload.year, month) * SECONDS_PER_DAY;
 
@@ -75,8 +73,7 @@ long long datetime_to_seconds(const datetime_t datetime_payload)
 
 datetime_t datetime_from_seconds(long long seconds_since_epoch)
 {
-  // Whole days since the epoch; whatever seconds are left over make up
-  // the clock time of the final day.
+  // Whole days since the epoch; leftover seconds form the final day's clock.
   long long day_count = seconds_since_epoch / SECONDS_PER_DAY;
   long long remaining_seconds = seconds_since_epoch % SECONDS_PER_DAY;
 
@@ -122,8 +119,8 @@ bool parse_datetime(const char datetime_text[], datetime_t *datetime_destination
 {
   if (datetime_text == NULL || datetime_destination == NULL) return false;
 
-  // The text must be exactly "yyyy-mm-dd hh:mm:ss", 19 characters with
-  // fixed separators at fixed positions.
+  // The text must be exactly 19 characters with fixed separators:
+  // "yyyy-mm-dd hh:mm:ss".
   if (strlen(datetime_text) != DATETIME_BUFFER_SIZE - 1) return false;
   if (datetime_text[4] != '-' || datetime_text[7] != '-' || datetime_text[10] != ' ') return false;
   if (datetime_text[13] != ':' || datetime_text[16] != ':') return false;

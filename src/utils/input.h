@@ -6,9 +6,8 @@
 /**
  * Reads one line from standard input into buffer, capped at buffer_capacity.
  *
- * The trailing newline is stripped. When the typed line is longer than the
- * buffer, the overflow is discarded and the truncated value is kept, so the
- * next read never sees the remainder of the previous line.
+ * Strips the trailing newline. A longer line is truncated and its remainder
+ * discarded, so the next read starts fresh.
  *
  * @param buffer receives the line without its trailing newline
  * @param buffer_capacity the number of characters buffer can hold
@@ -19,8 +18,8 @@ bool input_string(char buffer[], int buffer_capacity);
 /**
  * Reads a whole number from standard input into value.
  *
- * The rest of the input line is discarded after the number, so a later read
- * never sees stray characters. Non-numeric input is rejected.
+ * Discards the rest of the input line after the number. Rejects non-numeric
+ * input.
  *
  * @param value receives the parsed number on success
  * @return true when a valid number was read, false otherwise
@@ -30,9 +29,8 @@ bool input_integer(int *value);
 /**
  * Reads a strictly positive whole number from standard input into value.
  *
- * The rest of the input line is discarded after the number, so a later read
- * never sees stray characters. Non-numeric input, zero, and negative numbers
- * are rejected.
+ * Discards the rest of the input line after the number. Rejects non-numeric
+ * input, zero, and negatives.
  *
  * @param value receives the parsed number on success
  * @return true when a valid positive number was read, false otherwise

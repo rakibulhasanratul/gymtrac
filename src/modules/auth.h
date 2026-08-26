@@ -29,9 +29,8 @@ bool verify_password(const char *password, const char *stored_hash);
 /**
  * Authenticates a user by username and password.
  *
- * Looks up the username across all three user tables, verifies the
- * password against the stored salted hash, and populates the session
- * on success.
+ * Looks up the username across all three user tables, verifies the password,
+ * and fills the session on success.
  *
  * @param username the login name to look up
  * @param password the plaintext password to verify

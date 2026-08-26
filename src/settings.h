@@ -14,9 +14,7 @@
 #define DATETIME_BUFFER_SIZE 20     // yyyy-mm-dd hh:mm:ss + null terminator
 #define TIMEZONE_OFFSET_HOURS 6     // hours added to UTC; Bangladesh Standard Time is UTC+6
 #define FIELD_BUFFER_SIZE 256       // buffer for a single field when splitting a pipe-delimited record line
-#define LINE_BUFFER_SIZE 2048       // one full record line.
-// the previous allocation was 1024 and I was getting warnings and overflows sometimes
-// fortunately 2048 is covering it
+#define LINE_BUFFER_SIZE 2048       // one full record line; 1024 overflowed on long records
 
 // Hashing internals.
 #define SALT_BUFFER_SIZE 16        // 15 printable chars + null
@@ -46,7 +44,7 @@
 #ifndef DATA_DIRECTORY
 #define DATA_DIRECTORY "data"
 #endif
-// the delimiter needs to be verified to be 1 character long in main function
+// main verifies this is exactly one character
 #define FIELD_DELIMITER_STRING "|"
 #define FIELD_DELIMITER FIELD_DELIMITER_STRING[0]
 #define GYM_BRANCHES_FILE_PATH DATA_DIRECTORY "/branches.txt"
@@ -62,7 +60,7 @@
 #define DEFAULT_SYSADMIN_PASSWORD "admin123"
 
 // Error logging macro. Prints to stderr with source location.
-// Wrapped in do-while(0) so it behaves as a single statement in if/else blocks.
+// do-while(0) keeps it a single statement inside if/else blocks.
 #define LOG_ERROR(msg, ...)                                                                                            \
   do                                                                                                                   \
   {                                                                                                                    \

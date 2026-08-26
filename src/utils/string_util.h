@@ -20,11 +20,10 @@ void trim(char destination[], int destination_capacity, const char text[]);
 /**
  * Splits text on delimiter, copying each field into its own part buffer.
  *
- * Each field is copied as a null-terminated string of up to
- * FIELD_BUFFER_SIZE - 1 characters; longer fields are truncated. Consecutive
- * delimiters and a trailing delimiter produce empty fields, so the part count
- * is one more than the number of delimiters seen before the capacity is
- * reached.
+ * Copies each field as a null-terminated string capped at
+ * FIELD_BUFFER_SIZE - 1 characters; longer fields truncate. Consecutive and
+ * trailing delimiters yield empty fields, so the part count is one more than
+ * the delimiter count seen before capacity runs out.
  *
  * @param text the string to split; not modified
  * @param delimiter the character that separates fields

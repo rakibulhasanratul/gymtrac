@@ -35,10 +35,10 @@ static datetime_t make_datetime(int year, int month, int day, int hour, int minu
 }
 
 /**
- * Helper: asserts that actual falls inside [start_payload, end_payload].
+ * Helper: asserts actual falls inside [start_payload, end_payload].
  *
- * The wall clock keeps running while a module stamps its own now_datetime,
- * so exact equality is flaky at second precision; a bracket is not.
+ * The clock keeps running while a module stamps now_datetime, so equality
+ * flakes at second precision; a bracket does not.
  */
 static void assert_datetime_between(datetime_t start_payload, datetime_t actual_payload, datetime_t end_payload)
 {

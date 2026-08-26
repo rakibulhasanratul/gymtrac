@@ -7,8 +7,8 @@
 /**
  * Reads the next line from file into buffer, stripping the trailing newline.
  *
- * When a line is longer than the buffer, its remainder is discarded and false
- * is returned so an over-long line is never parsed as multiple records.
+ * An over-long line drains its remainder and returns false instead of
+ * parsing as multiple records.
  *
  * @param file the open file to read from
  * @param buffer receives the line without its trailing newline
@@ -29,9 +29,8 @@ bool write_line_to_file(FILE *file, const char line[]);
 /**
  * Reads every line of a file into destination, skipping empty lines.
  *
- * Each row of lines_destination must hold at least line_capacity characters.
- * Over-long lines are drained and skipped so a corrupted record never leaks
- * into the loaded data.
+ * Each row must hold at least line_capacity characters. Over-long lines are
+ * drained and skipped, keeping corrupted records out of the loaded data.
  *
  * @param file_path the path of the file to read
  * @param lines_destination receives one non-empty line per row;

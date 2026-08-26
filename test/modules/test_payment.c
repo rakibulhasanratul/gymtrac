@@ -10,8 +10,8 @@
 #include "test_payment.h"
 
 /**
- * Removes the payment and payment record data files from the test_data
- * directory. Called once at startup from test_main and between scenario resets.
+ * Removes the payments data file from the test_data directory.
+ * Called once at startup from test_main and between scenario resets.
  */
 void cleanup_payment_files()
 {
@@ -34,10 +34,10 @@ static datetime_t make_datetime(int year, int month, int day, int hour, int minu
 }
 
 /**
- * Helper: asserts that actual falls inside [start_payload, end_payload].
+ * Helper: asserts actual falls inside [start_payload, end_payload].
  *
- * The wall clock keeps running while a module stamps its own now_datetime,
- * so exact equality is flaky at second precision; a bracket is not.
+ * The clock keeps running while a module stamps now_datetime, so equality
+ * flakes at second precision; a bracket does not.
  */
 static void assert_datetime_between(datetime_t start_payload, datetime_t actual_payload, datetime_t end_payload)
 {
@@ -89,8 +89,8 @@ static digital_payment_request_t make_request(id_t gym_member_id, unsigned int a
 }
 
 /**
- * Helper: resets every store the payment scenarios touch, so member ids and
- * record counts stay deterministic no matter what earlier suites left behind.
+ * Helper: resets every store payment scenarios touch, keeping ids and counts
+ * deterministic regardless of what earlier suites left behind.
  */
 static void reset_stores()
 {

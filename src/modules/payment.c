@@ -10,8 +10,7 @@
 #include "payment.h"
 #include "user.h"
 
-// Short alias so record format strings read as "%lu" SEP "%s" instead of
-// repeating the full FIELD_DELIMITER_STRING macro at every field boundary.
+// Alias so format strings read "%lu" SEP "%s" instead of repeating FIELD_DELIMITER_STRING everywhere.
 #define SEP FIELD_DELIMITER_STRING
 
 static payment_t payments[MAX_PAYMENT_RECORDS];
@@ -68,9 +67,9 @@ static bool persist_payment(const payment_t record_payload)
 
 // Checks whether the member exists and their membership accepts payments.
 //
-// Active members settle their running dues and suspended members clear the
-// dues blocking their reactivation; on-hold members have no billing cycle
-// yet and cancelled memberships no longer accept money.
+// Active members settle running dues; suspended members clear dues blocking
+// reactivation. On-hold members have no billing cycle yet; cancelled ones
+// accept no money.
 static bool ensure_member_can_pay(id_t gym_member_id)
 {
   gym_member_t member;
@@ -86,11 +85,10 @@ static bool ensure_member_can_pay(id_t gym_member_id)
   }
 }
 
-// Persists a payment owned by its paying member and settles dues when
-// completed.
+// Persists a payment for its paying member and settles dues when completed.
 //
-// The record is appended file-first, then mirrored in memory, matching the
-// ordering used across modules.
+// Appends file-first, then mirrors in memory, matching the ordering used
+// across modules.
 static bool settle_payment(const payment_t payment_payload)
 {
   if (!persist_payment(payment_payload))
@@ -102,9 +100,8 @@ static bool settle_payment(const payment_t payment_payload)
   payments[payment_count] = payment_payload;
   payment_count++;
 
-  // Digital payments carry whatever status the gateway reported, so pending,
-  // failed, and invalid attempts land in the history only. Only a completed
-  // payment settles dues and restarts the member's billing cycle.
+  // Gateway-reported statuses land in history only; a completed payment also
+  // settles dues and restarts the billing cycle.
   if (payment_payload.status != PAYMENT_COMPLETED) return true;
 
   if (!update_gym_member_billing(
@@ -166,8 +163,7 @@ bool record_digital_payment(const digital_payment_request_t request_payload)
     return false;
   }
 
-  // Only a completed payment moves last_payment_date, so only one needs a
-  // real timestamp; history-only attempts may carry an unrecorded datetime.
+  // Only completed payments need a real timestamp; history-only attempts may go unrecorded.
   if (request_payload.status == PAYMENT_COMPLETED && is_empty_datetime(request_payload.transaction_time))
   {
     LOG_ERROR("Error: Completed payment requires a transaction time.");

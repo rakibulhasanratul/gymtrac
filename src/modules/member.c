@@ -11,8 +11,7 @@
 #include "member.h"
 #include "user.h"
 
-// Short alias so record format strings read as "%lu" SEP "%s" instead of
-// repeating the full FIELD_DELIMITER_STRING macro at every field boundary.
+// Alias so format strings read "%lu" SEP "%s" instead of repeating FIELD_DELIMITER_STRING everywhere.
 #define SEP FIELD_DELIMITER_STRING
 
 static suspension_record_t suspension_records[MAX_SUSPENSION_RECORDS];
@@ -47,10 +46,7 @@ static bool persist_suspension(const suspension_record_t record_payload)
   return success;
 }
 
-// Rewrites the entire suspensions file from memory.
-//
-// Used by unsuspend_gym_member so the persisted record reflects the
-// stamped unsuspension date.
+// Rewrites the entire suspensions file from memory after an unsuspension stamp.
 static bool rewrite_all_suspension_to_file()
 {
   FILE *file = fopen(SUSPENSIONS_FILE_PATH, "w");

@@ -4,8 +4,8 @@
 /**
  * Seeds the xoshiro128** pseudorandom number generator.
  *
- * The seed mixing guarantees the internal state is never all zero, which
- * the xoshiro128** algorithm requires.
+ * Seed mixing keeps the internal state from being all zero, as the
+ * algorithm requires.
  *
  * @param seed the seed value
  */

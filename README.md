@@ -6,7 +6,7 @@
 
 > This is a kind of demo project. So, it does not care about engineering!
 
-CSE115L is the very first major CSE course, the group project is to practice the concepts taught in class. Don't expect prod-grade code. A deliberately stupid solution that works beats a heavily engineered one here. If you're looking for a repo to learn from, your rocket engine falied in a very bad way that it make you land here.
+CSE115L is the very first major CSE course, the group project is to practice the concepts taught in class. Don't expect prod-grade code. A deliberately stupid solution that works beats a heavily engineered one here. If you're looking for a repo to learn from, your rocket engine failed in a very bad way that it make you land here.
 
 > Password hashing here stops a curious classmate, not an attacker with a GPU.
 

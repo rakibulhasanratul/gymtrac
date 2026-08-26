@@ -17,7 +17,7 @@ int load_branches();
 /**
  * Finds a branch by its exact name in the in-memory array.
  *
- * The comparison is case-sensitive and matches the exact string stored.
+ * The lookup is a case-sensitive exact match.
  *
  * @param branch_name the name to look up
  * @return the zero-based index of the matching branch, or -1 if not found
@@ -38,8 +38,8 @@ bool add_branch(const char branch_name[]);
 /**
  * Policy guard ensuring no staff or gym member is assigned to a branch.
  *
- * A branch with any assigned manager, trainer, or member can never be
- * deleted, so their records never point at a removed branch.
+ * A branch with any manager, trainer, or member stays undeletable, so
+ * records never reference a removed branch.
  *
  * @param branch_name the branch to check
  * @return true when the branch name is valid and has no users, false otherwise

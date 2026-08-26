@@ -28,8 +28,7 @@ void mix_salt(const char *password, const char *salt, char *destination);
 /**
  * Computes a polynomial hash of text (h = 31 * h + c).
  *
- * This is a demo hash function similar to Java's String.hashCode().
- * It is NOT cryptographically secure.
+ * Demo hash similar to Java's String.hashCode(); NOT cryptographically secure.
  *
  * @param text the string to hash
  * @return the polynomial hash value

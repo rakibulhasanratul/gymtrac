@@ -9,8 +9,7 @@
 #include "../utils/string_util.h"
 #include "user.h"
 
-// Short alias so record format strings read as "%lu" SEP "%s" instead of
-// repeating the full FIELD_DELIMITER_STRING macro at every field boundary.
+// Alias so format strings read "%lu" SEP "%s" instead of repeating FIELD_DELIMITER_STRING everywhere.
 #define SEP FIELD_DELIMITER_STRING
 
 static sysadmin_t sysadmins[MAX_SYSTEM_ADMINS];
@@ -114,8 +113,7 @@ static bool persist_gym_member(const gym_member_t record_payload)
   return success;
 }
 
-// Removes the branch staff record at index from memory by shifting later
-// records left.
+// Removes the branch staff record at index from memory by shifting later records left.
 static void remove_branch_staff_at(int index)
 {
   for (int i = index; i < branch_staff_count - 1; i++) branch_staffs[i] = branch_staffs[i + 1];
@@ -123,8 +121,7 @@ static void remove_branch_staff_at(int index)
   branch_staff_count--;
 }
 
-// Removes the gym member record at index from memory by shifting later
-// records left.
+// Removes the gym member record at index from memory by shifting later records left.
 static void remove_gym_member_at(int index)
 {
   for (int i = index; i < gym_member_count - 1; i++) gym_members[i] = gym_members[i + 1];
@@ -134,8 +131,8 @@ static void remove_gym_member_at(int index)
 
 // Rewrites the branch staff file from memory, skipping the record at index.
 //
-// Used by delete_branch_staff so the persisted file never contains the
-// removed record, matching the file-first ordering of creation.
+// Used by delete_branch_staff; the removed record never persists, matching
+// creation's file-first ordering.
 static bool rewrite_all_branch_staff_to_file_without_index(int index)
 {
   FILE *file = fopen(BRANCH_STAFF_FILE_PATH, "w");
@@ -165,8 +162,8 @@ static bool rewrite_all_branch_staff_to_file_without_index(int index)
 
 // Rewrites the gym members file from memory, skipping the record at index.
 //
-// Used by delete_gym_member so the persisted file never contains the
-// removed record, matching the file-first ordering of creation.
+// Used by delete_gym_member; the removed record never persists, matching
+// creation's file-first ordering.
 static bool rewrite_all_gym_members_to_file_without_index(int index)
 {
   FILE *file = fopen(GYM_MEMBERS_FILE_PATH, "w");
@@ -1031,12 +1028,11 @@ bool update_gym_member_lifecycle(
   return true;
 }
 
-// Renames the branch reference on every branch staff record assigned to the
-// old branch name, then rewrites the staff file from memory.
+// Renames the branch reference on every staff record assigned to the old
+// branch name, then rewrites the staff file from memory.
 //
-// Used by the branch rename flow so no staff record keeps pointing at a
-// branch name that no longer exists. Succeeds silently when no record
-// matches, since the persisted file is already correct.
+// Keeps no record pointing at a removed branch name. Succeeds silently when
+// nothing matches, since the file is already correct.
 static bool rename_branch_for_branch_staffs(const char old_branch_name[], const char new_branch_name[])
 {
   bool renamed = false;
@@ -1060,12 +1056,11 @@ static bool rename_branch_for_branch_staffs(const char old_branch_name[], const 
   return true;
 }
 
-// Renames the branch reference on every gym member record assigned to the
-// old branch name, then rewrites the members file from memory.
+// Renames the branch reference on every member record assigned to the old
+// branch name, then rewrites the members file from memory.
 //
-// Used by the branch rename flow so no member record keeps pointing at a
-// branch name that no longer exists. Succeeds silently when no record
-// matches, since the persisted file is already correct.
+// Keeps no record pointing at a removed branch name. Succeeds silently when
+// nothing matches, since the file is already correct.
 static bool rename_branch_for_gym_members(const char old_branch_name[], const char new_branch_name[])
 {
   bool renamed = false;

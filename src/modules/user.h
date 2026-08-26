@@ -156,8 +156,7 @@ int branch_member_count(const char branch_name[]);
 /**
  * Finds a sysadmin by id and copies the record into destination.
  *
- * Callers work on their own snapshot so internal records can never be
- * modified through the getter.
+ * Callers receive a copy, so internal records cannot change through the getter.
  *
  * @param id the sysadmin's id
  * @param destination receives a copy of the record when found;
@@ -169,8 +168,7 @@ bool get_sysadmin_by_id(id_t id, sysadmin_t *destination);
 /**
  * Finds a sysadmin by username and copies the record into destination.
  *
- * Callers work on their own snapshot so internal records can never be
- * modified through the getter.
+ * Callers receive a copy, so internal records cannot change through the getter.
  *
  * @param username the login name to look up
  * @param destination receives a copy of the record when found;
@@ -182,8 +180,7 @@ bool get_sysadmin_by_username(const char username[], sysadmin_t *destination);
 /**
  * Finds a branch staff member by id and copies the record into destination.
  *
- * Callers work on their own snapshot so internal records can never be
- * modified through the getter.
+ * Callers receive a copy, so internal records cannot change through the getter.
  *
  * @param id the staff member's id
  * @param destination receives a copy of the record when found;
@@ -196,8 +193,7 @@ bool get_branch_staff_by_id(id_t id, branch_staff_t *destination);
  * Finds a branch staff member by username and copies the record into
  * destination.
  *
- * Callers work on their own snapshot so internal records can never be
- * modified through the getter.
+ * Callers receive a copy, so internal records cannot change through the getter.
  *
  * @param username the login name to look up
  * @param destination receives a copy of the record when found;
@@ -209,8 +205,7 @@ bool get_branch_staff_by_username(const char username[], branch_staff_t *destina
 /**
  * Finds a gym member by id and copies the record into destination.
  *
- * Callers work on their own snapshot so internal records can never be
- * modified through the getter.
+ * Callers receive a copy, so internal records cannot change through the getter.
  *
  * @param id the member's id
  * @param destination receives a copy of the record when found;
@@ -222,8 +217,7 @@ bool get_gym_member_by_id(id_t id, gym_member_t *destination);
 /**
  * Finds a gym member by username and copies the record into destination.
  *
- * Callers work on their own snapshot so internal records can never be
- * modified through the getter.
+ * Callers receive a copy, so internal records cannot change through the getter.
  *
  * @param username the login name to look up
  * @param destination receives a copy of the record when found;
@@ -273,7 +267,8 @@ bool update_gym_member(
  * Updates a gym member's membership status and persists the change.
  *
  * The record is looked up by id; the file is rewritten with the updated
- * value. For status-only transitions such as suspension and unsuspension.
+ * value. Intended for status-only transitions such as suspension and
+ * unsuspension.
  *
  * @param id the member's id
  * @param status the membership status to store on the record

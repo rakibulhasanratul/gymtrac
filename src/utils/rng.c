@@ -1,14 +1,12 @@
 // xoshiro128** pseudorandom number generator.
 //
-// This is a non-cryptographic PRNG based on the xoshiro128** algorithm by
-// David Blackman and Sebastiano Vigna. It is NOT suitable for cryptographic
-// purposes.
+// Non-cryptographic PRNG by David Blackman and Sebastiano Vigna; NOT suitable
+// for cryptographic purposes.
 //
 // Reference: https://prng.di.unimi.it/xoshiro128starstar.c
 //
-// Bitwise operators (<<, >>, ^, |) are avoided in this implementation.
-// Equivalent computational results are achieved through arithmetic operations
-// using power_of_2_to_unsigned_int(), xor_32(), and rotate_left_32().
+// Bitwise operators (<<, >>, ^, |) are avoided; power_of_2_to_unsigned_int(),
+// xor_32(), and rotate_left_32() compute the same results arithmetically.
 
 #include <math.h>
 #include <time.h>

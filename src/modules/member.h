@@ -17,10 +17,9 @@ int load_suspensions();
 /**
  * Approves an on-hold gym member, activating the membership.
  *
- * Assigns the default subscription plan, starts the billing cycle at today's
- * date, and sets due_amount to the plan's payable amount. Rejected when the
- * member does not exist or is not currently on hold; only active members can
- * later be suspended, so no other status may pass through here.
+ * Assigns the default plan, starts billing today, and sets due_amount to the
+ * plan's payable amount. Rejected when the member does not exist or is not on
+ * hold; only active members can later be suspended.
  *
  * @param member_id the member to approve
  * @return true when the member was approved and persisted, false otherwise
@@ -30,9 +29,9 @@ bool approve_gym_member(id_t member_id);
 /**
  * Suspends an active gym member with a mandatory reason.
  *
- * Writes a suspension record dated today whose unsuspension_date stays 0
- * (still suspended) until unsuspend_gym_member closes it. Rejected when the
- * member does not exist, is not active, or the reason is empty.
+ * Writes a dated suspension record whose unsuspension_date stays open until
+ * unsuspend_gym_member closes it. Rejected when the member does not exist, is
+ * not active, or the reason is empty.
  *
  * @param member_id the member to suspend
  * @param reason why the membership is being suspended; cannot be empty

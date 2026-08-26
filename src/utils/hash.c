@@ -1,10 +1,8 @@
-// WARNING: This file implements a DEMO hashing function for educational
-// purposes only. The polynomial hash used here (h = 31 * h + c) is NOT
-// cryptographically secure and should NEVER be used in production.
+// WARNING: DEMO hashing for educational purposes only. The polynomial hash
+// (h = 31 * h + c) is NOT cryptographically secure; never use it in production.
 //
-// It is used in this project due to CSE115L constraints that prohibit
-// dynamic memory allocation, bitwise operations, and proper hashing
-// libraries (e.g., SHA-256, bcrypt).
+// CSE115L bans dynamic memory allocation, bitwise operations, and proper
+// hashing libraries (SHA-256, bcrypt), hence this file.
 
 #include <stdbool.h>
 #include <stdio.h>

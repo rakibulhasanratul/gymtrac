@@ -21,8 +21,7 @@ bool read_line_from_file(FILE *file, char buffer[], int buffer_capacity)
   // Accept a final line that ends without a newline at end of file.
   if (feof(file)) return true;
 
-  // Drain the remainder of an over-long line so it is never split across
-  // reads.
+  // Drain an over-long line's remainder so reads never split it.
   while (!feof(file) && !ferror(file))
   {
     if (fgetc(file) == '\n') break;

@@ -17,10 +17,9 @@ typedef struct
   int second; // 0-59
 } datetime_t;
 
-// Datetime meaning "nothing recorded yet", e.g. an open suspension has no
-// unsuspension date until the member is unsuspended. It deliberately
-// matches epoch second count 0, the value an unrecorded datetime keeps in
-// the numeric data files, so the sentinel survives save/load round-trips.
+// Datetime meaning "nothing recorded yet"; an open suspension uses it until
+// unsuspension. Matches epoch 0, the value an unrecorded datetime stores in
+// data files, so the sentinel survives save/load round-trips.
 #define EMPTY_DATETIME ((datetime_t){1970, 1, 1, 0, 0, 0})
 
 // System administrator record, seeded on first run.
@@ -93,7 +92,7 @@ typedef unsigned char payment_status_t;
 #define PAYMENT_FAILED 2
 #define PAYMENT_INVALID 3
 
-// Payment made by a gym member; every payment belongs to exactly one member.
+// Payment made by a gym member; each belongs to exactly one member.
 typedef struct
 {
   id_t id;

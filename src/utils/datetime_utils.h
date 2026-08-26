@@ -8,8 +8,8 @@
 /**
  * Returns the current wall-clock datetime with second precision.
  *
- * time(NULL) counts UTC seconds since the epoch, so the shift by
- * TIMEZONE_OFFSET_HOURS turns it into the gym's local time.
+ * time(NULL) counts UTC seconds since the epoch; shifting by
+ * TIMEZONE_OFFSET_HOURS yields local time.
  *
  * @return the current local datetime
  */
@@ -104,8 +104,8 @@ int days_between(const datetime_t earlier_payload, const datetime_t later_payloa
  * Checks whether a datetime equals the EMPTY_DATETIME sentinel, meaning
  * "nothing recorded yet".
  *
- * The sentinel is epoch zero (1970-01-01 00:00:00), the same value an
- * unrecorded datetime keeps in the numeric data files.
+ * The sentinel is epoch zero (1970-01-01 00:00:00), matching an unrecorded
+ * datetime in data files.
  *
  * @param datetime_payload the datetime to inspect
  * @return true when the datetime matches EMPTY_DATETIME

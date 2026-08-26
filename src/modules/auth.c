@@ -1,9 +1,8 @@
-// WARNING: This file implements password hashing using a DEMO polynomial
-// hash function for educational purposes only. It is NOT cryptographically
-// secure and should NEVER be used in production.
+// WARNING: DEMO polynomial password hashing for educational purposes only;
+// NOT cryptographically secure, never use it in production.
 //
-// Used in this project due to CSE115L constraints that prohibit dynamic
-// memory allocation, bitwise operations, and proper hashing libraries.
+// CSE115L bans dynamic memory allocation, bitwise operations, and proper
+// hashing libraries, hence this approach.
 
 #include <stdbool.h>
 #include <string.h>

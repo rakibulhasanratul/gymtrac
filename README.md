@@ -101,7 +101,7 @@ Work tracked per item; commit each with a Conventional Commit message (`feat:`, 
 - [x] Unit tests covering branch rename persistence and the cascade into staff and member records - `test:`
 - [x] Payment module: record digital payments instantly, let trainers record cash payments directly, then reduce `due_amount` (clamped at 0) and update `last_payment_date` - `feat:`
 - [x] Unit tests covering digital payment, trainer-recorded cash payment, due clamping, and date advancement - `test:`
-- [ ] Lost & Found module where members report lost/found items and managers/trainers list and resolve their branch's items - `feat:`
-- [ ] Unit tests covering item reporting and resolution - `test:`
+- [x] Lost & Found module where members report lost/found items and managers/trainers list and resolve their branch's items - `feat:`
+- [x] Unit tests covering item reporting and resolution - `test:`
 - [ ] Menu module with a login/register flow and one menu per role exposing only that role's allowed actions - `feat:`
 - [ ] `main.c` that boots the app, seeds the default admin on first run, runs the auto-suspend sweep, and dispatches to the login flow - `feat:`

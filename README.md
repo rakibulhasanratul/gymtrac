@@ -1,57 +1,57 @@
 # Gymtrac
 
-`Gymtrac` is a gym management system, a `group project` for `CSE115L` course of North South University. The project is developed using C following C11 standards. This is a complete `CLI only` project, with no GUI.
+`Gymtrac` is a gym management system, a `group project` for the `CSE115L` course at North South University. Written in C against C11 standards, strictly CLI, no GUI. Expecting buttons? Wrong repo.
 
-## Disclaimer About Stupidity
+## Disclaimer about stupidity
 
 > This is a demo project, and it does not care about engineering!
 
-CSE115L is the very first major course a student takes in CSE, and this project exists purely to practice the concepts taught in class. It does not aim for prod-grade code; deliberately stupid but working solutions beat heavily engineered ones here.
+CSE115L is the very first major CSE course, so this project exists purely to practice the concepts taught in class. Don't expect prod-grade code. A deliberately stupid solution that works beats a heavily engineered one here.
 
 > Password hashing here stops a curious classmate, not an attacker with a GPU.
 
-This project uses a polynomial hash function (similar to Java's `String.hashCode()`) for password storage. This is **not** a cryptographically secure hash and should **never** be used in production. It is used here due to CSE115L project constraints that prohibit dynamic memory allocation, bitwise operations, and proper hashing libraries (e.g., SHA-256, bcrypt).
+Passwords run through a polynomial hash function (similar to Java's `String.hashCode()`). This is **not** a cryptographically secure hash. Do **not** put it anywhere near production. CSE115L constraints leave no choice: dynamic memory allocation, bitwise operations, and proper hashing libraries (SHA-256, bcrypt) are all banned. So this ships.
 
 > The PRNG is xoshiro128**, great for dice rolls, useless against attackers.
 
-This project uses the [xoshiro128**](https://prng.di.unimi.it/xoshiro128starstar.c) pseudorandom number generator by David Blackman and Sebastiano Vigna for random number generation. This is **not** a cryptographically secure PRNG and should **never** be used in production. It is used here as a higher-quality alternative to the standard library `rand()` function. The implementation avoids bitwise operators by achieving equivalent computational results through arithmetic operations. Reference: <https://prng.di.unimi.it/>
+Random numbers come from the [xoshiro128**](https://prng.di.unimi.it/xoshiro128starstar.c) PRNG by David Blackman and Sebastiano Vigna. Not cryptographically secure, and it must stay out of production. It's a higher-quality stand-in for standard library `rand()`. The implementation dodges bitwise operators with equivalent arithmetic. Reference: <https://prng.di.unimi.it/>
 
 > No malloc, no database, just fixed arrays with ceilings written in settings.h.
 
-Dynamic memory allocation (`malloc`/`realloc`/`free`) is prohibited in this project, so every record table lives in a static fixed-size array whose size must be decided at compile time. The `MAX_*_RECORDS` macros in `settings.h` provide those sizes: derived caps like `MAX_GYM_MEMBERS` bound the user tables, and event-table caps like `MAX_SUSPENSION_RECORDS` or `MAX_PAYMENT_RECORDS` bound records that accumulate over a member's lifetime. When a table reaches its cap, creating further records is rejected instead of silently dropped.
+Dynamic memory allocation (`malloc`/`realloc`/`free`) is prohibited. No exceptions. Every record table lives in a static fixed-size array sized at compile time. The `MAX_*_RECORDS` macros in `settings.h` set those sizes: derived caps like `MAX_GYM_MEMBERS` bound the user tables, and event-table caps like `MAX_SUSPENSION_RECORDS` or `MAX_PAYMENT_RECORDS` bound records that accumulate over a member's lifetime. A table at its cap rejects new records outright. Nothing gets silently dropped.
 
 > split() (string_util.c:34) knows one buffer width. Hand it another and the compiler yells at you.
 
-`split()` (string_util.c:34) takes its output as `char parts[][FIELD_BUFFER_SIZE]`, not the more flexible `char *parts[]`. This is deliberate. The field width is controlled centrally through the `FIELD_BUFFER_SIZE` macro in `settings.h`, and because dynamic memory allocation is prohibited, every caller already declares fixed `parts[][FIELD_BUFFER_SIZE]` arrays anyway. Passing the real 2D array directly removes the pointer-map boilerplate callers previously needed, and the compiler now rejects any buffer whose row width differs from `FIELD_BUFFER_SIZE` instead of letting a caller misreport capacities and overflow rows silently. The trade-off: `split()` can only split into buffers of that one width, so it cannot be reused for arbitrary-sized field buffers.
+`split()` (string_util.c:34) takes its output as `char parts[][FIELD_BUFFER_SIZE]`, not the looser `char *parts[]`. That's deliberate. The `FIELD_BUFFER_SIZE` macro in `settings.h` controls the field width, and since dynamic allocation is off the table anyway, every caller already declares fixed `parts[][FIELD_BUFFER_SIZE]` arrays. Handing over the real 2D array kills the pointer-map boilerplate callers used to need. It also makes the compiler yell at any buffer whose row width differs from `FIELD_BUFFER_SIZE`, instead of letting a caller misreport capacities and overflow rows silently. Trade-off: `split()` only splits into buffers of that one width, so don't reach for it with arbitrary-sized field buffers.
 
-## Project Brief
+## Project brief
 
-- User authentication and authorization. Login with `username` + password; passwords are stored as salted hashes.
-- 3 user record types: System Administrator (pre-existed), Branch Staff (a `role` field distinguishes Branch Manager from Branch Trainer), and Gym Member.
-- Branches are a simple list of branch names. Every staff member and gym member belongs to exactly one existing branch.
+- Login takes `username` + password; passwords are stored as salted hashes. No password match, no entry.
+- 3 user record types exist: System Administrator (pre-existed), Branch Staff (a `role` field distinguishes Branch Manager from Branch Trainer), and Gym Member.
+- Branches are a plain list of branch names. Every staff member and gym member belongs to exactly one existing branch. One branch each, no exceptions.
 - Each branch's staff and member counts are capped by `MAX_MANAGERS_PER_BRANCH`, `MAX_TRAINERS_PER_BRANCH`, and `MAX_MEMBERS_PER_BRANCH` macros defined in `settings.h`. Derived global caps (`MAX_BRANCH_MANAGERS`, `MAX_TRAINERS`, `MAX_GYM_MEMBERS`) bound the static arrays that store all records.
-- A newly self-registered gym member has status `on_hold` until a branch manager approves them to `active`.
-- Each member subscribes to a plan (`payable_amount` + `interval_days`), which drives their fee amount and payment interval.
-- Digital payments are recorded by the member directly. Cash payments are handed to a branch trainer, who records them directly (no approval request).
-- Each member can view their own payment history.
-- A completed payment reduces a member's `due_amount` (clamped at 0) and updates their `last_payment_date`; the next due date is `last_payment_date + interval_days`.
-- Each member is automatically suspended if their dues stay unpaid past the due date plus a grace period. A manager can unsuspend them after they pay their dues.
-- Each member can view their own profile and submit profile-edit requests (name, phone, email, branch, username), which branch staff approve or reject.
-- `Lost & Found`: members report lost or found items; branch staff can view and mark them as resolved.
+- A newly self-registered gym member sits at `on_hold` until a branch manager moves them to `active`. There is no other way in.
+- Each member subscribes to a plan (`payable_amount` + `interval_days`). The plan sets the fee amount and the payment interval. Nothing else does.
+- Members record digital payments directly. Cash goes through a branch trainer, who records it. No approval request in either path.
+- Members view their own payment history.
+- A completed payment reduces `due_amount` (clamped at 0) and updates `last_payment_date`; the next due date is `last_payment_date + interval_days`.
+- Dues left unpaid past the due date plus a grace period trigger automatic suspension. A manager unsuspends after the dues are paid. No manager, no unsuspension.
+- Members view their own profiles and submit profile-edit requests (name, phone, email, branch, username). Branch staff approve or reject them; member input ends at submission.
+- `Lost & Found`: members report lost or found items. Branch staff view them and mark them resolved.
 - Suspensions and requests:
-  - Only branch managers can approve a member (`on_hold` to `active`), suspend, or unsuspend them directly.
-  - Branch trainers can only _request_ a member's status change (`membership_status_change_request_t`), and only branch managers resolve those requests.
+  - Only branch managers approve a member (`on_hold` to `active`), suspend, or unsuspend directly. Trainers hold none of this authority.
+  - Branch trainers can only _request_ a member's status change (`membership_status_change_request_t`). Only branch managers resolve those requests.
   - Members request plan changes (`subscription_plan_change_request_t`) and profile edits (`profile_edit_request_t`); branch staff approve or reject them.
-  - Every suspension has a mandatory `reason`, stored in a dedicated suspension record with its date (and an optional unsuspension date).
+  - Every suspension carries a mandatory `reason`, stored in a dedicated suspension record with its date (and an optional unsuspension date). No reason, no suspension.
 - Deletion rules:
-  - A branch can only be deleted when no staff or member is assigned to it (`ensure_branch_has_no_users()` (branch.c:92)).
-  - Branch staff and gym members can be deleted; a member with outstanding dues is protected and the system administrator account has no delete path.
+  - A branch stays undeletable while any staff or member is assigned to it (`ensure_branch_has_no_users()` (branch.c:92)).
+  - Branch staff and gym members can be deleted. A member with outstanding dues is protected. The system administrator account has no delete path.
 - Access control:
-  - Members see only their own data.
-  - Branch managers and trainers see only their own branch's resources (members, payments, requests, lost & found).
+  - Members see their own data. Only their own data.
+  - Branch managers and trainers see only their own branch's resources (members, payments, requests, lost & found). Nothing outside their branch.
   - The system administrator can perform every operation.
-  - Only the system administrator can create new branches.
-  - The system administrator can create users of any type (including branch managers); gym members self-register and stay `on_hold` until their branch manager approves them.
+  - New branches come from exactly one place: the system administrator.
+  - The system administrator creates users of any type (branch managers included). Gym members self-register and stay `on_hold` until their branch manager approves them.
 
 ## TODO
 

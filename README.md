@@ -2,6 +2,10 @@
 
 `Gymtrac` is a gym management system, a `group project` for `CSE115L` course of North South University. The project is developed using C following C11 standards. This is a complete `CLI only` project, with no GUI.
 
+### Warning: This Is A Demo Project
+
+CSE115L is the very first major course a student takes in CSE, and this project exists purely to practice the concepts taught in class. It does not aim for prod-grade code; deliberately stupid but working solutions beat heavily engineered ones here.
+
 ### Disclaimer About Hashing Function
 
 This project uses a polynomial hash function (similar to Java's `String.hashCode()`) for password storage. This is **not** a cryptographically secure hash and should **never** be used in production. It is used here due to CSE115L project constraints that prohibit dynamic memory allocation, bitwise operations, and proper hashing libraries (e.g., SHA-256, bcrypt).
@@ -9,6 +13,10 @@ This project uses a polynomial hash function (similar to Java's `String.hashCode
 ### About Random Number Generator
 
 This project uses the [xoshiro128**](https://prng.di.unimi.it/xoshiro128starstar.c) pseudorandom number generator by David Blackman and Sebastiano Vigna for random number generation. This is **not** a cryptographically secure PRNG and should **never** be used in production. It is used here as a higher-quality alternative to the standard library `rand()` function. The implementation avoids bitwise operators by achieving equivalent computational results through arithmetic operations. Reference: <https://prng.di.unimi.it/>
+
+### Why Record Counts Are Capped By `MAX_*_RECORDS` Macros
+
+Dynamic memory allocation (`malloc`/`realloc`/`free`) is prohibited in this project, so every record table lives in a static fixed-size array whose size must be decided at compile time. The `MAX_*_RECORDS` macros in `settings.h` provide those sizes: derived caps like `MAX_GYM_MEMBERS` bound the user tables, and event-table caps like `MAX_SUSPENSION_RECORDS` or `MAX_PAYMENT_RECORDS` bound records that accumulate over a member's lifetime. When a table reaches its cap, creating further records is rejected instead of silently dropped.
 
 ## Project Brief
 
@@ -83,8 +91,8 @@ Work tracked per item; commit each with a Conventional Commit message (`feat:`, 
 - [x] Unit tests covering approval, suspension records with optional unsuspension date, and the auto-suspend sweep - `test:`
 - [x] Branch rename/update: renaming a branch requires cascading updates to all staff and member records referencing it - `feat:`
 - [x] Unit tests covering branch rename persistence and the cascade into staff and member records - `test:`
-- [ ] Payment module: record digital payments instantly, let trainers record cash payments directly, then reduce `due_amount` (clamped at 0) and update `last_payment_date` - `feat:`
-- [ ] Unit tests covering digital payment, trainer-recorded cash payment, due clamping, and date advancement - `test:`
+- [x] Payment module: record digital payments instantly, let trainers record cash payments directly, then reduce `due_amount` (clamped at 0) and update `last_payment_date` - `feat:`
+- [x] Unit tests covering digital payment, trainer-recorded cash payment, due clamping, and date advancement - `test:`
 - [ ] Lost & Found module where members report lost/found items and managers/trainers list and resolve their branch's items - `feat:`
 - [ ] Unit tests covering item reporting and resolution - `test:`
 - [ ] Menu module with a login/register flow and one menu per role exposing only that role's allowed actions - `feat:`

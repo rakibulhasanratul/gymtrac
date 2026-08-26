@@ -5,6 +5,7 @@
 #include "../src/utils/rng.h"
 #include "modules/test_auth.h"
 #include "modules/test_branch.h"
+#include "modules/test_lost_found.h"
 #include "modules/test_member.h"
 #include "modules/test_payment.h"
 #include "modules/test_session.h"
@@ -25,6 +26,7 @@ int main()
   cleanup_user_files();
   cleanup_member_files();
   cleanup_payment_files();
+  cleanup_lost_found_files();
 
   /* string_util */
   test_trim_strips_whitespace();
@@ -253,6 +255,14 @@ int main()
   test_non_completed_digital_payment_records_history_without_settling();
   test_payment_rejects_invalid_members_amounts_and_details();
   test_get_payments_for_member_handles_history_and_capacity();
+
+  /* lost & found */
+  test_report_item_persists_with_branch_snapshot_and_open_state();
+  test_report_works_for_any_role();
+  test_get_lost_and_found_scopes_by_branch_reporter_and_resolver();
+  test_resolve_lost_item_by_manager_and_sysadmin();
+  test_report_rejects_invalid_input();
+  test_resolve_rejects_invalid_input();
 
   printf("\n\nAll tests passed.\n\n");
   return 0;

@@ -129,7 +129,7 @@ int load_payments()
   char line[LINE_BUFFER_SIZE];
   while (payment_count < MAX_PAYMENT_RECORDS && read_line_from_file(file, line, LINE_BUFFER_SIZE))
   {
-    if (strlen(line) > 0 && parse_payment_line(line, &payments[payment_count])) payment_count++;
+    if (!is_blank_string(line) && parse_payment_line(line, &payments[payment_count])) payment_count++;
   }
 
   fclose(file);
@@ -145,7 +145,7 @@ bool record_digital_payment(const digital_payment_request_t request_payload)
     return false;
   }
 
-  if (strlen(request_payload.transaction_id) == 0)
+  if (is_blank_string(request_payload.transaction_id))
   {
     LOG_ERROR("Error: Digital payment requires a transaction id.");
     return false;

@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "file_util.h"
+#include "string_util.h"
 
 bool read_line_from_file(FILE *file, char buffer[], int buffer_capacity)
 {
@@ -49,7 +50,7 @@ int read_lines_from_file(const char file_path[], char *lines_destination[], int 
   while (line_count < max_lines && read_line_from_file(file, lines_destination[line_count], line_capacity))
   {
     // Empty lines carry no record and stay invisible to callers.
-    if (strlen(lines_destination[line_count]) > 0) line_count++;
+    if (!is_blank_string(lines_destination[line_count])) line_count++;
   }
 
   fclose(file);

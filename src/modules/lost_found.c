@@ -115,7 +115,7 @@ int load_lost_and_found_records()
   char line[LINE_BUFFER_SIZE];
   while (lost_and_found_count < MAX_LOST_FOUND_RECORDS && read_line_from_file(file, line, LINE_BUFFER_SIZE))
   {
-    if (strlen(line) > 0 && parse_lost_and_found_line(line, &lost_and_found_records[lost_and_found_count]))
+    if (!is_blank_string(line) && parse_lost_and_found_line(line, &lost_and_found_records[lost_and_found_count]))
       lost_and_found_count++;
   }
 
@@ -126,19 +126,19 @@ int load_lost_and_found_records()
 
 bool report_lost_item(const char reporter_username[], const char gym_branch[], const char description[])
 {
-  if (reporter_username == NULL || strlen(reporter_username) == 0)
+  if (is_blank_string(reporter_username))
   {
     LOG_ERROR("Error: Reporter username cannot be empty.");
     return false;
   }
 
-  if (gym_branch == NULL || strlen(gym_branch) == 0)
+  if (is_blank_string(gym_branch))
   {
     LOG_ERROR("Error: Branch name cannot be empty.");
     return false;
   }
 
-  if (description == NULL || strlen(description) == 0)
+  if (is_blank_string(description))
   {
     LOG_ERROR("Error: Item description cannot be empty.");
     return false;
@@ -183,7 +183,7 @@ bool report_lost_item(const char reporter_username[], const char gym_branch[], c
 
 bool resolve_lost_item(id_t record_id, const char resolver_username[])
 {
-  if (resolver_username == NULL || strlen(resolver_username) == 0)
+  if (is_blank_string(resolver_username))
   {
     LOG_ERROR("Error: Resolver username cannot be empty.");
     return false;
@@ -205,7 +205,7 @@ bool resolve_lost_item(id_t record_id, const char resolver_username[])
     return false;
   }
 
-  if (strlen(lost_and_found_records[record_index].resolver_username) > 0)
+  if (!is_blank_string(lost_and_found_records[record_index].resolver_username))
   {
     LOG_ERROR("Error: Lost and found record %lu is already resolved.", (unsigned long)record_id);
     return false;

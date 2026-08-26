@@ -77,4 +77,14 @@ char *to_uppercase(char text[]);
  */
 char *sanitize_field(char text[]);
 
+/**
+ * Checks whether text is NULL, empty, or contains only whitespace.
+ *
+ * Uses isspace() so a string of spaces, tabs, or newlines counts as blank.
+ *
+ * @param text the string to check
+ * @return true when blank, false otherwise
+ */
+bool is_blank_string(const char text[]);
+
 #endif

@@ -1,3 +1,4 @@
+#include <ctype.h>
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
@@ -6,21 +7,14 @@
 #include "../types.h"
 #include "datetime_utils.h"
 
-// Base calendar units; every conversion below is built from these.
-#define SECONDS_PER_MINUTE 60
-#define MINUTES_PER_HOUR 60
-#define HOURS_PER_DAY 24
-#define MONTHS_PER_YEAR 12
-
-// Derived units, expressed through the base ones.
-#define SECONDS_PER_HOUR (MINUTES_PER_HOUR * SECONDS_PER_MINUTE)
-#define SECONDS_PER_DAY (HOURS_PER_DAY * SECONDS_PER_HOUR)
+#define SECONDS_PER_HOUR 3600
+#define SECONDS_PER_DAY (3600 * 24)
 
 // The instant all epoch second counts are measured from: 1970-01-01 00:00:00.
 #define EPOCH_YEAR 1970
 
 // Days in each month for a non-leap year, indexed by month - 1.
-static const int DAYS_IN_MONTH[MONTHS_PER_YEAR] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+static const int DAYS_IN_MONTH[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
 // Returns whether the given year is a leap year.
 static bool is_leap_year(int year)
@@ -55,18 +49,26 @@ long long datetime_to_seconds(const datetime_t datetime_payload)
 {
   long long total_seconds = 0;
 
-  // Each full year between EPOCH_YEAR and the target adds its length.
+  // Only whole years strictly before the target are elapsed.
+  // If target is 2026, years 1970..2025 are complete; 2026 is still
+  // in progress and its months/days are counted below. Hence
+  // year < datetime_payload.year, not <=.
   for (int year = EPOCH_YEAR; year < datetime_payload.year; year++)
     total_seconds += (long long)days_in_year(year) * SECONDS_PER_DAY;
 
-  // Full months before the target add their length, leap-aware for the year.
+  // Only whole months strictly before the target month in that year
+  // are elapsed. If target is March, Jan and Feb are done; March's
+  // progress is handled by (day - 1) and the clock fields below.
+  // Hence month < datetime_payload.month.
   for (int month = 1; month < datetime_payload.month; month++)
     total_seconds += (long long)days_in_month(datetime_payload.year, month) * SECONDS_PER_DAY;
 
-  // The rest is the not-yet-counted day plus the plain clock time.
+  // Day is 1-indexed, so day 1 has zero completed days.
+  // Day 15 has 14 previous days elapsed. Hours/minutes/seconds are
+  // the partial-day progress.
   total_seconds += (long long)(datetime_payload.day - 1) * SECONDS_PER_DAY;
   total_seconds += (long long)datetime_payload.hour * SECONDS_PER_HOUR;
-  total_seconds += (long long)datetime_payload.minute * SECONDS_PER_MINUTE;
+  total_seconds += (long long)datetime_payload.minute * 60;
 
   return total_seconds + datetime_payload.second;
 }
@@ -82,8 +84,8 @@ datetime_t datetime_from_seconds(long long seconds_since_epoch)
   result.month = 1;
   result.day = 1;
   result.hour = (int)(remaining_seconds / SECONDS_PER_HOUR);
-  result.minute = (int)(remaining_seconds % SECONDS_PER_HOUR / SECONDS_PER_MINUTE);
-  result.second = (int)(remaining_seconds % SECONDS_PER_MINUTE);
+  result.minute = (int)(remaining_seconds % SECONDS_PER_HOUR / 60);
+  result.second = (int)(remaining_seconds % 60);
 
   // Peel off one full year at a time until the leftover fits inside one.
   while (day_count >= days_in_year(result.year))
@@ -124,6 +126,12 @@ bool parse_datetime(const char datetime_text[], datetime_t *datetime_destination
   if (strlen(datetime_text) != DATETIME_BUFFER_SIZE - 1) return false;
   if (datetime_text[4] != '-' || datetime_text[7] != '-' || datetime_text[10] != ' ') return false;
   if (datetime_text[13] != ':' || datetime_text[16] != ':') return false;
+  // Every other position must be a digit; isdigit makes the intent obvious.
+  for (int i = 0; i < DATETIME_BUFFER_SIZE - 1; i++)
+  {
+    if (i == 4 || i == 7 || i == 10 || i == 13 || i == 16) continue;
+    if (!isdigit((unsigned char)datetime_text[i])) return false;
+  }
 
   int year = 0;
   int month = 0;
@@ -134,11 +142,11 @@ bool parse_datetime(const char datetime_text[], datetime_t *datetime_destination
   if (sscanf(datetime_text, "%4d-%2d-%2d %2d:%2d:%2d", &year, &month, &day, &hour, &minute, &second) != 6) return false;
 
   // Reject any component outside its valid range.
-  if (year < EPOCH_YEAR || month < 1 || month > MONTHS_PER_YEAR) return false;
+  if (year < EPOCH_YEAR || month < 1 || month > 12) return false;
   if (day < 1 || day > days_in_month(year, month)) return false;
-  if (hour < 0 || hour > HOURS_PER_DAY - 1) return false;
-  if (minute < 0 || minute > MINUTES_PER_HOUR - 1) return false;
-  if (second < 0 || second > SECONDS_PER_MINUTE - 1) return false;
+  if (hour < 0 || hour > 23) return false;
+  if (minute < 0 || minute > 59) return false;
+  if (second < 0 || second > 59) return false;
 
   datetime_destination->year = year;
   datetime_destination->month = month;
@@ -161,14 +169,14 @@ datetime_t add_months(const datetime_t date_payload, int months)
   result.month += months;
 
   // Carry or borrow whole years until month is back inside 1-12.
-  while (result.month > MONTHS_PER_YEAR)
+  while (result.month > 12)
   {
-    result.month -= MONTHS_PER_YEAR;
+    result.month -= 12;
     result.year++;
   }
   while (result.month < 1)
   {
-    result.month += MONTHS_PER_YEAR;
+    result.month += 12;
     result.year--;
   }
 
@@ -181,19 +189,10 @@ datetime_t add_months(const datetime_t date_payload, int months)
 
 int compare_datetime(const datetime_t left_payload, const datetime_t right_payload)
 {
-  if (left_payload.year < right_payload.year) return -1;
-  if (left_payload.year > right_payload.year) return 1;
-  if (left_payload.month < right_payload.month) return -1;
-  if (left_payload.month > right_payload.month) return 1;
-  if (left_payload.day < right_payload.day) return -1;
-  if (left_payload.day > right_payload.day) return 1;
-  if (left_payload.hour < right_payload.hour) return -1;
-  if (left_payload.hour > right_payload.hour) return 1;
-  if (left_payload.minute < right_payload.minute) return -1;
-  if (left_payload.minute > right_payload.minute) return 1;
-  if (left_payload.second < right_payload.second) return -1;
-  if (left_payload.second > right_payload.second) return 1;
-  return 0;
+  long long left_seconds = datetime_to_seconds(left_payload);
+  long long right_seconds = datetime_to_seconds(right_payload);
+  if (left_seconds == right_seconds) return 0;
+  return left_seconds < right_seconds ? -1 : 1;
 }
 
 int days_between(const datetime_t earlier_payload, const datetime_t later_payload)

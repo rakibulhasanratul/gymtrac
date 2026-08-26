@@ -4,6 +4,7 @@
 
 #include "../settings.h"
 #include "../utils/file_util.h"
+#include "../utils/string_util.h"
 #include "branch.h"
 #include "user.h"
 
@@ -38,7 +39,7 @@ int load_branches()
 
 int find_branch(const char branch_name[])
 {
-  if (branch_name == NULL || strlen(branch_name) == 0) return -1;
+  if (is_blank_string(branch_name)) return -1;
 
   for (int i = 0; i < branch_count; i++)
   {
@@ -50,7 +51,7 @@ int find_branch(const char branch_name[])
 
 bool add_branch(const char branch_name[])
 {
-  if (branch_name == NULL || strlen(branch_name) == 0)
+  if (is_blank_string(branch_name))
   {
     LOG_ERROR("Error: Branch name cannot be empty.");
     return false;
@@ -89,7 +90,7 @@ bool add_branch(const char branch_name[])
 
 bool ensure_branch_has_no_users(const char branch_name[])
 {
-  if (branch_name == NULL || strlen(branch_name) == 0) return false;
+  if (is_blank_string(branch_name)) return false;
 
   return branch_manager_count(branch_name) == 0 && branch_trainer_count(branch_name) == 0 &&
          branch_member_count(branch_name) == 0;
@@ -97,7 +98,7 @@ bool ensure_branch_has_no_users(const char branch_name[])
 
 bool delete_branch(const char branch_name[])
 {
-  if (branch_name == NULL || strlen(branch_name) == 0)
+  if (is_blank_string(branch_name))
   {
     LOG_ERROR("Error: Branch name cannot be empty.");
     return false;
@@ -128,13 +129,13 @@ bool delete_branch(const char branch_name[])
 
 bool update_branch_name(const char old_branch_name[], const char new_branch_name[])
 {
-  if (old_branch_name == NULL || strlen(old_branch_name) == 0)
+  if (is_blank_string(old_branch_name))
   {
     LOG_ERROR("Error: Old branch name cannot be empty.");
     return false;
   }
 
-  if (new_branch_name == NULL || strlen(new_branch_name) == 0)
+  if (is_blank_string(new_branch_name))
   {
     LOG_ERROR("Error: New branch name cannot be empty.");
     return false;

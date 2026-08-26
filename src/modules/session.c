@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "../types.h"
+#include "../utils/string_util.h"
 #include "session.h"
 
 static session_t current_session;
@@ -61,7 +62,7 @@ bool session_belongs_to_branch(const char branch_name[])
 {
   if (!session_is_active()) return false;
 
-  if (branch_name == NULL || strlen(branch_name) == 0) return false;
+  if (is_blank_string(branch_name)) return false;
 
   if (current_session.role == USER_ROLE_SYSADMIN) return true;
 

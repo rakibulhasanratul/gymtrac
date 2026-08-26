@@ -328,7 +328,7 @@ int load_sysadmins()
   char line[LINE_BUFFER_SIZE];
   while (sysadmin_count < MAX_SYSTEM_ADMINS && read_line_from_file(file, line, LINE_BUFFER_SIZE))
   {
-    if (strlen(line) > 0 && parse_sysadmin_line(line, &sysadmins[sysadmin_count])) sysadmin_count++;
+    if (!is_blank_string(line) && parse_sysadmin_line(line, &sysadmins[sysadmin_count])) sysadmin_count++;
   }
 
   fclose(file);
@@ -351,7 +351,8 @@ int load_branch_staff()
   int capacity = MAX_BRANCH_MANAGERS + MAX_TRAINERS;
   while (branch_staff_count < capacity && read_line_from_file(file, line, LINE_BUFFER_SIZE))
   {
-    if (strlen(line) > 0 && parse_branch_staff_line(line, &branch_staffs[branch_staff_count])) branch_staff_count++;
+    if (!is_blank_string(line) && parse_branch_staff_line(line, &branch_staffs[branch_staff_count]))
+      branch_staff_count++;
   }
 
   fclose(file);
@@ -373,7 +374,7 @@ int load_gym_members()
   char line[LINE_BUFFER_SIZE];
   while (gym_member_count < MAX_GYM_MEMBERS && read_line_from_file(file, line, LINE_BUFFER_SIZE))
   {
-    if (strlen(line) > 0 && parse_gym_member_line(line, &gym_members[gym_member_count])) gym_member_count++;
+    if (!is_blank_string(line) && parse_gym_member_line(line, &gym_members[gym_member_count])) gym_member_count++;
   }
 
   fclose(file);
@@ -383,13 +384,13 @@ int load_gym_members()
 
 id_t create_sysadmin(const char username[], const char password_hash[])
 {
-  if (username == NULL || strlen(username) == 0)
+  if (is_blank_string(username))
   {
     LOG_ERROR("Error: Username cannot be empty.");
     return 0;
   }
 
-  if (password_hash == NULL || strlen(password_hash) == 0)
+  if (is_blank_string(password_hash))
   {
     LOG_ERROR("Error: Password hash cannot be empty.");
     return 0;
@@ -433,37 +434,37 @@ id_t create_branch_staff(
   staff_role_t role
 )
 {
-  if (full_name == NULL || strlen(full_name) == 0)
+  if (is_blank_string(full_name))
   {
     LOG_ERROR("Error: Full name cannot be empty.");
     return 0;
   }
 
-  if (email == NULL || strlen(email) == 0)
+  if (is_blank_string(email))
   {
     LOG_ERROR("Error: Email cannot be empty.");
     return 0;
   }
 
-  if (phone_number == NULL || strlen(phone_number) == 0)
+  if (is_blank_string(phone_number))
   {
     LOG_ERROR("Error: Phone number cannot be empty.");
     return 0;
   }
 
-  if (gym_branch == NULL || strlen(gym_branch) == 0)
+  if (is_blank_string(gym_branch))
   {
     LOG_ERROR("Error: Branch name cannot be empty.");
     return 0;
   }
 
-  if (username == NULL || strlen(username) == 0)
+  if (is_blank_string(username))
   {
     LOG_ERROR("Error: Username cannot be empty.");
     return 0;
   }
 
-  if (password_hash == NULL || strlen(password_hash) == 0)
+  if (is_blank_string(password_hash))
   {
     LOG_ERROR("Error: Password hash cannot be empty.");
     return 0;
@@ -516,37 +517,37 @@ id_t create_gym_member(
   membership_status_t status
 )
 {
-  if (full_name == NULL || strlen(full_name) == 0)
+  if (is_blank_string(full_name))
   {
     LOG_ERROR("Error: Full name cannot be empty.");
     return 0;
   }
 
-  if (email == NULL || strlen(email) == 0)
+  if (is_blank_string(email))
   {
     LOG_ERROR("Error: Email cannot be empty.");
     return 0;
   }
 
-  if (phone_number == NULL || strlen(phone_number) == 0)
+  if (is_blank_string(phone_number))
   {
     LOG_ERROR("Error: Phone number cannot be empty.");
     return 0;
   }
 
-  if (gym_branch == NULL || strlen(gym_branch) == 0)
+  if (is_blank_string(gym_branch))
   {
     LOG_ERROR("Error: Branch name cannot be empty.");
     return 0;
   }
 
-  if (username == NULL || strlen(username) == 0)
+  if (is_blank_string(username))
   {
     LOG_ERROR("Error: Username cannot be empty.");
     return 0;
   }
 
-  if (password_hash == NULL || strlen(password_hash) == 0)
+  if (is_blank_string(password_hash))
   {
     LOG_ERROR("Error: Password hash cannot be empty.");
     return 0;
@@ -654,7 +655,7 @@ bool delete_gym_member(id_t id)
 
 bool username_exists(const char username[])
 {
-  if (username == NULL || strlen(username) == 0) return false;
+  if (is_blank_string(username)) return false;
 
   for (int i = 0; i < sysadmin_count; i++)
   {
@@ -676,7 +677,7 @@ bool username_exists(const char username[])
 
 int branch_manager_count(const char branch_name[])
 {
-  if (branch_name == NULL || strlen(branch_name) == 0) return 0;
+  if (is_blank_string(branch_name)) return 0;
 
   int count = 0;
   for (int i = 0; i < branch_staff_count; i++)
@@ -688,7 +689,7 @@ int branch_manager_count(const char branch_name[])
 
 int branch_trainer_count(const char branch_name[])
 {
-  if (branch_name == NULL || strlen(branch_name) == 0) return 0;
+  if (is_blank_string(branch_name)) return 0;
 
   int count = 0;
   for (int i = 0; i < branch_staff_count; i++)
@@ -700,7 +701,7 @@ int branch_trainer_count(const char branch_name[])
 
 int branch_member_count(const char branch_name[])
 {
-  if (branch_name == NULL || strlen(branch_name) == 0) return 0;
+  if (is_blank_string(branch_name)) return 0;
 
   int count = 0;
   for (int i = 0; i < gym_member_count; i++)
@@ -727,7 +728,7 @@ bool get_sysadmin_by_id(id_t id, sysadmin_t *destination)
 
 bool get_sysadmin_by_username(const char username[], sysadmin_t *destination)
 {
-  if (username == NULL || strlen(username) == 0 || destination == NULL) return false;
+  if (is_blank_string(username) || destination == NULL) return false;
 
   for (int i = 0; i < sysadmin_count; i++)
   {
@@ -757,7 +758,7 @@ bool get_branch_staff_by_id(id_t id, branch_staff_t *destination)
 
 bool get_branch_staff_by_username(const char username[], branch_staff_t *destination)
 {
-  if (username == NULL || strlen(username) == 0 || destination == NULL) return false;
+  if (is_blank_string(username) || destination == NULL) return false;
 
   for (int i = 0; i < branch_staff_count; i++)
   {
@@ -787,7 +788,7 @@ bool get_gym_member_by_id(id_t id, gym_member_t *destination)
 
 bool get_gym_member_by_username(const char username[], gym_member_t *destination)
 {
-  if (username == NULL || strlen(username) == 0 || destination == NULL) return false;
+  if (is_blank_string(username) || destination == NULL) return false;
 
   for (int i = 0; i < gym_member_count; i++)
   {
@@ -802,19 +803,19 @@ bool get_gym_member_by_username(const char username[], gym_member_t *destination
 
 bool update_branch_staff(id_t id, const char full_name[], const char email[], const char phone_number[])
 {
-  if (full_name == NULL || strlen(full_name) == 0)
+  if (is_blank_string(full_name))
   {
     LOG_ERROR("Error: Full name cannot be empty.");
     return false;
   }
 
-  if (email == NULL || strlen(email) == 0)
+  if (is_blank_string(email))
   {
     LOG_ERROR("Error: Email cannot be empty.");
     return false;
   }
 
-  if (phone_number == NULL || strlen(phone_number) == 0)
+  if (is_blank_string(phone_number))
   {
     LOG_ERROR("Error: Phone number cannot be empty.");
     return false;
@@ -858,31 +859,31 @@ bool update_gym_member(
   const char username[]
 )
 {
-  if (full_name == NULL || strlen(full_name) == 0)
+  if (is_blank_string(full_name))
   {
     LOG_ERROR("Error: Full name cannot be empty.");
     return false;
   }
 
-  if (email == NULL || strlen(email) == 0)
+  if (is_blank_string(email))
   {
     LOG_ERROR("Error: Email cannot be empty.");
     return false;
   }
 
-  if (phone_number == NULL || strlen(phone_number) == 0)
+  if (is_blank_string(phone_number))
   {
     LOG_ERROR("Error: Phone number cannot be empty.");
     return false;
   }
 
-  if (gym_branch == NULL || strlen(gym_branch) == 0)
+  if (is_blank_string(gym_branch))
   {
     LOG_ERROR("Error: Branch name cannot be empty.");
     return false;
   }
 
-  if (username == NULL || strlen(username) == 0)
+  if (is_blank_string(username))
   {
     LOG_ERROR("Error: Username cannot be empty.");
     return false;
@@ -1086,13 +1087,13 @@ static bool rename_branch_for_gym_members(const char old_branch_name[], const ch
 
 bool rename_branch_for_all_users(const char old_branch_name[], const char new_branch_name[])
 {
-  if (old_branch_name == NULL || strlen(old_branch_name) == 0)
+  if (is_blank_string(old_branch_name))
   {
     LOG_ERROR("Error: Old branch name cannot be empty.");
     return false;
   }
 
-  if (new_branch_name == NULL || strlen(new_branch_name) == 0)
+  if (is_blank_string(new_branch_name))
   {
     LOG_ERROR("Error: New branch name cannot be empty.");
     return false;

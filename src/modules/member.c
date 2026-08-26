@@ -103,7 +103,8 @@ int load_suspensions()
   char line[LINE_BUFFER_SIZE];
   while (suspension_count < MAX_SUSPENSION_RECORDS && read_line_from_file(file, line, LINE_BUFFER_SIZE))
   {
-    if (strlen(line) > 0 && parse_suspension_line(line, &suspension_records[suspension_count])) suspension_count++;
+    if (!is_blank_string(line) && parse_suspension_line(line, &suspension_records[suspension_count]))
+      suspension_count++;
   }
 
   fclose(file);
@@ -144,7 +145,7 @@ bool approve_gym_member(id_t member_id)
 
 bool suspend_gym_member(id_t member_id, const char reason[])
 {
-  if (reason == NULL || strlen(reason) == 0)
+  if (is_blank_string(reason))
   {
     LOG_ERROR("Error: Suspension reason cannot be empty.");
     return false;

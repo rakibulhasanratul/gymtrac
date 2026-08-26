@@ -2,21 +2,27 @@
 
 `Gymtrac` is a gym management system, a `group project` for `CSE115L` course of North South University. The project is developed using C following C11 standards. This is a complete `CLI only` project, with no GUI.
 
-### Warning: This Is A Demo Project
+## Disclaimer About Stupidity
+
+> This is a demo project, and it does not care about engineering!
 
 CSE115L is the very first major course a student takes in CSE, and this project exists purely to practice the concepts taught in class. It does not aim for prod-grade code; deliberately stupid but working solutions beat heavily engineered ones here.
 
-### Disclaimer About Hashing Function
+> Password hashing here stops a curious classmate, not an attacker with a GPU.
 
 This project uses a polynomial hash function (similar to Java's `String.hashCode()`) for password storage. This is **not** a cryptographically secure hash and should **never** be used in production. It is used here due to CSE115L project constraints that prohibit dynamic memory allocation, bitwise operations, and proper hashing libraries (e.g., SHA-256, bcrypt).
 
-### About Random Number Generator
+> The PRNG is xoshiro128**, great for dice rolls, useless against attackers.
 
 This project uses the [xoshiro128**](https://prng.di.unimi.it/xoshiro128starstar.c) pseudorandom number generator by David Blackman and Sebastiano Vigna for random number generation. This is **not** a cryptographically secure PRNG and should **never** be used in production. It is used here as a higher-quality alternative to the standard library `rand()` function. The implementation avoids bitwise operators by achieving equivalent computational results through arithmetic operations. Reference: <https://prng.di.unimi.it/>
 
-### Why Record Counts Are Capped By `MAX_*_RECORDS` Macros
+> No malloc, no database, just fixed arrays with ceilings written in settings.h.
 
 Dynamic memory allocation (`malloc`/`realloc`/`free`) is prohibited in this project, so every record table lives in a static fixed-size array whose size must be decided at compile time. The `MAX_*_RECORDS` macros in `settings.h` provide those sizes: derived caps like `MAX_GYM_MEMBERS` bound the user tables, and event-table caps like `MAX_SUSPENSION_RECORDS` or `MAX_PAYMENT_RECORDS` bound records that accumulate over a member's lifetime. When a table reaches its cap, creating further records is rejected instead of silently dropped.
+
+> split() (string_util.c:34) knows one buffer width. Hand it another and the compiler yells at you.
+
+`split()` (string_util.c:34) takes its output as `char parts[][FIELD_BUFFER_SIZE]`, not the more flexible `char *parts[]`. This is deliberate. The field width is controlled centrally through the `FIELD_BUFFER_SIZE` macro in `settings.h`, and because dynamic memory allocation is prohibited, every caller already declares fixed `parts[][FIELD_BUFFER_SIZE]` arrays anyway. Passing the real 2D array directly removes the pointer-map boilerplate callers previously needed, and the compiler now rejects any buffer whose row width differs from `FIELD_BUFFER_SIZE` instead of letting a caller misreport capacities and overflow rows silently. The trade-off: `split()` can only split into buffers of that one width, so it cannot be reused for arbitrary-sized field buffers.
 
 ## Project Brief
 
@@ -38,7 +44,7 @@ Dynamic memory allocation (`malloc`/`realloc`/`free`) is prohibited in this proj
   - Members request plan changes (`subscription_plan_change_request_t`) and profile edits (`profile_edit_request_t`); branch staff approve or reject them.
   - Every suspension has a mandatory `reason`, stored in a dedicated suspension record with its date (and an optional unsuspension date).
 - Deletion rules:
-  - A branch can only be deleted when no staff or member is assigned to it (`ensure_branch_has_no_users()`).
+  - A branch can only be deleted when no staff or member is assigned to it (`ensure_branch_has_no_users()` (branch.c:92)).
   - Branch staff and gym members can be deleted; a member with outstanding dues is protected and the system administrator account has no delete path.
 - Access control:
   - Members see only their own data.
@@ -70,7 +76,7 @@ Work tracked per item; commit each with a Conventional Commit message (`feat:`, 
 - [x] Auth module (`src/modules/auth.[ch]`): `hash_password` (generate salt, mix, hash, store salt+hash string) and `verify_password` (extract salt, re-hash, compare). Builds on hash utility for credential storage. - `feat:`
 - [x] Unit tests for hash utility: known polynomial hash vectors, salt generation length and character set, `mix_salt` sandwich output, `hash_value_to_string` / `parse_hash_value` round-trip, `compare_hash` equality - `test:`
 - [x] Unit tests for auth module: `hash_password` produces valid stored format, `verify_password` accepts correct and rejects wrong passwords - `test:`
-- [x] Date helpers built on a custom `datetime_t` (year/month/day/hour/minute/second ints) that converts to and from epoch seconds with loop-based calendar math, no `localtime_r`/`localtime_s`, plus `add_months()` handling month-end, `add_days()`, formatting/parsing `yyyy-mm-dd hh:mm:ss` - `feat:`
+- [x] Date helpers built on a custom `datetime_t` (year/month/day/hour/minute/second ints) that converts to and from epoch seconds with loop-based calendar math, no `localtime_r`/`localtime_s`, plus `add_months()` (datetime_utils.c:161) handling month-end, `add_days()` (datetime_utils.c:155), formatting/parsing `yyyy-mm-dd hh:mm:ss` - `feat:`
 - [x] Unit tests covering date round-trips, leap years, and month-end arithmetic - `test:`
 - [x] Derive `FIELD_DELIMITER` from a `FIELD_DELIMITER_STRING` literal so record format strings concatenate the shared macro instead of hardcoding the delimiter byte, with a one-character startup check in `main` - `chore:`
 
@@ -79,8 +85,8 @@ Work tracked per item; commit each with a Conventional Commit message (`feat:`, 
 - [x] Add `DATA_DIRECTORY` macro and per-file `*_FILE_PATH` macros in `settings.h` so every module resolves data files through one shared path convention - `feat:`
 - [x] Branch module that loads/lists branch names and validates existence before anyone is assigned, so users can never attach to a nonexistent branch - `feat:`
 - [x] Unit tests covering branch listing and existence validation - `test:`
-- [x] User module that creates/fetches each role with auto-incremented ids, enforces globally unique usernames across all roles, and enforces per-branch capacity limits via `branch_manager_count()`, `branch_trainer_count()`, `branch_member_count()` - `feat:`
-- [x] Branch deletion guarded by `ensure_branch_has_no_users()`, so a branch with assigned staff or members can never be removed - `feat:`
+- [x] User module that creates/fetches each role with auto-incremented ids, enforces globally unique usernames across all roles, and enforces per-branch capacity limits via `branch_manager_count()` (user.c:680), `branch_trainer_count()` (user.c:692), `branch_member_count()` (user.c:704) - `feat:`
+- [x] Branch deletion guarded by `ensure_branch_has_no_users()` (branch.c:92), so a branch with assigned staff or members can never be removed - `feat:`
 - [x] User deletion for branch staff and gym members; indebted members are blocked from deletion, and sysadmins have no delete path - `feat:`
 - [x] Unit tests covering both delete policies, memory+disk round-trips after deletion, and username reuse once a record is gone - `test:`
 - [x] Unit tests covering per-role CRUD, cross-role username uniqueness, and per-branch capacity enforcement - `test:`

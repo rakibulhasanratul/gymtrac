@@ -1,20 +1,22 @@
 # Gymtrac
 
-`Gymtrac` is a gym management system, a `group project` for the `CSE115L` course at North South University. Written in C against C11 standards, strictly CLI, no GUI. Expecting buttons? Wrong repo.
+`Gymtrac` is a gym management system, a `group project` for the `CSE115L` course at North South University. Expecting fancy engineering? Wrong repo. Written in C against C11 standards, strictly CLI, no GUI.
 
 ## Disclaimer about stupidity
 
-> This is a demo project, and it does not care about engineering!
+> This is a kind of demo project. So, it does not care about engineering!
 
-CSE115L is the very first major CSE course, so this project exists purely to practice the concepts taught in class. Don't expect prod-grade code. A deliberately stupid solution that works beats a heavily engineered one here.
+CSE115L is the very first major CSE course, the group project is to practice the concepts taught in class. Don't expect prod-grade code. A deliberately stupid solution that works beats a heavily engineered one here. If you're looking for a repo to learn from, your rocket engine falied in a very bad way that it make you land here.
 
 > Password hashing here stops a curious classmate, not an attacker with a GPU.
 
-Passwords run through a polynomial hash function (similar to Java's `String.hashCode()`). This is **not** a cryptographically secure hash. Do **not** put it anywhere near production. CSE115L constraints leave no choice: dynamic memory allocation, bitwise operations, and proper hashing libraries (SHA-256, bcrypt) are all banned. So this ships.
+Passwords run through a polynomial hash function (similar to Java's `String.hashCode()`). This is **not** a cryptographically secure hash. Do **not** put it anywhere near production. CSE115L constraints leave no choice: dynamic memory allocation, bitwise operations, and proper hashing libraries (SHA-256, bcrypt) are all banned. Why? Because those aren't covered in this F-ing course! So this ships.
 
 > The PRNG is xoshiro128**, great for dice rolls, useless against attackers.
 
-Random numbers come from the [xoshiro128**](https://prng.di.unimi.it/xoshiro128starstar.c) PRNG by David Blackman and Sebastiano Vigna. Not cryptographically secure, and it must stay out of production. It's a higher-quality stand-in for standard library `rand()`. The implementation dodges bitwise operators with equivalent arithmetic. Reference: <https://prng.di.unimi.it/>
+Random numbers come from the [xoshiro128**](https://prng.di.unimi.it/xoshiro128starstar.c) PRNG by David Blackman and Sebastiano Vigna. Not cryptographically secure, and it must stay out of production. It's a higher-quality stand-in for standard library `rand()`. The implementation dodges bitwise operators with equivalent arithmetic. Why this was implemented? Broh, we care enough about our grades.
+
+BTW, Reference for xoshiro128 if you care enough to learn it: <https://prng.di.unimi.it/>
 
 > No malloc, no database, just fixed arrays with ceilings written in settings.h.
 

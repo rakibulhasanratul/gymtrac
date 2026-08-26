@@ -126,8 +126,8 @@ typedef struct
 {
   id_t request_id;
   id_t gym_member_id;
-  id_t requested_by_staff_id;
-  id_t resolved_by_staff_id;
+  id_t requester_staff_id;
+  id_t resolver_staff_id;
   char reason[REASON_BUFFER_SIZE];
   membership_status_t new_membership_status;
   request_status_t status;
@@ -178,14 +178,15 @@ typedef struct
   datetime_t unsuspension_date;
 } suspension_record_t;
 
-// Lost or found item report, resolved by staff.
+// Lost or found item report, resolved by a manager or the system administrator.
 typedef struct
 {
   id_t id;
   char description[DESCRIPTION_BUFFER_SIZE];
-  char reported_by_username[USERNAME_BUFFER_SIZE];
+  char reporter_username[USERNAME_BUFFER_SIZE];
+  char gym_branch[BRANCH_NAME_BUFFER_SIZE];
   datetime_t reported_at;
-  id_t resolved_by_staff_id;
+  char resolver_username[USERNAME_BUFFER_SIZE];
 } lost_and_found_record_t;
 
 // Top-level role of a logged-in user.

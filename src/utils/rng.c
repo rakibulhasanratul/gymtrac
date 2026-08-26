@@ -46,7 +46,7 @@ static inline unsigned int rotate_left_32(unsigned int x, unsigned int k)
 }
 
 // Advances the xoshiro128** state by one step.
-static void xoshiro128_next(void)
+static inline void xoshiro128_next(void)
 {
   unsigned int t = state[1] * power_of_2_to_unsigned_int(9);
 

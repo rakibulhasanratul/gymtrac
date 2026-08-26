@@ -25,7 +25,7 @@ static int gym_member_count;
 static id_t next_gym_member_id;
 
 // Formats a sysadmin record as a delimiter-separated line.
-static void format_sysadmin_line(const sysadmin_t record_payload, char *line_destination)
+static inline void format_sysadmin_line(const sysadmin_t record_payload, char *line_destination)
 {
   snprintf(
     line_destination, LINE_BUFFER_SIZE, "%lu" SEP "%s" SEP "%s", (unsigned long)record_payload.id,
@@ -52,7 +52,7 @@ static bool persist_sysadmin(const sysadmin_t record_payload)
 }
 
 // Formats a branch staff record as a delimiter-separated line.
-static void format_branch_staff_line(const branch_staff_t record_payload, char *line_destination)
+static inline void format_branch_staff_line(const branch_staff_t record_payload, char *line_destination)
 {
   snprintf(
     line_destination, LINE_BUFFER_SIZE, "%lu" SEP "%s" SEP "%s" SEP "%s" SEP "%s" SEP "%s" SEP "%s" SEP "%lld" SEP "%d",
@@ -63,7 +63,7 @@ static void format_branch_staff_line(const branch_staff_t record_payload, char *
 }
 
 // Formats a gym member record as a delimiter-separated line.
-static void format_gym_member_line(const gym_member_t record_payload, char *line_destination)
+static inline void format_gym_member_line(const gym_member_t record_payload, char *line_destination)
 {
   snprintf(
     line_destination, LINE_BUFFER_SIZE,
@@ -114,7 +114,7 @@ static bool persist_gym_member(const gym_member_t record_payload)
 }
 
 // Removes the branch staff record at index from memory by shifting later records left.
-static void remove_branch_staff_at(int index)
+static inline void remove_branch_staff_at(int index)
 {
   for (int i = index; i < branch_staff_count - 1; i++) branch_staffs[i] = branch_staffs[i + 1];
 
@@ -122,7 +122,7 @@ static void remove_branch_staff_at(int index)
 }
 
 // Removes the gym member record at index from memory by shifting later records left.
-static void remove_gym_member_at(int index)
+static inline void remove_gym_member_at(int index)
 {
   for (int i = index; i < gym_member_count - 1; i++) gym_members[i] = gym_members[i + 1];
 
@@ -251,14 +251,14 @@ static bool rewrite_all_gym_members_to_file()
 
 // Splits a pipe-delimited record line into field buffers and returns the
 // field count.
-static int split_record_line(const char line[], char parts_destination[][FIELD_BUFFER_SIZE])
+static inline int split_record_line(const char line[], char parts_destination[][FIELD_BUFFER_SIZE])
 {
   return split(line, FIELD_DELIMITER, parts_destination, MAX_RECORD_FIELDS);
 }
 
 // Parses a pipe-delimited line into a sysadmin record.
 // Returns true on success, false if the field count is wrong.
-static bool parse_sysadmin_line(const char line[], sysadmin_t *destination)
+static inline bool parse_sysadmin_line(const char line[], sysadmin_t *destination)
 {
   char parts[MAX_RECORD_FIELDS][FIELD_BUFFER_SIZE];
   int count = split_record_line(line, parts);
@@ -272,7 +272,7 @@ static bool parse_sysadmin_line(const char line[], sysadmin_t *destination)
 
 // Parses a pipe-delimited line into a branch staff record.
 // Returns true on success, false if the field count is wrong.
-static bool parse_branch_staff_line(const char line[], branch_staff_t *destination)
+static inline bool parse_branch_staff_line(const char line[], branch_staff_t *destination)
 {
   char parts[MAX_RECORD_FIELDS][FIELD_BUFFER_SIZE];
   int count = split_record_line(line, parts);
@@ -292,7 +292,7 @@ static bool parse_branch_staff_line(const char line[], branch_staff_t *destinati
 
 // Parses a pipe-delimited line into a gym member record.
 // Returns true on success, false if the field count is wrong.
-static bool parse_gym_member_line(const char line[], gym_member_t *destination)
+static inline bool parse_gym_member_line(const char line[], gym_member_t *destination)
 {
   char parts[MAX_RECORD_FIELDS][FIELD_BUFFER_SIZE];
   int count = split_record_line(line, parts);

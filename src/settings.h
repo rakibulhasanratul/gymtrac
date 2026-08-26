@@ -61,12 +61,15 @@
 #define DEFAULT_SYSADMIN_USERNAME "admin"
 #define DEFAULT_SYSADMIN_PASSWORD "admin123"
 
-// Error logging macro. Prints to stderr with source location.
-// do-while(0) keeps it a single statement inside if/else blocks.
-#define LOG_ERROR(msg, ...)                                                                                            \
+// The initial attempt was to wrap fprintf. But later on, discovered this on google search AI result, of course for the
+// same search. It uses compiler built-ins __FILE__, __LINE__, and __VA_ARGS__ to print <file>:<line> + the message to
+// stderr buffer (defined in stdio.h). I am printing file and line number just to debug things.
+#define LOG_ERROR(...)                                                                                                 \
   do                                                                                                                   \
   {                                                                                                                    \
-    fprintf(stderr, "%s:%d: " msg "\n", __FILE__, __LINE__, ##__VA_ARGS__);                                            \
+    fprintf(stderr, "%s:%d: ", __FILE__, __LINE__);                                                                    \
+    fprintf(stderr, __VA_ARGS__);                                                                                      \
+    fprintf(stderr, "\n");                                                                                             \
   } while (0)
 
 #endif

@@ -18,7 +18,7 @@ static int lost_and_found_count;
 static id_t next_lost_and_found_id;
 
 // Formats a lost and found record as a delimiter-separated line.
-static void format_lost_and_found_line(const lost_and_found_record_t record_payload, char *line_destination)
+static inline void format_lost_and_found_line(const lost_and_found_record_t record_payload, char *line_destination)
 {
   snprintf(
     line_destination, LINE_BUFFER_SIZE, "%lu" SEP "%s" SEP "%s" SEP "%s" SEP "%lld" SEP "%s",
@@ -29,7 +29,7 @@ static void format_lost_and_found_line(const lost_and_found_record_t record_payl
 
 // Parses a pipe-delimited line into a lost and found record.
 // Returns true on success, false if the field count is wrong.
-static bool parse_lost_and_found_line(const char line[], lost_and_found_record_t *destination)
+static inline bool parse_lost_and_found_line(const char line[], lost_and_found_record_t *destination)
 {
   char parts[MAX_RECORD_FIELDS][FIELD_BUFFER_SIZE];
 
@@ -90,7 +90,7 @@ static bool rewrite_all_lost_and_found_to_file()
 }
 
 // Policy guard: the resolver must be a branch manager or the system administrator.
-static bool ensure_resolver_can_resolve(const char resolver_username[])
+static inline bool ensure_resolver_can_resolve(const char resolver_username[])
 {
   sysadmin_t sysadmin;
   if (get_sysadmin_by_username(resolver_username, &sysadmin)) return true;

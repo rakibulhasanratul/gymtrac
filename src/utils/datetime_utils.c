@@ -17,7 +17,7 @@
 static const int DAYS_IN_MONTH[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
 // Returns whether the given year is a leap year.
-static bool is_leap_year(int year)
+static inline bool is_leap_year(int year)
 {
   if (year % 400 == 0) return true;
   if (year % 100 == 0) return false;
@@ -26,14 +26,14 @@ static bool is_leap_year(int year)
 }
 
 // Returns the number of days in the given month (1-indexed).
-static int days_in_month(int year, int month)
+static inline int days_in_month(int year, int month)
 {
   if (month == 2 && is_leap_year(year)) return 29;
   return DAYS_IN_MONTH[month - 1];
 }
 
 // Returns the number of days in the given year.
-static int days_in_year(int year)
+static inline int days_in_year(int year)
 {
   if (is_leap_year(year)) return 366;
   return 365;

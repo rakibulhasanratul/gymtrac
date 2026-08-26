@@ -18,7 +18,7 @@ static int payment_count;
 static id_t next_payment_id;
 
 // Formats a payment as a delimiter-separated line.
-static void format_payment_line(const payment_t record_payload, char *line_destination)
+static inline void format_payment_line(const payment_t record_payload, char *line_destination)
 {
   snprintf(
     line_destination, LINE_BUFFER_SIZE, "%lu" SEP "%lu" SEP "%u" SEP "%lld" SEP "%d" SEP "%s" SEP "%d",
@@ -30,7 +30,7 @@ static void format_payment_line(const payment_t record_payload, char *line_desti
 
 // Parses a pipe-delimited line into a payment.
 // Returns true on success, false if the field count is wrong.
-static bool parse_payment_line(const char line[], payment_t *destination)
+static inline bool parse_payment_line(const char line[], payment_t *destination)
 {
   char parts[MAX_RECORD_FIELDS][FIELD_BUFFER_SIZE];
 
@@ -70,7 +70,7 @@ static bool persist_payment(const payment_t record_payload)
 // Active members settle running dues; suspended members clear dues blocking
 // reactivation. On-hold members have no billing cycle yet; cancelled ones
 // accept no money.
-static bool ensure_member_can_pay(id_t gym_member_id)
+static inline bool ensure_member_can_pay(id_t gym_member_id)
 {
   gym_member_t member;
   if (!get_gym_member_by_id(gym_member_id, &member)) return false;

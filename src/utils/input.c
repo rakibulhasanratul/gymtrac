@@ -4,7 +4,7 @@
 #include "input.h"
 
 // Discards every character up to the end of the current input line.
-static void discard_remaining_input()
+static inline void discard_remaining_input()
 {
   int ch;
   while ((ch = getchar()) != '\n' && ch != EOF);

@@ -19,7 +19,7 @@ static int suspension_count;
 static id_t next_suspension_id;
 
 // Formats a suspension record as a delimiter-separated line.
-static void format_suspension_line(const suspension_record_t record_payload, char *line_destination)
+static inline void format_suspension_line(const suspension_record_t record_payload, char *line_destination)
 {
   snprintf(
     line_destination, LINE_BUFFER_SIZE, "%lu" SEP "%lu" SEP "%s" SEP "%lld" SEP "%lld",
@@ -74,7 +74,7 @@ static bool rewrite_all_suspension_to_file()
 
 // Parses a pipe-delimited line into a suspension record.
 // Returns true on success, false if the field count is wrong.
-static bool parse_suspension_line(const char line[], suspension_record_t *destination)
+static inline bool parse_suspension_line(const char line[], suspension_record_t *destination)
 {
   char parts[MAX_RECORD_FIELDS][FIELD_BUFFER_SIZE];
 

@@ -64,7 +64,7 @@ int split(const char text[], char delimiter, char parts[][FIELD_BUFFER_SIZE], in
 
 unsigned int string_to_unsigned_int(const char text[])
 {
-  if (text == NULL || text[0] == '\0') return 0;
+  if (text == NULL || strlen(text) == 0) return 0;
 
   unsigned int accumulated = 0;
   for (int i = 0; text[i] != '\0'; i++)
@@ -82,7 +82,7 @@ unsigned int string_to_unsigned_int(const char text[])
 
 unsigned long int string_to_unsigned_long_int(const char text[])
 {
-  if (text == NULL || text[0] == '\0') return 0;
+  if (text == NULL || strlen(text) == 0) return 0;
 
   unsigned long int accumulated = 0;
   for (int i = 0; text[i] != '\0'; i++)

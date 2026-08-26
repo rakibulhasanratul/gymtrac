@@ -145,7 +145,7 @@ bool record_digital_payment(const digital_payment_request_t request_payload)
     return false;
   }
 
-  if (request_payload.transaction_id[0] == '\0')
+  if (strlen(request_payload.transaction_id) == 0)
   {
     LOG_ERROR("Error: Digital payment requires a transaction id.");
     return false;

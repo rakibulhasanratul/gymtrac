@@ -22,9 +22,9 @@ BTW, Reference for xoshiro128 if you care enough to learn it: <https://prng.di.u
 
 Dynamic memory allocation (`malloc`/`realloc`/`free`) is prohibited. No exceptions. Every record table lives in a static fixed-size array sized at compile time. The `MAX_*_RECORDS` macros in `settings.h` set those sizes: derived caps like `MAX_GYM_MEMBERS` bound the user tables, and event-table caps like `MAX_SUSPENSION_RECORDS` or `MAX_PAYMENT_RECORDS` bound records that accumulate over a member's lifetime. A table at its cap rejects new records outright. Nothing gets silently dropped.
 
-> split() (string_util.c:34) knows one buffer width. Hand it another and the compiler yells at you.
+> split() (string_util.c:34) knows one buffer width. Don't blame me if the compiler yells at you.
 
-`split()` (string_util.c:34) takes its output as `char parts[][FIELD_BUFFER_SIZE]`, not the looser `char *parts[]`. That's deliberate. The `FIELD_BUFFER_SIZE` macro in `settings.h` controls the field width, and since dynamic allocation is off the table anyway, every caller already declares fixed `parts[][FIELD_BUFFER_SIZE]` arrays. Handing over the real 2D array kills the pointer-map boilerplate callers used to need. It also makes the compiler yell at any buffer whose row width differs from `FIELD_BUFFER_SIZE`, instead of letting a caller misreport capacities and overflow rows silently. Trade-off: `split()` only splits into buffers of that one width, so don't reach for it with arbitrary-sized field buffers.
+`split()` (string_util.c:34) takes its output destination as `char parts[][FIELD_BUFFER_SIZE]`, not the looser `char *parts[]`. That's deliberate. The `FIELD_BUFFER_SIZE` macro in `settings.h` controls the field width, and since dynamic allocation is off the table anyway, every caller already declares fixed `parts[][FIELD_BUFFER_SIZE]` buffers. Handing over the real 2D array kills the pointer-map boilerplate callers used to need. It also makes the compiler yell at any buffer whose row width differs from `FIELD_BUFFER_SIZE`, instead of letting a caller misreport capacities and overflow rows silently. Trade-off: `split()` only splits into buffers of that one width, so don't reach for it with arbitrary-sized field buffers.
 
 ## Project brief
 

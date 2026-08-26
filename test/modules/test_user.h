@@ -73,5 +73,6 @@ void test_update_gym_member_rejects_unknown_id();
 void test_update_gym_member_rejects_empty_fields();
 void test_update_gym_member_rejects_duplicate_username();
 void test_update_gym_member_allows_same_username();
+void test_update_gym_member_billing_clamps_and_persists();
 
 #endif

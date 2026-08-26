@@ -1,0 +1,14 @@
+#ifndef GYMTRAC_TEST_PAYMENT_H
+#define GYMTRAC_TEST_PAYMENT_H
+
+void cleanup_payment_files();
+
+void test_record_digital_completed_payment_settles_account();
+void test_record_partial_digital_payment_reduces_due_by_paid_amount();
+void test_record_cash_payment_settles_account();
+void test_payment_clamps_overpayment_to_zero_due();
+void test_non_completed_digital_payment_records_history_without_settling();
+void test_payment_rejects_invalid_members_amounts_and_details();
+void test_get_payments_for_member_handles_history_and_capacity();
+
+#endif

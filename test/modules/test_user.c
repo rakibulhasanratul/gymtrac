@@ -742,3 +742,70 @@ void test_update_gym_member_allows_same_username()
   assert(strcmp(found.username, "keeper") == 0);
   assert(strcmp(found.full_name, "New Name") == 0);
 }
+
+// ---- update: billing ----
+
+/**
+ * Helper: builds a datetime from explicit calendar components.
+ */
+static datetime_t make_datetime(int year, int month, int day, int hour, int minute, int second)
+{
+  datetime_t result;
+  result.year = year;
+  result.month = month;
+  result.day = day;
+  result.hour = hour;
+  result.minute = minute;
+  result.second = second;
+  return result;
+}
+
+/**
+ * Verifies the billing setter reduces dues by exactly the paid amount,
+ * clamps overpayments at zero, stamps last_payment_date with the payment
+ * date, leaves plan and status untouched, and persists across reloads.
+ */
+void test_update_gym_member_billing_clamps_and_persists()
+{
+  cleanup_user_files();
+  load_sysadmins();
+  load_branch_staff();
+  load_gym_members();
+
+  subscription_plan_t plan;
+  plan.payable_amount = 1000;
+  plan.interval_days = 30;
+
+  id_t id = create_gym_member("Name", "e@t.com", "0171111111", "B1", "billme", "h1", plan, MEMBERSHIP_ACTIVE);
+  assert(id != 0);
+
+  // Seed dues through the lifecycle setter so the member owes 700 Taka.
+  datetime_t cycle_start = make_datetime(2026, 1, 1, 0, 0, 0);
+  assert(update_gym_member_lifecycle(id, plan, cycle_start, 700, MEMBERSHIP_ACTIVE) == true);
+
+  // A partial payment reduces dues by exactly the paid amount.
+  datetime_t paid_at = make_datetime(2026, 2, 15, 18, 30, 0);
+  assert(update_gym_member_billing(id, paid_at, 500) == true);
+
+  gym_member_t found;
+  assert(get_gym_member_by_id(id, &found) == true);
+  assert(found.due_amount == 200);
+  assert(compare_datetime(found.last_payment_date, paid_at) == 0);
+  // Plan and membership status stay untouched by billing.
+  assert(found.plan.payable_amount == 1000);
+  assert(found.status == MEMBERSHIP_ACTIVE);
+
+  // An overpayment clamps at zero instead of wrapping below it.
+  assert(update_gym_member_billing(id, paid_at, 999) == true);
+  assert(get_gym_member_by_id(id, &found) == true);
+  assert(found.due_amount == 0);
+
+  // Reload and confirm the billed state persisted to disk.
+  load_gym_members();
+  assert(get_gym_member_by_id(id, &found) == true);
+  assert(found.due_amount == 0);
+  assert(compare_datetime(found.last_payment_date, paid_at) == 0);
+
+  // Unknown ids are rejected.
+  assert(update_gym_member_billing(9999, paid_at, 100) == false);
+}

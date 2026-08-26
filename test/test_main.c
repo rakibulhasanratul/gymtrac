@@ -6,6 +6,7 @@
 #include "modules/test_auth.h"
 #include "modules/test_branch.h"
 #include "modules/test_member.h"
+#include "modules/test_payment.h"
 #include "modules/test_session.h"
 #include "modules/test_user.h"
 #include "utils/test_datetime_utils.h"
@@ -23,6 +24,7 @@ int main()
   cleanup_branches_file();
   cleanup_user_files();
   cleanup_member_files();
+  cleanup_payment_files();
 
   /* string_util */
   test_trim_strips_whitespace();
@@ -200,6 +202,7 @@ int main()
   test_update_gym_member_rejects_empty_fields();
   test_update_gym_member_rejects_duplicate_username();
   test_update_gym_member_allows_same_username();
+  test_update_gym_member_billing_clamps_and_persists();
 
   /* session */
   test_session_init_is_inactive();
@@ -237,6 +240,19 @@ int main()
 
   /* member: suspension history getter */
   test_get_suspensions_for_member_handles_history_and_capacity();
+
+  /* payment: digital */
+  test_record_digital_completed_payment_settles_account();
+  test_record_partial_digital_payment_reduces_due_by_paid_amount();
+
+  /* payment: cash */
+  test_record_cash_payment_settles_account();
+  test_payment_clamps_overpayment_to_zero_due();
+
+  /* payment: status handling, rejections, history */
+  test_non_completed_digital_payment_records_history_without_settling();
+  test_payment_rejects_invalid_members_amounts_and_details();
+  test_get_payments_for_member_handles_history_and_capacity();
 
   printf("\n\nAll tests passed.\n\n");
   return 0;

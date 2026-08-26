@@ -962,6 +962,41 @@ bool update_gym_member_status(id_t id, membership_status_t status)
   return true;
 }
 
+bool update_gym_member_billing(id_t id, const datetime_t last_payment_date_payload, unsigned int paid_amount)
+{
+  int index = -1;
+  for (int i = 0; i < gym_member_count; i++)
+  {
+    if (gym_members[i].id == id)
+    {
+      index = i;
+      break;
+    }
+  }
+
+  if (index < 0)
+  {
+    LOG_ERROR("Error: No gym member found with id %lu.", (unsigned long)id);
+    return false;
+  }
+
+  gym_members[index].last_payment_date = last_payment_date_payload;
+
+  // Dues never go negative; overpayments clamp at zero.
+  if (gym_members[index].due_amount > paid_amount)
+    gym_members[index].due_amount -= paid_amount;
+  else
+    gym_members[index].due_amount = 0;
+
+  if (!rewrite_all_gym_members_to_file())
+  {
+    LOG_ERROR("Error: Failed to persist gym member billing update.");
+    return false;
+  }
+
+  return true;
+}
+
 bool update_gym_member_lifecycle(
   id_t id,
   subscription_plan_t plan_payload,

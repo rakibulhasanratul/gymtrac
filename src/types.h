@@ -93,23 +93,17 @@ typedef unsigned char payment_status_t;
 #define PAYMENT_FAILED 2
 #define PAYMENT_INVALID 3
 
-// Payment details shared by cash and digital payments.
+// Payment made by a gym member; every payment belongs to exactly one member.
 typedef struct
 {
   id_t id;
+  id_t gym_member_id;
   unsigned int amount;
   datetime_t transaction_time;
   transaction_t transaction_type;
   char transaction_id[TRX_ID_BUFFER_SIZE];
   payment_status_t status;
 } payment_t;
-
-// Join record linking a gym member to a payment.
-typedef struct
-{
-  id_t gym_member_id;
-  id_t payment_id;
-} payment_record_t;
 
 // Arguments carried to record a digital payment.
 typedef struct

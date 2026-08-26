@@ -282,6 +282,20 @@ bool update_gym_member(
 bool update_gym_member_status(id_t id, membership_status_t status);
 
 /**
+ * Updates a gym member's billing state after a payment and persists the change.
+ *
+ * Moves last_payment_date to the payment date and reduces due_amount by the
+ * paid amount, clamped at zero so overpayments never wrap below it. Plan and
+ * membership status stay untouched; the record is looked up by id.
+ *
+ * @param id the member's id
+ * @param last_payment_date_payload the datetime the payment was made
+ * @param paid_amount the settled amount in whole Taka
+ * @return true if the record was found and updated, false otherwise
+ */
+bool update_gym_member_billing(id_t id, const datetime_t last_payment_date_payload, unsigned int paid_amount);
+
+/**
  * Updates a gym member's lifecycle fields and persists the change.
  *
  * Covers the plan, billing date, dues, and membership status in one write,

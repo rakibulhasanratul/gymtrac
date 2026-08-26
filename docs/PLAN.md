@@ -76,24 +76,22 @@ Branch managers and trainers share one table (`branch_staff_t`), so a single sta
 
 | Table | Fields |
 |---|---|
-| `payment_t` | `id`, `amount`, `transaction_time`, `transaction_type`, `transaction_id`, `status` |
-| `payment_record_t` | `gym_member_id`, `payment_id` |
+| `payment_t` | `id`, `gym_member_id`, `amount`, `transaction_time`, `transaction_type`, `transaction_id`, `status` |
 | `suspension_record_t` | `id`, `gym_member_id`, `reason`, `suspension_date`, `unsuspension_date` |
 | `lost_and_found_record_t` | `id`, `description`, `reported_by_username`, `reported_at`, `resolved_by_staff_id` |
 
-- `payment_t`: transaction history. `transaction_type` is `CASH_TRANSACTION` / `DIGITAL_TRANSACTION`; `status` (`payment_status_t`) is `PAYMENT_PENDING`, `PAYMENT_COMPLETED`, `PAYMENT_FAILED`, `PAYMENT_INVALID`. Cash payments are recorded as `PAYMENT_COMPLETED` by a trainer on handover; digital payments are recorded by the member and carry the status the gateway reports. Only `PAYMENT_COMPLETED` payments affect the member's account. `transaction_id` is the external reference.
-- `payment_record_t`: join table linking a member to their payments (a member can have many payments; a payment belongs to exactly one member).
+- `payment_t`: transaction history. Every payment belongs to exactly one gym member, carried by `gym_member_id` on the record itself, so a standalone unowned payment cannot exist. `transaction_type` is `CASH_TRANSACTION` / `DIGITAL_TRANSACTION`; `status` (`payment_status_t`) is `PAYMENT_PENDING`, `PAYMENT_COMPLETED`, `PAYMENT_FAILED`, `PAYMENT_INVALID`. Cash payments are recorded as `PAYMENT_COMPLETED` by a trainer on handover; digital payments are recorded by the member and carry the status the gateway reports. Only `PAYMENT_COMPLETED` payments affect the member's account. `transaction_id` is the external reference.
 - `suspension_record_t`: one record per suspension event. `unsuspension_date` is nullable (`0` means still suspended).
 - `lost_and_found_record_t`: `resolved_by_staff_id` is nullable (`0` means open). Resolution is signaled by a non-zero staff id, so no separate status/type/title fields are needed.
 
 ### Carriers and view models (not persisted)
 
-- `digital_payment_request_t` (`request_id`, `gym_member_id`, `amount`, `transaction_time`, `transaction_id`, `status`): a function-argument carrier used when a member records a digital payment; a `payment_t` + `payment_record_t` are persisted from it. It is not a stored approval flow.
+- `digital_payment_request_t` (`request_id`, `gym_member_id`, `amount`, `transaction_time`, `transaction_id`, `status`): a function-argument carrier used when a member records a digital payment; a `payment_t` is persisted from it. It is not a stored approval flow.
 - `gym_member_profile_t` (`id`, `full_name`, `email`, `phone_number`, `gym_branch`, `username`, `joined_at`, `plan`): a read-only projection of a member's profile (no credentials, dues, or status), used when viewing a profile.
 
 ### Data files
 
-`data/branches.txt`, `data/sysadmins.dat`, `data/branch_staff.dat`, `data/gym_members.dat`, `data/payments.dat`, `data/payment_records.dat`, `data/membership_status_change_requests.dat`, `data/subscription_plan_change_requests.dat`, `data/profile_edit_requests.dat`, `data/suspensions.dat`, `data/lost_and_found.dat`.
+`data/branches.txt`, `data/sysadmins.dat`, `data/branch_staff.dat`, `data/gym_members.dat`, `data/payments.dat`, `data/membership_status_change_requests.dat`, `data/subscription_plan_change_requests.dat`, `data/profile_edit_requests.dat`, `data/suspensions.dat`, `data/lost_and_found.dat`.
 
 ## Rules & Flows
 

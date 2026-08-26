@@ -34,6 +34,7 @@
 #define MAX_TRAINERS (BRANCH_COUNT_MAX * MAX_TRAINERS_PER_BRANCH)
 #define MAX_GYM_MEMBERS (BRANCH_COUNT_MAX * MAX_MEMBERS_PER_BRANCH)
 #define MAX_SUSPENSION_RECORDS (MAX_GYM_MEMBERS * 2) // a member may be suspended more than once
+#define MAX_PAYMENT_RECORDS (MAX_GYM_MEMBERS * 4)    // a member pays once per interval, many times over
 
 // Member economics: default plan assigned on approval and dues grace period.
 #define DEFAULT_PLAN_AMOUNT 1000      // default plan payable amount in whole Taka
@@ -53,6 +54,7 @@
 #define BRANCH_STAFF_FILE_PATH DATA_DIRECTORY "/branch_staff.dat"
 #define GYM_MEMBERS_FILE_PATH DATA_DIRECTORY "/gym_members.dat"
 #define SUSPENSIONS_FILE_PATH DATA_DIRECTORY "/suspensions.dat"
+#define PAYMENTS_FILE_PATH DATA_DIRECTORY "/payments.dat"
 #define MAX_RECORD_FIELDS 14 // maximum number of fields in any pipe-delimited record
 
 // Credentials for the sysadmin account seeded on first run.

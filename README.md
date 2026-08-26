@@ -1,4 +1,4 @@
-#Gymtrac
+# Gymtrac
 
 `Gymtrac` is a gym management system, a `group project` for the `CSE115L` course at North South University. Expecting fancy engineering? Wrong repo. Written in C against C11 standards, strictly CLI, no GUI.
 
@@ -28,7 +28,7 @@ Dynamic memory allocation (`malloc`/`realloc`/`free`) is prohibited. No exceptio
 
 > `static inline` saves a call, not the world.
 
-Helper functions that are tiny, pure, and called a lot live as `static inline` in their own `.c` file. Think `is_leap_year()` (datetime_utils.c:20), `days_in_month()` (datetime_utils.c:29), `days_in_year()` (datetime_utils.c:36), `discard_remaining_input()` (input.c:7), `xoshiro128_next()` (rng.c:49), `split_record_line()` (user.c:254), the `format_*_line()` / `parse_*_line()` family, `remove_*_at()` (user.c:117), `ensure_member_can_pay()` (payment.c:73), and `ensure_resolver_can_resolve()` (lost_found.c:93). The compiler can fold them away when it wants; when it does not, nothing breaks. Anything that touches `FILE *` — `persist_*()` and `rewrite_all_*_to_file()` — stays plain `static` because inlining I/O just bloats the binary for zero gain. No `inline` in headers, no cross-translation-unit trickery, no `extern inline` nonsense. It is a hint, not a promise, and deliberately boring.
+Small helpers are `static inline` in their own `.c` file. We're not paying for calling small and plain static helper functions if it isn't inlined. Although static inline saves a call, not your broken rocket engine.
 
 ## Project brief
 

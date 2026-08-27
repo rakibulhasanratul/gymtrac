@@ -39,11 +39,11 @@ datetime_t datetime_from_seconds(long long seconds_since_epoch);
  * Fails when the buffer is smaller than DATETIME_BUFFER_SIZE.
  *
  * @param datetime_payload the datetime to format
- * @param buffer_destination receives the formatted string
- * @param destination_capacity the number of characters the buffer holds
+ * @param destination receives the formatted string
+ * @param destination_capacity the number of characters destination can hold
  * @return true when the string was written, false otherwise
  */
-bool format_datetime(const datetime_t datetime_payload, char *buffer_destination, int destination_capacity);
+bool format_datetime(const datetime_t datetime_payload, char *destination, int destination_capacity);
 
 /**
  * Parses a "yyyy-mm-dd hh:mm:ss" string into a datetime.
@@ -53,10 +53,10 @@ bool format_datetime(const datetime_t datetime_payload, char *buffer_destination
  * bounds) and a year not before the epoch year.
  *
  * @param datetime_text the string to parse
- * @param datetime_destination receives the parsed datetime
+ * @param destination receives the parsed datetime
  * @return true on success, false on invalid input
  */
-bool parse_datetime(const char datetime_text[], datetime_t *datetime_destination);
+bool parse_datetime(const char datetime_text[], datetime_t *destination);
 
 /**
  * Adds days to a datetime, keeping hour, minute, and second unchanged.

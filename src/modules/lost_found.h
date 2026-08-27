@@ -50,52 +50,49 @@ bool report_lost_item(const char reporter_username[], const char gym_branch[], c
 bool resolve_lost_item(id_t record_id, const char resolver_username[]);
 
 /**
- * Copies every report belonging to the given branch into destination_records.
+ * Copies every report belonging to the given branch into destination.
  *
  * A report belongs to the branch stored on the record at report time. Records
  * come back in the order they were reported, oldest first, open and resolved
  * alike. At most destination_capacity records are copied.
  *
  * @param branch_name the branch whose reports to fetch
- * @param destination_records receives one lost_and_found_record_t per match
- * @param destination_capacity the number of slots available in
- *                             destination_records
+ * @param destination receives one lost_and_found_record_t per match
+ * @param destination_capacity the number of slots available in destination
  * @return the number of records copied, 0 when the branch has none
  */
 int get_lost_and_found_for_branch(
-  const char branch_name[], lost_and_found_record_t destination_records[], int destination_capacity
+  const char branch_name[], lost_and_found_record_t *destination, int destination_capacity
 );
 
 /**
- * Copies every report submitted by the given user into destination_records.
+ * Copies every report submitted by the given user into destination.
  *
  * Records come back in the order they were reported, oldest first. At most
  * destination_capacity records are copied.
  *
  * @param reporter_username the reporting user's username
- * @param destination_records receives one lost_and_found_record_t per match
- * @param destination_capacity the number of slots available in
- *                             destination_records
+ * @param destination receives one lost_and_found_record_t per match
+ * @param destination_capacity the number of slots available in destination
  * @return the number of records copied, 0 when the user reported nothing
  */
 int get_lost_and_found_for_reporter(
-  const char reporter_username[], lost_and_found_record_t destination_records[], int destination_capacity
+  const char reporter_username[], lost_and_found_record_t *destination, int destination_capacity
 );
 
 /**
- * Copies every record resolved by the given user into destination_records.
+ * Copies every record resolved by the given user into destination.
  *
  * Records come back in the order they were reported, oldest first. At most
  * destination_capacity records are copied.
  *
  * @param resolver_username the resolver's username
- * @param destination_records receives one lost_and_found_record_t per match
- * @param destination_capacity the number of slots available in
- *                             destination_records
+ * @param destination receives one lost_and_found_record_t per match
+ * @param destination_capacity the number of slots available in destination
  * @return the number of records copied, 0 when the user resolved nothing
  */
 int get_lost_and_found_for_resolver(
-  const char resolver_username[], lost_and_found_record_t destination_records[], int destination_capacity
+  const char resolver_username[], lost_and_found_record_t *destination, int destination_capacity
 );
 
 #endif

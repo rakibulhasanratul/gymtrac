@@ -332,10 +332,10 @@ bool rename_branch_for_all_users(const char old_branch_name[], const char new_br
  * Copies at most destination_capacity ids; members beyond that are skipped.
  *
  * @param status the membership status to filter by
- * @param destination_ids receives the matching member ids
- * @param destination_capacity the number of slots available in destination_ids
+ * @param destination receives the matching member ids
+ * @param destination_capacity the number of slots available in destination
  * @return the number of ids copied
  */
-int get_gym_member_ids_by_status(membership_status_t status, id_t ids_destination[], int destination_capacity);
+int get_gym_member_ids_by_status(membership_status_t status, id_t *destination, int destination_capacity);
 
 #endif

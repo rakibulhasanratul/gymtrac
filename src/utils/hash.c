@@ -23,7 +23,7 @@ void generate_salt(char *destination)
   destination[SALT_BUFFER_SIZE - 1] = '\0';
 }
 
-void mix_salt(const char *password, const char *salt, char *destination)
+void mix_salt(const char password[], const char salt[], char *destination)
 {
   if (password == NULL || salt == NULL || destination == NULL) return;
 
@@ -41,7 +41,7 @@ void mix_salt(const char *password, const char *salt, char *destination)
   destination[write_index] = '\0';
 }
 
-hash_t create_hash(const char *text)
+hash_t create_hash(const char text[])
 {
   if (text == NULL) return 0;
 
@@ -63,7 +63,7 @@ void hash_value_to_string(hash_t value, char *destination)
   sprintf(destination, "%lu", value);
 }
 
-hash_t parse_hash_value(const char *text)
+hash_t parse_hash_value(const char text[])
 {
   return string_to_unsigned_long_int(text);
 }

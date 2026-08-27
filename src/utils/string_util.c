@@ -5,7 +5,7 @@
 #include "../settings.h"
 #include "string_util.h"
 
-void trim(char destination[], int destination_capacity, const char text[])
+void trim(const char text[], char *destination, int destination_capacity)
 {
   if (destination == NULL || text == NULL || destination_capacity < 2) return;
 
@@ -31,13 +31,13 @@ void trim(char destination[], int destination_capacity, const char text[])
   destination[write_index] = '\0';
 }
 
-int split(const char text[], char delimiter, char parts[][FIELD_BUFFER_SIZE], int part_capacity)
+int split(const char text[], char delimiter, char destination[][FIELD_BUFFER_SIZE], int destination_capacity)
 {
-  if (text == NULL || parts == NULL || part_capacity < 1) return 0;
+  if (text == NULL || destination == NULL || destination_capacity < 1) return 0;
 
   int part_count = 0;
   int cursor_index = 0;
-  while (part_count < part_capacity)
+  while (part_count < destination_capacity)
   {
     // Copy the current field into the next part.
     int field_index = 0;
@@ -46,12 +46,12 @@ int split(const char text[], char delimiter, char parts[][FIELD_BUFFER_SIZE], in
       // Write only the characters that fit in the buffer.
       if (field_index < FIELD_BUFFER_SIZE - 1)
       {
-        parts[part_count][field_index] = text[cursor_index];
+        destination[part_count][field_index] = text[cursor_index];
         field_index++;
       }
       cursor_index++;
     }
-    parts[part_count][field_index] = '\0';
+    destination[part_count][field_index] = '\0';
     part_count++;
     // Stop once the string is exhausted.
     if (text[cursor_index] == '\0') break;
@@ -118,9 +118,9 @@ char *to_uppercase(char text[])
   return text;
 }
 
-char *sanitize_field(char text[])
+bool sanitize_field(const char text[], char *destination, int destination_capacity)
 {
-  if (text == NULL) return NULL;
+  if (text == NULL || destination == NULL || destination_capacity < 2) return false;
 
   int write_index = 0;
   for (int i = 0; text[i] != '\0'; i++)
@@ -128,20 +128,23 @@ char *sanitize_field(char text[])
     unsigned char ch = (unsigned char)text[i];
     // Drop the field delimiter and any control character.
     if (ch == (unsigned char)FIELD_DELIMITER || iscntrl(ch)) continue;
-    // Compact the kept characters toward the front.
-    text[write_index] = text[i];
-    write_index++;
+    // Copy kept characters, truncating when destination is full.
+    if (write_index < destination_capacity - 1)
+    {
+      destination[write_index] = text[i];
+      write_index++;
+    }
   }
-  // Terminate the compacted string.
-  text[write_index] = '\0';
+  // Terminate the sanitized string.
+  destination[write_index] = '\0';
 
-  return text;
+  return true;
 }
 
 bool is_blank_string(const char text[])
 {
   if (text == NULL) return true;
-  if (text[0] == '\0') return true;
+  if (strlen(text) == 0) return true;
   for (int i = 0; text[i] != '\0'; i++)
   {
     if (!isspace((unsigned char)text[i])) return false;

@@ -10,18 +10,18 @@ static inline void discard_remaining_input()
   while ((ch = getchar()) != '\n' && ch != EOF);
 }
 
-bool input_string(char buffer[], int buffer_capacity)
+bool input_string(char *destination, int destination_capacity)
 {
-  if (buffer == NULL || buffer_capacity < 2) return false;
+  if (destination == NULL || destination_capacity < 2) return false;
 
-  if (fgets(buffer, buffer_capacity, stdin) == NULL) return false;
+  if (fgets(destination, destination_capacity, stdin) == NULL) return false;
 
-  int length = (int)strlen(buffer);
+  int length = (int)strlen(destination);
   // Strip the trailing newline and any preceding carriage return.
-  if (length > 0 && buffer[length - 1] == '\n')
+  if (length > 0 && destination[length - 1] == '\n')
   {
-    buffer[length - 1] = '\0';
-    if (length > 1 && buffer[length - 2] == '\r') buffer[length - 2] = '\0';
+    destination[length - 1] = '\0';
+    if (length > 1 && destination[length - 2] == '\r') destination[length - 2] = '\0';
     return true;
   }
 
@@ -30,11 +30,11 @@ bool input_string(char buffer[], int buffer_capacity)
   return true;
 }
 
-bool input_integer(int *value)
+bool input_integer(int *destination)
 {
-  if (value == NULL) return false;
+  if (destination == NULL) return false;
 
-  int matched = scanf("%d", value);
+  int matched = scanf("%d", destination);
   if (matched != 1)
   {
     discard_remaining_input();
@@ -45,10 +45,10 @@ bool input_integer(int *value)
   return true;
 }
 
-bool input_positive_int(int *value)
+bool input_positive_int(int *destination)
 {
-  if (!input_integer(value)) return false;
+  if (!input_integer(destination)) return false;
   // Reject anything but positives.
-  if (*value <= 0) return false;
+  if (*destination <= 0) return false;
   return true;
 }

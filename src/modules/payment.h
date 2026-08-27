@@ -44,17 +44,16 @@ bool record_digital_payment(const digital_payment_request_t request_payload);
 bool record_cash_payment(id_t gym_member_id, unsigned int amount);
 
 /**
- * Copies every payment recorded for a member into destination_payments.
+ * Copies every payment recorded for a member into destination.
  *
  * Payments come back in the order they were recorded, oldest first. At most
  * destination_capacity payments are copied.
  *
  * @param gym_member_id the member whose payment history to fetch
- * @param destination_payments receives one payment_t per match
- * @param destination_capacity the number of slots available in
- *                             destination_payments
+ * @param destination receives one payment_t per match
+ * @param destination_capacity the number of slots available in destination
  * @return the number of payments copied, 0 when the member has none
  */
-int get_payments_for_member(id_t gym_member_id, payment_t destination_payments[], int destination_capacity);
+int get_payments_for_member(id_t gym_member_id, payment_t *destination, int destination_capacity);
 
 #endif

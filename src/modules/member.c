@@ -19,11 +19,11 @@ static int suspension_count;
 static id_t next_suspension_id;
 
 // Formats a suspension record as a delimiter-separated line.
-static inline void format_suspension_line(const suspension_record_t record_payload, char *line_destination)
+static inline void format_suspension_line(const suspension_record_t record_payload, char *destination)
 {
   snprintf(
-    line_destination, LINE_BUFFER_SIZE, "%lu" SEP "%lu" SEP "%s" SEP "%lld" SEP "%lld",
-    (unsigned long)record_payload.id, (unsigned long)record_payload.gym_member_id, record_payload.reason,
+    destination, LINE_BUFFER_SIZE, "%lu" SEP "%lu" SEP "%s" SEP "%lld" SEP "%lld", (unsigned long)record_payload.id,
+    (unsigned long)record_payload.gym_member_id, record_payload.reason,
     datetime_to_seconds(record_payload.suspension_date), datetime_to_seconds(record_payload.unsuspension_date)
   );
 }
@@ -290,16 +290,16 @@ int auto_suspend_overdue_members()
   return suspended_count;
 }
 
-int get_suspensions_for_member(id_t gym_member_id, suspension_record_t *destination_records, int destination_capacity)
+int get_suspensions_for_member(id_t gym_member_id, suspension_record_t *destination, int destination_capacity)
 {
-  if (destination_records == NULL || destination_capacity <= 0) return 0;
+  if (destination == NULL || destination_capacity <= 0) return 0;
 
   int copied_count = 0;
   for (int i = 0; i < suspension_count && copied_count < destination_capacity; i++)
   {
     if (suspension_records[i].gym_member_id == gym_member_id)
     {
-      destination_records[copied_count] = suspension_records[i];
+      destination[copied_count] = suspension_records[i];
       copied_count++;
     }
   }

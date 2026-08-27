@@ -65,17 +65,16 @@ bool unsuspend_gym_member(id_t member_id);
 int auto_suspend_overdue_members();
 
 /**
- * Copies every suspension recorded for a member into destination_records.
+ * Copies every suspension recorded for a member into destination.
  *
  * Records come back in the order they were created, oldest first. At most
  * destination_capacity records are copied.
  *
  * @param gym_member_id the member whose suspension history to fetch
- * @param destination_records receives one suspension_record_t per match
- * @param destination_capacity the number of slots available in
- *                             destination_records
+ * @param destination receives one suspension_record_t per match
+ * @param destination_capacity the number of slots available in destination
  * @return the number of records copied, 0 when the member has none
  */
-int get_suspensions_for_member(id_t gym_member_id, suspension_record_t destination_records[], int destination_capacity);
+int get_suspensions_for_member(id_t gym_member_id, suspension_record_t *destination, int destination_capacity);
 
 #endif

@@ -18,24 +18,24 @@ void test_trim_strips_whitespace()
   char result[64];
 
   strcpy(input, "  hello world  \t\n");
-  trim(result, sizeof(result), input);
+  trim(input, result, sizeof(result));
   assert(strcmp(result, "hello world") == 0);
   assert(strcmp(input, "  hello world  \t\n") == 0);
 
   strcpy(input, "\t\n  ");
-  trim(result, sizeof(result), input);
+  trim(input, result, sizeof(result));
   assert(strcmp(result, "") == 0);
 
   strcpy(input, "no-space");
-  trim(result, sizeof(result), input);
+  trim(input, result, sizeof(result));
   assert(strcmp(result, "no-space") == 0);
 
   strcpy(input, "hello world");
-  trim(result, 6, input);
+  trim(input, result, 6);
   assert(strcmp(result, "hello") == 0);
 
-  trim(NULL, sizeof(result), input);
-  trim(result, sizeof(result), NULL);
+  trim(input, NULL, sizeof(result));
+  trim(NULL, result, sizeof(result));
 }
 
 /**
@@ -173,23 +173,31 @@ void test_lowercase_and_uppercase_convert_letters()
  */
 void test_sanitize_field_strips_control_chars()
 {
-  char buffer[128];
+  char input[128];
+  char result[128];
 
-  strcpy(buffer, "bad\t|\nchar\x01s\r");
-  assert(sanitize_field(buffer) == buffer);
-  assert(strcmp(buffer, "badchars") == 0);
+  strcpy(input, "bad\t|\nchar\x01s\r");
+  assert(sanitize_field(input, result, sizeof(result)));
+  assert(strcmp(result, "badchars") == 0);
+  assert(strcmp(input, "bad\t|\nchar\x01s\r") == 0);
 
-  strcpy(buffer, "clean|text");
-  assert(sanitize_field(buffer) == buffer);
-  assert(strcmp(buffer, "cleantext") == 0);
+  strcpy(input, "clean|text");
+  assert(sanitize_field(input, result, sizeof(result)));
+  assert(strcmp(result, "cleantext") == 0);
 
-  strcpy(buffer, "no change needed");
-  assert(sanitize_field(buffer) == buffer);
-  assert(strcmp(buffer, "no change needed") == 0);
+  strcpy(input, "no change needed");
+  assert(sanitize_field(input, result, sizeof(result)));
+  assert(strcmp(result, "no change needed") == 0);
 
-  strcpy(buffer, "||||");
-  assert(sanitize_field(buffer) == buffer);
-  assert(strcmp(buffer, "") == 0);
+  strcpy(input, "||||");
+  assert(sanitize_field(input, result, sizeof(result)));
+  assert(strcmp(result, "") == 0);
 
-  assert(sanitize_field(NULL) == NULL);
+  strcpy(input, "hello|world");
+  assert(sanitize_field(input, result, 6));
+  assert(strcmp(result, "hello") == 0);
+
+  assert(!sanitize_field(NULL, result, sizeof(result)));
+  assert(!sanitize_field(input, NULL, sizeof(result)));
+  assert(!sanitize_field(input, result, 1));
 }

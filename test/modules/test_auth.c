@@ -135,7 +135,7 @@ void test_auth_login_sysadmin_success()
   load_sysadmins();
   load_branch_staff();
   load_gym_members();
-  session_init();
+  initialize_session();
 
   char stored[PASSWORD_HASH_BUFFER_SIZE];
   hash_password("adminpass", stored);
@@ -159,7 +159,7 @@ void test_auth_login_branch_manager_success()
   load_sysadmins();
   load_branch_staff();
   load_gym_members();
-  session_init();
+  initialize_session();
 
   char stored[PASSWORD_HASH_BUFFER_SIZE];
   hash_password("mgrpass", stored);
@@ -183,7 +183,7 @@ void test_auth_login_trainer_success()
   load_sysadmins();
   load_branch_staff();
   load_gym_members();
-  session_init();
+  initialize_session();
 
   char stored[PASSWORD_HASH_BUFFER_SIZE];
   hash_password("trpass", stored);
@@ -207,7 +207,7 @@ void test_auth_login_member_success()
   load_sysadmins();
   load_branch_staff();
   load_gym_members();
-  session_init();
+  initialize_session();
 
   char stored[PASSWORD_HASH_BUFFER_SIZE];
   hash_password("mempass", stored);
@@ -235,7 +235,7 @@ void test_auth_login_wrong_password()
   load_sysadmins();
   load_branch_staff();
   load_gym_members();
-  session_init();
+  initialize_session();
 
   char stored[PASSWORD_HASH_BUFFER_SIZE];
   hash_password("correct", stored);
@@ -257,7 +257,7 @@ void test_auth_login_unknown_username()
   load_sysadmins();
   load_branch_staff();
   load_gym_members();
-  session_init();
+  initialize_session();
 
   user_role_t role;
   bool result = auth_login("nobody", "pass", &role);
@@ -286,7 +286,7 @@ void test_auth_logout_clears_session()
   load_sysadmins();
   load_branch_staff();
   load_gym_members();
-  session_init();
+  initialize_session();
 
   char stored[PASSWORD_HASH_BUFFER_SIZE];
   hash_password("pass", stored);
@@ -298,5 +298,6 @@ void test_auth_logout_clears_session()
 
   auth_logout();
   assert(session_is_active() == false);
-  assert(session_get_current() == NULL);
+  assert(get_user_id_from_session() == 0);
+  assert(strcmp(get_username_from_session(), "") == 0);
 }

@@ -23,7 +23,7 @@ void generate_salt(char *destination);
  * @param salt the null-terminated salt string (at least 15 characters)
  * @param destination receives the mixed string
  */
-void mix_salt(const char *password, const char *salt, char *destination);
+void mix_salt(const char password[], const char salt[], char *destination);
 
 /**
  * Computes a polynomial hash of text (h = 31 * h + c).
@@ -33,7 +33,7 @@ void mix_salt(const char *password, const char *salt, char *destination);
  * @param text the string to hash
  * @return the polynomial hash value
  */
-hash_t create_hash(const char *text);
+hash_t create_hash(const char text[]);
 
 /**
  * Compares two hash values for equality.
@@ -59,6 +59,6 @@ void hash_value_to_string(hash_t value, char *destination);
  * @param text the decimal string to parse
  * @return the parsed hash value, or 0 if the string is invalid
  */
-hash_t parse_hash_value(const char *text);
+hash_t parse_hash_value(const char text[]);
 
 #endif

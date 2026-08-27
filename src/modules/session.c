@@ -5,57 +5,60 @@
 #include "../utils/string_util.h"
 #include "session.h"
 
-static session_t current_session;
+static session_t _session;
 
-void session_init()
+void initialize_session()
 {
-  memset(&current_session, 0, sizeof(session_t));
+  _session.role = 0;
+  _session.user_id = 0;
+  _session.username[0] = '\0';
+  _session.branch_name[0] = '\0';
 }
 
 void set_session_context(user_role_t role, id_t user_id, const char username[], const char branch_name[])
 {
-  current_session.role = role;
-  current_session.user_id = user_id;
+  _session.role = role;
+  _session.user_id = user_id;
 
   if (username != NULL)
-    strcpy(current_session.username, username);
+    strcpy(_session.username, username);
   else
-    current_session.username[0] = '\0';
+    _session.username[0] = '\0';
 
   if (branch_name != NULL)
-    strcpy(current_session.branch_name, branch_name);
+    strcpy(_session.branch_name, branch_name);
   else
-    current_session.branch_name[0] = '\0';
+    _session.branch_name[0] = '\0';
 }
 
 void clear_session_context()
 {
-  memset(&current_session, 0, sizeof(session_t));
+  initialize_session();
 }
 
 bool session_is_active()
 {
-  return current_session.user_id != 0;
+  return _session.user_id != 0;
 }
 
 bool session_is_sysadmin()
 {
-  return session_is_active() && current_session.role == USER_ROLE_SYSADMIN;
+  return session_is_active() && _session.role == USER_ROLE_SYSADMIN;
 }
 
 bool session_is_branch_manager()
 {
-  return session_is_active() && current_session.role == USER_ROLE_BRANCH_MANAGER;
+  return session_is_active() && _session.role == USER_ROLE_BRANCH_MANAGER;
 }
 
 bool session_is_trainer()
 {
-  return session_is_active() && current_session.role == USER_ROLE_TRAINER;
+  return session_is_active() && _session.role == USER_ROLE_TRAINER;
 }
 
 bool session_is_member()
 {
-  return session_is_active() && current_session.role == USER_ROLE_MEMBER;
+  return session_is_active() && _session.role == USER_ROLE_MEMBER;
 }
 
 bool session_belongs_to_branch(const char branch_name[])
@@ -64,14 +67,27 @@ bool session_belongs_to_branch(const char branch_name[])
 
   if (is_blank_string(branch_name)) return false;
 
-  if (current_session.role == USER_ROLE_SYSADMIN) return true;
+  if (_session.role == USER_ROLE_SYSADMIN) return true;
 
-  return strcmp(current_session.branch_name, branch_name) == 0;
+  return strcmp(_session.branch_name, branch_name) == 0;
 }
 
-const session_t *session_get_current()
+user_role_t get_role_from_session()
 {
-  if (!session_is_active()) return NULL;
+  return _session.role;
+}
 
-  return &current_session;
+id_t get_user_id_from_session()
+{
+  return _session.user_id;
+}
+
+const char *get_username_from_session()
+{
+  return _session.username;
+}
+
+const char *get_branch_name_from_session()
+{
+  return _session.branch_name;
 }

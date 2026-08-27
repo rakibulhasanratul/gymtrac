@@ -15,7 +15,7 @@
  * @param destination receives the salted hash string;
  *                    must hold at least PASSWORD_HASH_BUFFER_SIZE characters
  */
-void hash_password(const char *password, char *destination);
+void hash_password(const char password[], char *destination);
 
 /**
  * Verifies a password against a stored salted hash.
@@ -24,7 +24,7 @@ void hash_password(const char *password, char *destination);
  * @param stored_hash the previously stored salt+hash string
  * @return true if the password matches, false otherwise
  */
-bool verify_password(const char *password, const char *stored_hash);
+bool verify_password(const char password[], const char stored_hash[]);
 
 /**
  * Authenticates a user by username and password.
@@ -34,10 +34,10 @@ bool verify_password(const char *password, const char *stored_hash);
  *
  * @param username the login name to look up
  * @param password the plaintext password to verify
- * @param role_destination receives the user's role on success
+ * @param destination receives the user's role on success
  * @return true if authentication succeeded, false otherwise
  */
-bool auth_login(const char username[], const char password[], user_role_t *role_destination);
+bool auth_login(const char username[], const char password[], user_role_t *destination);
 
 /**
  * Logs out the current user by clearing the session.

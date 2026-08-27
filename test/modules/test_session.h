@@ -15,7 +15,7 @@ void test_session_belongs_to_branch_matching();
 void test_session_belongs_to_branch_non_matching();
 void test_session_belongs_to_branch_inactive_returns_false();
 void test_session_belongs_to_branch_null_returns_false();
-void test_session_get_current_returns_null_when_inactive();
-void test_session_get_current_returns_record_when_active();
+void test_session_getters_return_empty_when_inactive();
+void test_session_getters_return_values_when_active();
 
 #endif

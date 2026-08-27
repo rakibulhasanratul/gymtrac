@@ -10,7 +10,7 @@
  *
  * Should be called once at startup.
  */
-void session_init();
+void initialize_session();
 
 /**
  * Populates the session with the logged-in user's context.
@@ -66,10 +66,31 @@ bool session_is_member();
 bool session_belongs_to_branch(const char branch_name[]);
 
 /**
- * Returns the current session context (read-only).
+ * Returns the logged-in user's role.
  *
- * @return pointer to the internal session struct, or NULL if not initialized
+ * @return the role stored in the session, or 0 if no session is active
  */
-const session_t *session_get_current();
+user_role_t get_role_from_session();
+
+/**
+ * Returns the logged-in user's id.
+ *
+ * @return the user id stored in the session, or 0 if no session is active
+ */
+id_t get_user_id_from_session();
+
+/**
+ * Returns the logged-in user's username.
+ *
+ * @return pointer to the internal username buffer, empty string if inactive
+ */
+const char *get_username_from_session();
+
+/**
+ * Returns the logged-in user's branch name.
+ *
+ * @return pointer to the internal branch_name buffer, empty string if inactive
+ */
+const char *get_branch_name_from_session();
 
 #endif

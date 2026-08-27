@@ -4,18 +4,18 @@
 #include "file_util.h"
 #include "string_util.h"
 
-bool read_line_from_file(FILE *file, char buffer[], int buffer_capacity)
+bool read_line_from_file(FILE *file, char *destination, int destination_capacity)
 {
-  if (file == NULL || buffer == NULL || buffer_capacity < 2) return false;
+  if (file == NULL || destination == NULL || destination_capacity < 2) return false;
 
-  if (fgets(buffer, buffer_capacity, file) == NULL) return false;
+  if (fgets(destination, destination_capacity, file) == NULL) return false;
 
-  int length = (int)strlen(buffer);
+  int length = (int)strlen(destination);
   // Strip the trailing newline and any preceding carriage return.
-  if (length > 0 && buffer[length - 1] == '\n')
+  if (length > 0 && destination[length - 1] == '\n')
   {
-    buffer[length - 1] = '\0';
-    if (length > 1 && buffer[length - 2] == '\r') buffer[length - 2] = '\0';
+    destination[length - 1] = '\0';
+    if (length > 1 && destination[length - 2] == '\r') destination[length - 2] = '\0';
     return true;
   }
 
@@ -39,18 +39,18 @@ bool write_line_to_file(FILE *file, const char line[])
   return true;
 }
 
-int read_lines_from_file(const char file_path[], char *lines_destination[], int max_lines, int line_capacity)
+int read_lines_from_file(const char file_path[], char *destination[], int max_lines, int line_capacity)
 {
-  if (file_path == NULL || lines_destination == NULL || max_lines < 1 || line_capacity < 2) return 0;
+  if (file_path == NULL || destination == NULL || max_lines < 1 || line_capacity < 2) return 0;
 
   FILE *file = fopen(file_path, "r");
   if (file == NULL) return 0;
 
   int line_count = 0;
-  while (line_count < max_lines && read_line_from_file(file, lines_destination[line_count], line_capacity))
+  while (line_count < max_lines && read_line_from_file(file, destination[line_count], line_capacity))
   {
     // Empty lines carry no record and stay invisible to callers.
-    if (!is_blank_string(lines_destination[line_count])) line_count++;
+    if (!is_blank_string(destination[line_count])) line_count++;
   }
 
   fclose(file);

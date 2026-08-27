@@ -5,17 +5,18 @@
 #include <stdio.h>
 
 /**
- * Reads the next line from file into buffer, stripping the trailing newline.
+ * Reads the next line from file into destination, stripping the trailing
+ * newline.
  *
  * An over-long line drains its remainder and returns false instead of
  * parsing as multiple records.
  *
  * @param file the open file to read from
- * @param buffer receives the line without its trailing newline
- * @param buffer_capacity the number of characters buffer can hold
+ * @param destination receives the line without its trailing newline
+ * @param destination_capacity the number of characters destination can hold
  * @return true when a line was read, false on invalid input or end of file
  */
-bool read_line_from_file(FILE *file, char buffer[], int buffer_capacity);
+bool read_line_from_file(FILE *file, char *destination, int destination_capacity);
 
 /**
  * Writes line to file followed by a newline.
@@ -33,14 +34,14 @@ bool write_line_to_file(FILE *file, const char line[]);
  * drained and skipped, keeping corrupted records out of the loaded data.
  *
  * @param file_path the path of the file to read
- * @param lines_destination receives one non-empty line per row;
- *                          rows are filled through char pointers
+ * @param destination receives one non-empty line per row;
+ *                    rows are filled through char pointers
  * @param max_lines the maximum number of lines to read
- * @param line_capacity the capacity of each row in lines_destination
+ * @param line_capacity the capacity of each row in destination
  * @return the number of lines read, 0 on invalid arguments or when the
  *         file cannot be opened
  */
-int read_lines_from_file(const char file_path[], char *lines_destination[], int max_lines, int line_capacity);
+int read_lines_from_file(const char file_path[], char *destination[], int max_lines, int line_capacity);
 
 /**
  * Writes each element of lines as one line into the file.

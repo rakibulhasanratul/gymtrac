@@ -25,11 +25,11 @@ static int gym_member_count;
 static id_t next_gym_member_id;
 
 // Formats a sysadmin record as a delimiter-separated line.
-static inline void format_sysadmin_line(const sysadmin_t record_payload, char *line_destination)
+static inline void format_sysadmin_line(const sysadmin_t record_payload, char *destination)
 {
   snprintf(
-    line_destination, LINE_BUFFER_SIZE, "%lu" SEP "%s" SEP "%s", (unsigned long)record_payload.id,
-    record_payload.username, record_payload.password_hash
+    destination, LINE_BUFFER_SIZE, "%lu" SEP "%s" SEP "%s", (unsigned long)record_payload.id, record_payload.username,
+    record_payload.password_hash
   );
 }
 
@@ -52,10 +52,10 @@ static bool persist_sysadmin(const sysadmin_t record_payload)
 }
 
 // Formats a branch staff record as a delimiter-separated line.
-static inline void format_branch_staff_line(const branch_staff_t record_payload, char *line_destination)
+static inline void format_branch_staff_line(const branch_staff_t record_payload, char *destination)
 {
   snprintf(
-    line_destination, LINE_BUFFER_SIZE, "%lu" SEP "%s" SEP "%s" SEP "%s" SEP "%s" SEP "%s" SEP "%s" SEP "%lld" SEP "%d",
+    destination, LINE_BUFFER_SIZE, "%lu" SEP "%s" SEP "%s" SEP "%s" SEP "%s" SEP "%s" SEP "%s" SEP "%lld" SEP "%d",
     (unsigned long)record_payload.id, record_payload.full_name, record_payload.email, record_payload.phone_number,
     record_payload.gym_branch, record_payload.username, record_payload.password_hash,
     datetime_to_seconds(record_payload.joined_at), (int)record_payload.role
@@ -63,10 +63,10 @@ static inline void format_branch_staff_line(const branch_staff_t record_payload,
 }
 
 // Formats a gym member record as a delimiter-separated line.
-static inline void format_gym_member_line(const gym_member_t record_payload, char *line_destination)
+static inline void format_gym_member_line(const gym_member_t record_payload, char *destination)
 {
   snprintf(
-    line_destination, LINE_BUFFER_SIZE,
+    destination, LINE_BUFFER_SIZE,
     "%lu" SEP "%s" SEP "%s" SEP "%s" SEP "%s" SEP "%s" SEP "%s" SEP "%lld" SEP "%lld" SEP "%u" SEP "%u" SEP "%u" SEP
     "%d",
     (unsigned long)record_payload.id, record_payload.full_name, record_payload.email, record_payload.phone_number,
@@ -251,9 +251,9 @@ static bool rewrite_all_gym_members_to_file()
 
 // Splits a pipe-delimited record line into field buffers and returns the
 // field count.
-static inline int split_record_line(const char line[], char parts_destination[][FIELD_BUFFER_SIZE])
+static inline int split_record_line(const char line[], char destination[][FIELD_BUFFER_SIZE])
 {
-  return split(line, FIELD_DELIMITER, parts_destination, MAX_RECORD_FIELDS);
+  return split(line, FIELD_DELIMITER, destination, MAX_RECORD_FIELDS);
 }
 
 // Parses a pipe-delimited line into a sysadmin record.
@@ -1115,16 +1115,16 @@ bool rename_branch_for_all_users(const char old_branch_name[], const char new_br
   return true;
 }
 
-int get_gym_member_ids_by_status(membership_status_t status, id_t ids_destination[], int destination_capacity)
+int get_gym_member_ids_by_status(membership_status_t status, id_t *destination, int destination_capacity)
 {
-  if (ids_destination == NULL || destination_capacity <= 0) return 0;
+  if (destination == NULL || destination_capacity <= 0) return 0;
 
   int copied_count = 0;
   for (int i = 0; i < gym_member_count && copied_count < destination_capacity; i++)
   {
     if (gym_members[i].status == status)
     {
-      ids_destination[copied_count] = gym_members[i].id;
+      destination[copied_count] = gym_members[i].id;
       copied_count++;
     }
   }

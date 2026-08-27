@@ -221,8 +221,8 @@ int main()
   test_session_belongs_to_branch_non_matching();
   test_session_belongs_to_branch_inactive_returns_false();
   test_session_belongs_to_branch_null_returns_false();
-  test_session_get_current_returns_null_when_inactive();
-  test_session_get_current_returns_record_when_active();
+  test_session_getters_return_empty_when_inactive();
+  test_session_getters_return_values_when_active();
 
   /* member: approval */
   test_approve_on_hold_member_activates_with_default_plan();

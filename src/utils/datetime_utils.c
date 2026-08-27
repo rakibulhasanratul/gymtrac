@@ -105,21 +105,21 @@ datetime_t datetime_from_seconds(long long seconds_since_epoch)
   return result;
 }
 
-bool format_datetime(const datetime_t datetime_payload, char *buffer_destination, int destination_capacity)
+bool format_datetime(const datetime_t datetime_payload, char *destination, int destination_capacity)
 {
-  if (buffer_destination == NULL || destination_capacity < DATETIME_BUFFER_SIZE) return false;
+  if (destination == NULL || destination_capacity < DATETIME_BUFFER_SIZE) return false;
 
   snprintf(
-    buffer_destination, (size_t)destination_capacity, "%04d-%02d-%02d %02d:%02d:%02d", datetime_payload.year,
+    destination, (size_t)destination_capacity, "%04d-%02d-%02d %02d:%02d:%02d", datetime_payload.year,
     datetime_payload.month, datetime_payload.day, datetime_payload.hour, datetime_payload.minute,
     datetime_payload.second
   );
   return true;
 }
 
-bool parse_datetime(const char datetime_text[], datetime_t *datetime_destination)
+bool parse_datetime(const char datetime_text[], datetime_t *destination)
 {
-  if (datetime_text == NULL || datetime_destination == NULL) return false;
+  if (datetime_text == NULL || destination == NULL) return false;
 
   // The text must be exactly 19 characters with fixed separators:
   // "yyyy-mm-dd hh:mm:ss".
@@ -148,12 +148,12 @@ bool parse_datetime(const char datetime_text[], datetime_t *datetime_destination
   if (minute < 0 || minute > 59) return false;
   if (second < 0 || second > 59) return false;
 
-  datetime_destination->year = year;
-  datetime_destination->month = month;
-  datetime_destination->day = day;
-  datetime_destination->hour = hour;
-  datetime_destination->minute = minute;
-  datetime_destination->second = second;
+  destination->year = year;
+  destination->month = month;
+  destination->day = day;
+  destination->hour = hour;
+  destination->minute = minute;
+  destination->second = second;
   return true;
 }
 

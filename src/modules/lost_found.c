@@ -18,10 +18,10 @@ static int lost_and_found_count;
 static id_t next_lost_and_found_id;
 
 // Formats a lost and found record as a delimiter-separated line.
-static inline void format_lost_and_found_line(const lost_and_found_record_t record_payload, char *line_destination)
+static inline void format_lost_and_found_line(const lost_and_found_record_t record_payload, char *destination)
 {
   snprintf(
-    line_destination, LINE_BUFFER_SIZE, "%lu" SEP "%s" SEP "%s" SEP "%s" SEP "%lld" SEP "%s",
+    destination, LINE_BUFFER_SIZE, "%lu" SEP "%s" SEP "%s" SEP "%s" SEP "%lld" SEP "%s",
     (unsigned long)record_payload.id, record_payload.description, record_payload.reporter_username,
     record_payload.gym_branch, datetime_to_seconds(record_payload.reported_at), record_payload.resolver_username
   );
@@ -232,17 +232,17 @@ bool resolve_lost_item(id_t record_id, const char resolver_username[])
 }
 
 int get_lost_and_found_for_branch(
-  const char branch_name[], lost_and_found_record_t destination_records[], int destination_capacity
+  const char branch_name[], lost_and_found_record_t *destination, int destination_capacity
 )
 {
-  if (branch_name == NULL || destination_records == NULL || destination_capacity <= 0) return 0;
+  if (branch_name == NULL || destination == NULL || destination_capacity <= 0) return 0;
 
   int copied_count = 0;
   for (int i = 0; i < lost_and_found_count && copied_count < destination_capacity; i++)
   {
     if (strcmp(lost_and_found_records[i].gym_branch, branch_name) == 0)
     {
-      destination_records[copied_count] = lost_and_found_records[i];
+      destination[copied_count] = lost_and_found_records[i];
       copied_count++;
     }
   }
@@ -251,17 +251,17 @@ int get_lost_and_found_for_branch(
 }
 
 int get_lost_and_found_for_reporter(
-  const char reporter_username[], lost_and_found_record_t destination_records[], int destination_capacity
+  const char reporter_username[], lost_and_found_record_t *destination, int destination_capacity
 )
 {
-  if (reporter_username == NULL || destination_records == NULL || destination_capacity <= 0) return 0;
+  if (reporter_username == NULL || destination == NULL || destination_capacity <= 0) return 0;
 
   int copied_count = 0;
   for (int i = 0; i < lost_and_found_count && copied_count < destination_capacity; i++)
   {
     if (strcmp(lost_and_found_records[i].reporter_username, reporter_username) == 0)
     {
-      destination_records[copied_count] = lost_and_found_records[i];
+      destination[copied_count] = lost_and_found_records[i];
       copied_count++;
     }
   }
@@ -270,17 +270,17 @@ int get_lost_and_found_for_reporter(
 }
 
 int get_lost_and_found_for_resolver(
-  const char resolver_username[], lost_and_found_record_t destination_records[], int destination_capacity
+  const char resolver_username[], lost_and_found_record_t *destination, int destination_capacity
 )
 {
-  if (resolver_username == NULL || destination_records == NULL || destination_capacity <= 0) return 0;
+  if (resolver_username == NULL || destination == NULL || destination_capacity <= 0) return 0;
 
   int copied_count = 0;
   for (int i = 0; i < lost_and_found_count && copied_count < destination_capacity; i++)
   {
     if (strcmp(lost_and_found_records[i].resolver_username, resolver_username) == 0)
     {
-      destination_records[copied_count] = lost_and_found_records[i];
+      destination[copied_count] = lost_and_found_records[i];
       copied_count++;
     }
   }

@@ -16,7 +16,7 @@
 // Buffer for the mixed salt+password string.
 #define MIXED_BUFFER_SIZE 128
 
-void hash_password(const char *password, char *destination)
+void hash_password(const char password[], char *destination)
 {
   if (password == NULL || destination == NULL) return;
 
@@ -43,7 +43,7 @@ void hash_password(const char *password, char *destination)
   destination[write_index] = '\0';
 }
 
-bool verify_password(const char *password, const char *stored_hash)
+bool verify_password(const char password[], const char stored_hash[])
 {
   if (password == NULL || stored_hash == NULL) return false;
 
@@ -64,9 +64,9 @@ bool verify_password(const char *password, const char *stored_hash)
   return compare_hash(stored, computed);
 }
 
-bool auth_login(const char username[], const char password[], user_role_t *role_destination)
+bool auth_login(const char username[], const char password[], user_role_t *destination)
 {
-  if (username == NULL || password == NULL || role_destination == NULL) return false;
+  if (username == NULL || password == NULL || destination == NULL) return false;
 
   // Check sysadmin table.
   sysadmin_t sysadmin;
@@ -74,7 +74,7 @@ bool auth_login(const char username[], const char password[], user_role_t *role_
   {
     if (!verify_password(password, sysadmin.password_hash)) return false;
 
-    *role_destination = USER_ROLE_SYSADMIN;
+    *destination = USER_ROLE_SYSADMIN;
     set_session_context(USER_ROLE_SYSADMIN, sysadmin.id, sysadmin.username, "");
     return true;
   }
@@ -88,14 +88,14 @@ bool auth_login(const char username[], const char password[], user_role_t *role_
     switch (staff.role)
     {
     case BRANCH_MANAGER:
-      *role_destination = USER_ROLE_BRANCH_MANAGER;
+      *destination = USER_ROLE_BRANCH_MANAGER;
       break;
     default:
-      *role_destination = USER_ROLE_TRAINER;
+      *destination = USER_ROLE_TRAINER;
       break;
     }
 
-    set_session_context(*role_destination, staff.id, staff.username, staff.gym_branch);
+    set_session_context(*destination, staff.id, staff.username, staff.gym_branch);
     return true;
   }
 
@@ -105,7 +105,7 @@ bool auth_login(const char username[], const char password[], user_role_t *role_
   {
     if (!verify_password(password, member.password_hash)) return false;
 
-    *role_destination = USER_ROLE_MEMBER;
+    *destination = USER_ROLE_MEMBER;
     set_session_context(USER_ROLE_MEMBER, member.id, member.username, member.gym_branch);
     return true;
   }

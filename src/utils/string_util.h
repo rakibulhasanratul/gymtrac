@@ -11,11 +11,11 @@
  * The result is truncated when the trimmed string does not fit in
  * destination. Trimming never modifies text.
  *
+ * @param text the string to trim
  * @param destination receives the trimmed string
  * @param destination_capacity the number of characters destination can hold
- * @param text the string to trim
  */
-void trim(char destination[], int destination_capacity, const char text[]);
+void trim(const char text[], char *destination, int destination_capacity);
 
 /**
  * Splits text on delimiter, copying each field into its own part buffer.
@@ -27,13 +27,14 @@ void trim(char destination[], int destination_capacity, const char text[]);
  *
  * @param text the string to split; not modified
  * @param delimiter the character that separates fields
- * @param parts the 2D array that receives each captured field; every row must
- *              hold exactly FIELD_BUFFER_SIZE characters, enforced by the type
- * @param part_capacity the number of rows available in parts
- * @return the number of parts captured; when this equals part_capacity, text
- *         may still hold more unsplit fields
+ * @param destination the 2D array that receives each captured field; every row
+ *                    must hold exactly FIELD_BUFFER_SIZE characters, enforced
+ *                    by the type
+ * @param destination_capacity the number of rows available in destination
+ * @return the number of parts captured; when this equals destination_capacity,
+ *         text may still hold more unsplit fields
  */
-int split(const char text[], char delimiter, char parts[][FIELD_BUFFER_SIZE], int part_capacity);
+int split(const char text[], char delimiter, char destination[][FIELD_BUFFER_SIZE], int destination_capacity);
 
 /**
  * Converts text to a non-negative decimal number.
@@ -70,12 +71,18 @@ char *to_lowercase(char text[]);
 char *to_uppercase(char text[]);
 
 /**
- * Removes control characters and the field delimiter from text in place.
+ * Copies text into destination with control characters and the field delimiter
+ * removed.
+ *
+ * The result is truncated when the sanitized string does not fit in
+ * destination. Sanitizing never modifies text.
  *
  * @param text the field value to clean
- * @return text, or NULL when text is NULL
+ * @param destination receives the sanitized string
+ * @param destination_capacity the number of characters destination can hold
+ * @return true when the string was sanitized, false on invalid input
  */
-char *sanitize_field(char text[]);
+bool sanitize_field(const char text[], char *destination, int destination_capacity);
 
 /**
  * Checks whether text is NULL, empty, or contains only whitespace.

@@ -53,7 +53,7 @@ Branches are not a table. `data/branches.txt` holds one branch name per line (ar
 
 ### Session
 
-`session_t` holds the logged-in user's context: `role` (`user_role_t`), `user_id`, `username`, and `branch_name` (empty for the sysadmin). It is runtime state, not a persisted record. The session module (`session.[ch]`) provides access predicates (`session_is_sysadmin()`, `session_is_staff()`, `session_belongs_to_branch()`, per-role checks) that gate every action by role and branch scope.
+`session_t` holds the logged-in user's context: `role` (`user_role_t`), `user_id`, `username`, and `branch_name` (empty for the sysadmin). It is runtime state, not a persisted record. The session module (`session.[ch]`) keeps the struct private and exposes only narrow accessors (`session_get_role()`, `session_get_user_id()`, `session_get_username()`, `session_get_branch_name()`) plus predicates (`session_is_active()`, `session_is_sysadmin()`, `session_is_branch_manager()`, `session_is_trainer()`, `session_is_member()`, `session_belongs_to_branch()`) that gate every action by role and branch scope. No raw `session_t` pointer is exposed.
 
 ### Actor references
 

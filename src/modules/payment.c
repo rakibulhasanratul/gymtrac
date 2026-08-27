@@ -18,10 +18,10 @@ static int payment_count;
 static id_t next_payment_id;
 
 // Formats a payment as a delimiter-separated line.
-static inline void format_payment_line(const payment_t record_payload, char *line_destination)
+static inline void format_payment_line(const payment_t record_payload, char *destination)
 {
   snprintf(
-    line_destination, LINE_BUFFER_SIZE, "%lu" SEP "%lu" SEP "%u" SEP "%lld" SEP "%d" SEP "%s" SEP "%d",
+    destination, LINE_BUFFER_SIZE, "%lu" SEP "%lu" SEP "%u" SEP "%lld" SEP "%d" SEP "%s" SEP "%d",
     (unsigned long)record_payload.id, (unsigned long)record_payload.gym_member_id, record_payload.amount,
     datetime_to_seconds(record_payload.transaction_time), (int)record_payload.transaction_type,
     record_payload.transaction_id, (int)record_payload.status
@@ -226,16 +226,16 @@ bool record_cash_payment(id_t gym_member_id, unsigned int amount)
   return settle_payment(payment);
 }
 
-int get_payments_for_member(id_t gym_member_id, payment_t destination_payments[], int destination_capacity)
+int get_payments_for_member(id_t gym_member_id, payment_t *destination, int destination_capacity)
 {
-  if (destination_payments == NULL || destination_capacity <= 0) return 0;
+  if (destination == NULL || destination_capacity <= 0) return 0;
 
   int count = 0;
   for (int i = 0; i < payment_count && count < destination_capacity; i++)
   {
     if (payments[i].gym_member_id == gym_member_id)
     {
-      destination_payments[count] = payments[i];
+      destination[count] = payments[i];
       count++;
     }
   }

@@ -128,12 +128,13 @@ bool ensure_member_profile_view_allowed(id_t gym_member_id);
  * Checks whether the current session is allowed to resolve a lost and
  * found report.
  *
- * Sysadmins may resolve any report. Branch managers may resolve reports
- * in their own branch.
+ * Sysadmins may resolve any report. Branch managers may only resolve
+ * reports in their own branch.
  *
+ * @param item_payload the report whose branch gates the check
  * @return true when the operation is permitted, false otherwise
  */
-bool ensure_lost_found_resolution_is_allowed();
+bool ensure_lost_found_resolution_is_allowed(const lost_and_found_record_t item_payload);
 
 /**
  * Checks whether the current session is allowed to delete a branch.

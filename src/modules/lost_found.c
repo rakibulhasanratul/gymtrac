@@ -287,3 +287,17 @@ int get_lost_and_found_for_resolver(
 
   return copied_count;
 }
+
+bool get_lost_and_found_by_id(id_t id, lost_and_found_record_t *destination)
+{
+  if (destination == NULL) return false;
+  for (int i = 0; i < lost_and_found_count; i++)
+  {
+    if (lost_and_found_records[i].id == id)
+    {
+      *destination = lost_and_found_records[i];
+      return true;
+    }
+  }
+  return false;
+}

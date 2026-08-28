@@ -1,6 +1,7 @@
 #include <stdbool.h>
 
 #include "../types.h"
+#include "../utils/string_util.h"
 #include "session.h"
 #include "user.h"
 
@@ -89,15 +90,16 @@ bool ensure_member_profile_view_allowed(id_t gym_member_id)
   return session_belongs_to_branch(member.gym_branch);
 }
 
-bool ensure_lost_found_resolution_is_allowed(lost_and_found_record_t item)
+bool ensure_lost_found_resolution_is_allowed(const lost_and_found_record_t item_payload)
 {
   if (session_is_sysadmin()) return true;
   if (!session_is_branch_manager()) return false;
-  return session_belongs_to_branch(item.gym_branch);
+  return session_belongs_to_branch(item_payload.gym_branch);
 }
 
-bool ensure_branch_deletion_is_allowed()
+bool ensure_branch_deletion_is_allowed(const char branch_name[])
 {
+  if (is_blank_string(branch_name)) return false;
   if (session_is_sysadmin()) return true;
   return false;
 }

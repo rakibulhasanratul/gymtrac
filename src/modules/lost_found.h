@@ -95,4 +95,13 @@ int get_lost_and_found_for_resolver(
   const char resolver_username[], lost_and_found_record_t *destination, int destination_capacity
 );
 
+/**
+ * Finds a lost and found record by id and copies it into destination.
+ *
+ * @param id the report id to look up
+ * @param destination receives a copy of the record when found
+ * @return true when found and copied, false otherwise
+ */
+bool get_lost_and_found_by_id(id_t id, lost_and_found_record_t *destination);
+
 #endif

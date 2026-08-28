@@ -107,6 +107,7 @@ bool ensure_member_deletion_is_allowed(id_t gym_member_id)
   if (session_is_sysadmin()) return true;
   if (!session_is_branch_manager()) return false;
   gym_member_t member;
+  if (!get_gym_member_by_id(gym_member_id, &member)) return false;
   if (!session_belongs_to_branch(member.gym_branch)) return false;
   return member.due_amount == 0;
 }

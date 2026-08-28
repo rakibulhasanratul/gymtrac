@@ -83,6 +83,7 @@ src/
 │   ├── payment.[ch]    payments (digital recorded by member, cash recorded by trainer) + due_amount / last_payment_date updates
 │   ├── lost_found.[ch] report lost/found items, mark resolved
 │   ├── session.[ch]    session_t (role, user_id, username, branch_name) + access predicates
+│   ├── policy.[ch]     permission enforcement via session context: ensure_* policy functions
 │   └── menu.[ch]       login/register menus + one menu handler per role
 └── utils/
     ├── string_util.[ch] trim, split, parse numbers, case helpers, sanitize_field

@@ -170,4 +170,102 @@ bool ensure_member_deletion_is_allowed(id_t gym_member_id);
  */
 bool ensure_staff_deletion_is_allowed(id_t staff_id);
 
+/**
+ * Checks whether the current session is allowed to create a branch.
+ *
+ * Only the system administrator may create branches and only while the
+ * branch table has capacity.
+ *
+ * @return true when the operation is permitted, false otherwise
+ */
+bool ensure_branch_creation_is_allowed();
+
+/**
+ * Checks whether the current session is allowed to rename a branch.
+ *
+ * Only the system administrator may rename branches.
+ *
+ * @return true when the operation is permitted, false otherwise
+ */
+bool ensure_branch_rename_is_allowed();
+
+/**
+ * Checks whether the current session is allowed to create branch staff.
+ *
+ * Sysadmins may create any staff while the branch has capacity for that role.
+ * Branch managers may create trainers in their own branch only, also
+ * respecting per-branch trainer capacity; they may not create managers and
+ * may not create staff outside their branch.
+ *
+ * @param branch_name the branch where the new staff will be assigned
+ * @param role the role of the new staff (TRAINER or BRANCH_MANAGER)
+ * @return true when the operation is permitted, false otherwise
+ */
+bool ensure_staff_creation_is_allowed(const char branch_name[], staff_role_t role);
+
+/**
+ * Checks whether a new gym member can be created in the given branch.
+ *
+ * The branch must exist and have member capacity remaining. The check is
+ * independent of session role so self-registration (no active session) and
+ * sysadmin-driven creation both respect the same capacity limit.
+ *
+ * @param branch_name the branch where the new member will be assigned
+ * @return true when the branch can accept another member, false otherwise
+ */
+bool ensure_gym_member_creation_is_allowed(const char branch_name[]);
+
+/**
+ * Checks whether a branch name is valid for assignment.
+ *
+ * The name must be non-blank and refer to an existing branch.
+ *
+ * @param branch_name the branch name to validate
+ * @return true when the branch exists, false otherwise
+ */
+bool ensure_branch_name_is_valid(const char branch_name[]);
+
+/**
+ * Checks whether the current session is allowed to list branches.
+ *
+ * Any active session may list branches.
+ *
+ * @return true when the operation is permitted, false otherwise
+ */
+bool ensure_branch_listing_is_allowed();
+
+/**
+ * Checks whether the current session is allowed to list members of a branch.
+ *
+ * Sysadmins may list any branch (empty branch_name means all). Branch
+ * managers and trainers may only list their own branch.
+ *
+ * @param branch_name the branch whose members are being listed
+ * @return true when the operation is permitted, false otherwise
+ */
+bool ensure_member_listing_is_allowed(const char branch_name[]);
+
+/**
+ * Checks whether the current session is allowed to view lost and found
+ * reports of a branch.
+ *
+ * Sysadmins may view any branch. Branch staff may only view their own branch.
+ *
+ * @param branch_name the branch whose reports are being viewed
+ * @return true when the operation is permitted, false otherwise
+ */
+bool ensure_lost_found_view_is_allowed(const char branch_name[]);
+
+/**
+ * Checks whether the current session is allowed to report a lost and found
+ * item for a branch.
+ *
+ * Sysadmins may report for any branch. Branch staff and members may only
+ * report for their own branch. Requires an active session.
+ *
+ * @param branch_name the branch where the item is being reported
+ * @return true when the operation is permitted, false otherwise
+ */
+bool ensure_lost_found_report_is_allowed(const char branch_name[]);
+
 #endif

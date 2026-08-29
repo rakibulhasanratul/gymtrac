@@ -110,4 +110,4 @@ Work tracked per item; commit each with a Conventional Commit message (`feat:`, 
 - [x] Policy module (`src/modules/policy.[ch]`): centralized permission enforcement using session context, with `ensure_*` functions gating every role-based action - `feat:`
 - [x] Unit tests covering policy functions with all session states (inactive, sysadmin, manager, trainer, member, wrong branch, nonexistent target) - `test:`
 - [x] Menu module with a login/register flow and one menu per role exposing only that role's allowed actions - `feat:`
-- [ ] `main.c` that boots the app, seeds the default admin on first run, runs the auto-suspend sweep, and dispatches to the login flow - `feat:`
+- [x] `main.c` that boots the app, seeds the default admin on first run, runs the auto-suspend sweep, and dispatches to the login flow - `feat:`

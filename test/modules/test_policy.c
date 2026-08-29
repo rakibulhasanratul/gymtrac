@@ -24,22 +24,16 @@ static const char *STAFF_B = "managerB";
 // Writes a gym member record with a chosen due_amount to the data file.
 // Used to test the zero-dues guard in ensure_member_deletion_is_allowed.
 static void write_raw_member_with_dues(
-  id_t member_id,
-  const char username[],
-  unsigned int due_amount,
-  membership_status_t status
+  id_t member_id, const char username[], unsigned int due_amount, membership_status_t status
 )
 {
   FILE *file = fopen(GYM_MEMBERS_FILE_PATH, "a");
   assert(file != NULL);
-  long long joined_seconds = datetime_to_seconds(
-    (datetime_t){.year = 2024, .month = 1, .day = 1, .hour = 0, .minute = 0, .second = 0}
-  );
+  long long joined_seconds =
+    datetime_to_seconds((datetime_t){.year = 2024, .month = 1, .day = 1, .hour = 0, .minute = 0, .second = 0});
   fprintf(
-    file,
-    "%lu|%s|%s@test.com|0181234567|%s|%s|h|%lld|%lld|%u|%u|%u|%d\n",
-    (unsigned long)member_id, username, username, BRANCH_A, username, joined_seconds, joined_seconds,
-    due_amount, 1000u, 30u, (int)status
+    file, "%lu|%s|%s@test.com|0181234567|%s|%s|h|%lld|%lld|%u|%u|%u|%d\n", (unsigned long)member_id, username, username,
+    BRANCH_A, username, joined_seconds, joined_seconds, due_amount, 1000u, 30u, (int)status
   );
   fclose(file);
 }
@@ -61,7 +55,8 @@ static void seed_fixture()
   load_lost_and_found_records();
 
   // Branch A: one manager, one member.
-  id_t manager_a = create_branch_staff("Manager A", "mgrA@test.com", "01811111111", BRANCH_A, STAFF_A, "h", BRANCH_MANAGER);
+  id_t manager_a =
+    create_branch_staff("Manager A", "mgrA@test.com", "01811111111", BRANCH_A, STAFF_A, "h", BRANCH_MANAGER);
   assert(manager_a != 0);
   id_t member_a = create_gym_member(
     "Alice", "alice@test.com", "01811111112", BRANCH_A, MEMBER_A, "h",
@@ -70,7 +65,8 @@ static void seed_fixture()
   assert(member_a != 0);
 
   // Branch B: one manager, one member.
-  id_t manager_b = create_branch_staff("Manager B", "mgrB@test.com", "01822222221", BRANCH_B, STAFF_B, "h", BRANCH_MANAGER);
+  id_t manager_b =
+    create_branch_staff("Manager B", "mgrB@test.com", "01822222221", BRANCH_B, STAFF_B, "h", BRANCH_MANAGER);
   assert(manager_b != 0);
   id_t member_b = create_gym_member(
     "Bob", "bob@test.com", "01822222222", BRANCH_B, MEMBER_B, "h",
@@ -972,9 +968,7 @@ void test_staff_deletion_manager_own_branch_trainer_allows()
 {
   seed_fixture();
   // Add a trainer under branch A so the deletion has a valid target.
-  id_t trainer = create_branch_staff(
-    "Trainer A", "trA@test.com", "01844444444", BRANCH_A, "trainerA", "h", TRAINER
-  );
+  id_t trainer = create_branch_staff("Trainer A", "trA@test.com", "01844444444", BRANCH_A, "trainerA", "h", TRAINER);
   assert(trainer != 0);
   id_t manager_a = find_staff_id(STAFF_A);
 
@@ -994,9 +988,8 @@ void test_staff_deletion_manager_own_branch_manager_denies()
   assert(ensure_staff_deletion_is_allowed(manager_b) == false);
 
   // Set up a second manager under branch A so the same-branch manager-role check fires.
-  id_t second_mgr = create_branch_staff(
-    "Second Mgr A", "mgr2A@test.com", "01855555555", BRANCH_A, "secondA", "h", BRANCH_MANAGER
-  );
+  id_t second_mgr =
+    create_branch_staff("Second Mgr A", "mgr2A@test.com", "01855555555", BRANCH_A, "secondA", "h", BRANCH_MANAGER);
   assert(second_mgr != 0);
   assert(ensure_staff_deletion_is_allowed(second_mgr) == false);
   clear_session_context();

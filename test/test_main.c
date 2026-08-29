@@ -8,6 +8,7 @@
 #include "modules/test_lost_found.h"
 #include "modules/test_member.h"
 #include "modules/test_payment.h"
+#include "modules/test_policy.h"
 #include "modules/test_session.h"
 #include "modules/test_user.h"
 #include "utils/test_datetime_utils.h"
@@ -263,6 +264,196 @@ int main()
   test_resolve_lost_item_by_manager_and_sysadmin();
   test_report_rejects_invalid_input();
   test_resolve_rejects_invalid_input();
+
+  /* policy: membership approval */
+  test_membership_approval_sysadmin_allows_any();
+  test_membership_approval_manager_own_branch_allows();
+  test_membership_approval_manager_other_branch_denies();
+  test_membership_approval_trainer_denies();
+  test_membership_approval_member_denies();
+  test_membership_approval_inactive_session_denies();
+  test_membership_approval_unknown_member_id_denies();
+
+  /* policy: membership suspension */
+  test_membership_suspension_sysadmin_allows_any();
+  test_membership_suspension_manager_own_branch_allows();
+  test_membership_suspension_manager_other_branch_denies();
+  test_membership_suspension_trainer_denies();
+  test_membership_suspension_member_denies();
+  test_membership_suspension_inactive_session_denies();
+  test_membership_suspension_unknown_member_id_denies();
+
+  /* policy: membership unsuspension */
+  test_membership_unsuspension_sysadmin_allows_any();
+  test_membership_unsuspension_manager_own_branch_allows();
+  test_membership_unsuspension_manager_other_branch_denies();
+  test_membership_unsuspension_trainer_denies();
+  test_membership_unsuspension_member_denies();
+  test_membership_unsuspension_inactive_session_denies();
+  test_membership_unsuspension_unknown_member_id_denies();
+
+  /* policy: status change request (trainer) */
+  test_status_change_request_sysadmin_allows_any();
+  test_status_change_request_trainer_own_branch_allows();
+  test_status_change_request_trainer_other_branch_denies();
+  test_status_change_request_manager_denies();
+  test_status_change_request_member_denies();
+  test_status_change_request_inactive_session_denies();
+  test_status_change_request_unknown_member_id_denies();
+
+  /* policy: plan change request (member) */
+  test_plan_change_request_sysadmin_allows_any();
+  test_plan_change_request_member_self_allows();
+  test_plan_change_request_member_other_denies();
+  test_plan_change_request_trainer_denies();
+  test_plan_change_request_inactive_session_denies();
+
+  /* policy: profile edit request (member) */
+  test_profile_edit_request_sysadmin_allows_any();
+  test_profile_edit_request_member_self_allows();
+  test_profile_edit_request_member_other_denies();
+  test_profile_edit_request_trainer_denies();
+  test_profile_edit_request_inactive_session_denies();
+
+  /* policy: digital payment (member self) */
+  test_digital_payment_sysadmin_allows_any();
+  test_digital_payment_member_self_allows();
+  test_digital_payment_member_other_denies();
+  test_digital_payment_trainer_denies();
+  test_digital_payment_inactive_session_denies();
+
+  /* policy: cash payment (staff) */
+  test_cash_payment_sysadmin_allows_any();
+  test_cash_payment_manager_own_branch_allows();
+  test_cash_payment_trainer_own_branch_allows();
+  test_cash_payment_manager_other_branch_denies();
+  test_cash_payment_member_denies();
+  test_cash_payment_inactive_session_denies();
+  test_cash_payment_unknown_member_id_denies();
+
+  /* policy: payment view */
+  test_payment_view_sysadmin_allows_any();
+  test_payment_view_member_self_allows();
+  test_payment_view_member_other_denies();
+  test_payment_view_manager_own_branch_allows();
+  test_payment_view_manager_other_branch_denies();
+  test_payment_view_inactive_session_denies();
+  test_payment_view_unknown_member_id_denies();
+
+  /* policy: member profile view */
+  test_member_profile_view_sysadmin_allows_any();
+  test_member_profile_view_member_self_allows();
+  test_member_profile_view_member_other_denies();
+  test_member_profile_view_manager_own_branch_allows();
+  test_member_profile_view_manager_other_branch_denies();
+  test_member_profile_view_inactive_session_denies();
+  test_member_profile_view_unknown_member_id_denies();
+
+  /* policy: lost and found resolution */
+  test_lost_found_resolution_sysadmin_allows_any();
+  test_lost_found_resolution_manager_own_branch_allows();
+  test_lost_found_resolution_manager_other_branch_denies();
+  test_lost_found_resolution_trainer_denies();
+  test_lost_found_resolution_inactive_session_denies();
+
+  /* policy: branch deletion */
+  test_branch_deletion_sysadmin_allows();
+  test_branch_deletion_manager_denies();
+  test_branch_deletion_trainer_denies();
+  test_branch_deletion_member_denies();
+  test_branch_deletion_inactive_session_denies();
+  test_branch_deletion_blank_branch_denies();
+  test_branch_deletion_null_branch_denies();
+
+  /* policy: member deletion */
+  test_member_deletion_sysadmin_allows_any();
+  test_member_deletion_manager_own_branch_zero_dues_allows();
+  test_member_deletion_manager_own_branch_with_dues_denies();
+  test_member_deletion_manager_other_branch_denies();
+  test_member_deletion_trainer_denies();
+  test_member_deletion_inactive_session_denies();
+  test_member_deletion_unknown_member_id_denies();
+
+  /* policy: staff deletion */
+  test_staff_deletion_sysadmin_allows_any();
+  test_staff_deletion_manager_own_branch_trainer_allows();
+  test_staff_deletion_manager_own_branch_manager_denies();
+  test_staff_deletion_manager_other_branch_denies();
+  test_staff_deletion_trainer_denies();
+  test_staff_deletion_inactive_session_denies();
+  test_staff_deletion_unknown_staff_id_denies();
+
+  /* policy: branch creation */
+  test_branch_creation_sysadmin_allows();
+  test_branch_creation_manager_denies();
+  test_branch_creation_trainer_denies();
+  test_branch_creation_member_denies();
+  test_branch_creation_inactive_session_denies();
+
+  /* policy: branch rename */
+  test_branch_rename_sysadmin_allows();
+  test_branch_rename_manager_denies();
+  test_branch_rename_trainer_denies();
+  test_branch_rename_member_denies();
+  test_branch_rename_inactive_session_denies();
+
+  /* policy: staff creation */
+  test_staff_creation_sysadmin_trainer_any_branch_allows();
+  test_staff_creation_sysadmin_manager_any_branch_allows();
+  test_staff_creation_manager_trainer_own_branch_allows();
+  test_staff_creation_manager_manager_own_branch_denies();
+  test_staff_creation_manager_trainer_other_branch_denies();
+  test_staff_creation_trainer_denies();
+  test_staff_creation_member_denies();
+  test_staff_creation_inactive_session_denies();
+  test_staff_creation_blank_branch_denies();
+  test_staff_creation_unknown_branch_denies();
+  test_staff_creation_invalid_role_denies();
+
+  /* policy: gym member creation */
+  test_gym_member_creation_blank_branch_denies();
+  test_gym_member_creation_unknown_branch_denies();
+  test_gym_member_creation_valid_branch_allows();
+
+  /* policy: branch name validity */
+  test_branch_name_is_valid_blank_denies();
+  test_branch_name_is_valid_null_denies();
+  test_branch_name_is_valid_unknown_denies();
+  test_branch_name_is_valid_known_allows();
+
+  /* policy: branch listing */
+  test_branch_listing_sysadmin_allows();
+  test_branch_listing_manager_allows();
+  test_branch_listing_member_allows();
+  test_branch_listing_inactive_session_denies();
+
+  /* policy: member listing */
+  test_member_listing_sysadmin_any_branch_allows();
+  test_member_listing_sysadmin_empty_branch_allows();
+  test_member_listing_manager_own_branch_allows();
+  test_member_listing_manager_other_branch_denies();
+  test_member_listing_trainer_own_branch_allows();
+  test_member_listing_trainer_other_branch_denies();
+  test_member_listing_inactive_session_denies();
+  test_member_listing_blank_branch_non_sysadmin_denies();
+
+  /* policy: lost and found view */
+  test_lost_found_view_sysadmin_any_branch_allows();
+  test_lost_found_view_manager_own_branch_allows();
+  test_lost_found_view_manager_other_branch_denies();
+  test_lost_found_view_trainer_own_branch_allows();
+  test_lost_found_view_trainer_other_branch_denies();
+  test_lost_found_view_inactive_session_denies();
+  test_lost_found_view_blank_branch_non_sysadmin_denies();
+
+  /* policy: lost and found report */
+  test_lost_found_report_sysadmin_any_branch_allows();
+  test_lost_found_report_manager_own_branch_allows();
+  test_lost_found_report_manager_other_branch_denies();
+  test_lost_found_report_member_own_branch_allows();
+  test_lost_found_report_member_other_branch_denies();
+  test_lost_found_report_inactive_session_denies();
+  test_lost_found_report_blank_branch_denies();
 
   printf("\n\nAll tests passed.\n\n");
   return 0;

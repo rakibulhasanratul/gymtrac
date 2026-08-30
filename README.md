@@ -30,6 +30,10 @@ Dynamic memory allocation (`malloc`/`realloc`/`free`) is prohibited. No exceptio
 
 Small helpers are `static inline` in their own `.c` file. We're not paying for calling small and plain static helper functions if it isn't inlined. Although static inline saves a call, not your broken rocket engine.
 
+> Auto-suspend only fires when a menu action runs. Don't expect cron.
+
+There's no background scheduler here. A member only gets suspended the next time someone hits a menu, or the next time the app boots. Sit idle on the login screen and a stale member keeps their stale status.
+
 ## Project brief
 
 - Login takes `username` + password; passwords are stored as salted hashes. No password match, no entry.

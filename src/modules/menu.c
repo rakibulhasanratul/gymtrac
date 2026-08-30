@@ -163,6 +163,15 @@ static inline void print_lost_found_line(const lost_and_found_record_t record_pa
   printf(" desc=%s\n", record_payload.description);
 }
 
+// Runs the auto-suspend sweep after a menu action. Menu-driven stand-in for a
+// cron job or background thread, both unavailable in this project. Silent when
+// nothing is overdue; announces the count when a member is auto-suspended.
+static inline void run_auto_suspend_sweep()
+{
+  int suspended = auto_suspend_overdue_members();
+  if (suspended > 0) printf("Auto-suspended %d overdue member(s).\n", suspended);
+}
+
 // Fills destination with the branch the current action should target. Sysadmin is
 // prompted for any branch; non-sysadmin sessions get their own branch.
 static inline bool resolve_target_branch(const char prompt[], char *destination, int destination_capacity)
@@ -553,57 +562,75 @@ static void run_sysadmin_menu()
     {
     case 1:
       handle_add_branch();
+      run_auto_suspend_sweep();
       break;
     case 2:
       handle_delete_branch();
+      run_auto_suspend_sweep();
       break;
     case 3:
       handle_rename_branch();
+      run_auto_suspend_sweep();
       break;
     case 4:
       handle_list_branches();
+      run_auto_suspend_sweep();
       break;
     case 5:
       handle_create_staff();
+      run_auto_suspend_sweep();
       break;
     case 6:
       handle_delete_staff();
+      run_auto_suspend_sweep();
       break;
     case 7:
       handle_register_member();
+      run_auto_suspend_sweep();
       break;
     case 8:
       handle_approve_member();
+      run_auto_suspend_sweep();
       break;
     case 9:
       handle_suspend_member();
+      run_auto_suspend_sweep();
       break;
     case 10:
       handle_unsuspend_member();
+      run_auto_suspend_sweep();
       break;
     case 11:
       handle_delete_member();
+      run_auto_suspend_sweep();
       break;
     case 12:
       handle_view_members_by_branch();
+      run_auto_suspend_sweep();
       break;
     case 13:
       handle_record_digital_payment();
+      run_auto_suspend_sweep();
       break;
     case 14:
       handle_record_cash_payment();
+      run_auto_suspend_sweep();
       break;
     case 15:
       handle_view_payments();
+      run_auto_suspend_sweep();
       break;
     case 16:
       handle_report_lost_found();
+      run_auto_suspend_sweep();
       break;
     case 17:
       handle_view_lost_found();
+      run_auto_suspend_sweep();
       break;
     case 18:
       handle_resolve_lost_found();
+      run_auto_suspend_sweep();
       break;
     case 0:
       auth_logout();
@@ -641,42 +668,55 @@ static void run_branch_manager_menu()
     {
     case 1:
       handle_list_branches();
+      run_auto_suspend_sweep();
       break;
     case 2:
       handle_approve_member();
+      run_auto_suspend_sweep();
       break;
     case 3:
       handle_suspend_member();
+      run_auto_suspend_sweep();
       break;
     case 4:
       handle_unsuspend_member();
+      run_auto_suspend_sweep();
       break;
     case 5:
       handle_delete_member();
+      run_auto_suspend_sweep();
       break;
     case 6:
       handle_delete_staff();
+      run_auto_suspend_sweep();
       break;
     case 7:
       handle_view_members_by_branch();
+      run_auto_suspend_sweep();
       break;
     case 8:
       handle_record_cash_payment();
+      run_auto_suspend_sweep();
       break;
     case 9:
       handle_view_payments();
+      run_auto_suspend_sweep();
       break;
     case 10:
       handle_view_lost_found();
+      run_auto_suspend_sweep();
       break;
     case 11:
       handle_resolve_lost_found();
+      run_auto_suspend_sweep();
       break;
     case 12:
       handle_report_lost_found();
+      run_auto_suspend_sweep();
       break;
     case 13:
       handle_create_staff();
+      run_auto_suspend_sweep();
       break;
     case 0:
       auth_logout();
@@ -706,18 +746,23 @@ static void run_trainer_menu()
     {
     case 1:
       handle_view_members_by_branch();
+      run_auto_suspend_sweep();
       break;
     case 2:
       handle_view_payments();
+      run_auto_suspend_sweep();
       break;
     case 3:
       handle_record_cash_payment();
+      run_auto_suspend_sweep();
       break;
     case 4:
       handle_view_lost_found();
+      run_auto_suspend_sweep();
       break;
     case 5:
       handle_report_lost_found();
+      run_auto_suspend_sweep();
       break;
     case 0:
       auth_logout();
@@ -748,21 +793,27 @@ static void run_member_menu()
     {
     case 1:
       handle_view_own_profile();
+      run_auto_suspend_sweep();
       break;
     case 2:
       handle_record_digital_payment();
+      run_auto_suspend_sweep();
       break;
     case 3:
       handle_view_payments();
+      run_auto_suspend_sweep();
       break;
     case 4:
       handle_view_own_suspensions();
+      run_auto_suspend_sweep();
       break;
     case 5:
       handle_report_lost_found();
+      run_auto_suspend_sweep();
       break;
     case 6:
       handle_view_lost_found();
+      run_auto_suspend_sweep();
       break;
     case 0:
       auth_logout();
@@ -823,9 +874,11 @@ void run_main_menu()
     {
     case 1:
       handle_login();
+      run_auto_suspend_sweep();
       break;
     case 2:
       handle_register_member();
+      run_auto_suspend_sweep();
       break;
     case 0:
       printf("Goodbye.\n");

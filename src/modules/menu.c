@@ -18,7 +18,7 @@
 
 static bool prompt_string_input(const char prompt[], char *destination, int destination_capacity)
 {
-  printf("%s\n", prompt);
+  printf("%s ", prompt);
   char raw[LINE_BUFFER_SIZE];
   if (!input_string(raw, LINE_BUFFER_SIZE))
   {
@@ -37,7 +37,7 @@ static bool prompt_string_input(const char prompt[], char *destination, int dest
 
 static bool prompt_integer_input(const char prompt[], int *destination)
 {
-  printf("%s\n", prompt);
+  printf("%s ", prompt);
   if (!input_integer(destination))
   {
     LOG_ERROR("Error: Invalid integer input for '%s'.", prompt);
@@ -48,7 +48,7 @@ static bool prompt_integer_input(const char prompt[], int *destination)
 
 static bool prompt_positive_input(const char prompt[], int *destination)
 {
-  printf("%s\n", prompt);
+  printf("%s ", prompt);
   if (!input_positive_int(destination))
   {
     LOG_ERROR("Error: Invalid positive integer input for '%s'.", prompt);

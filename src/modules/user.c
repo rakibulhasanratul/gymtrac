@@ -1115,6 +1115,19 @@ bool rename_branch_for_all_users(const char old_branch_name[], const char new_br
   return true;
 }
 
+int get_branch_staff_count()
+{
+  return branch_staff_count;
+}
+
+bool get_branch_staff_at(int index, branch_staff_t *destination)
+{
+  if (destination == NULL) return false;
+  if (index < 0 || index >= branch_staff_count) return false;
+  *destination = branch_staffs[index];
+  return true;
+}
+
 int get_gym_member_ids_by_status(membership_status_t status, id_t *destination, int destination_capacity)
 {
   if (destination == NULL || destination_capacity <= 0) return 0;

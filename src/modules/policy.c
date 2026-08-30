@@ -201,3 +201,12 @@ bool ensure_lost_found_report_is_allowed(const char branch_name[])
   if (session_is_sysadmin()) return true;
   return session_belongs_to_branch(branch_name);
 }
+
+bool ensure_staff_listing_is_allowed(const char branch_name[])
+{
+  if (!session_is_active()) return false;
+  if (session_is_sysadmin()) return true;
+  if (!session_is_branch_manager()) return false;
+  if (is_blank_string(branch_name)) return false;
+  return session_belongs_to_branch(branch_name);
+}

@@ -163,6 +163,15 @@ static inline void print_lost_found_line(const lost_and_found_record_t record_pa
   printf(" desc=%s\n", record_payload.description);
 }
 
+static inline void print_staff_line(const branch_staff_t staff_payload)
+{
+  printf(
+    "  id=%lu name=%s username=%s branch=%s role=%s email=%s phone=%s\n", (unsigned long)staff_payload.id,
+    staff_payload.full_name, staff_payload.username, staff_payload.gym_branch,
+    staff_payload.role == BRANCH_MANAGER ? "manager" : "trainer", staff_payload.email, staff_payload.phone_number
+  );
+}
+
 // Runs the auto-suspend sweep after a menu action. Menu-driven stand-in for a
 // cron job or background thread, both unavailable in this project. Silent when
 // nothing is overdue; announces the count when a member is auto-suspended.
@@ -380,8 +389,9 @@ static void handle_view_members_by_branch()
 {
   char branch[BRANCH_NAME_BUFFER_SIZE];
   if (!resolve_target_branch("Enter branch name (empty for all):", branch, BRANCH_NAME_BUFFER_SIZE)) return;
-  if (is_blank_string(branch) && !session_is_sysadmin()) return;
-  if (!is_blank_string(branch) && !ensure_member_listing_is_allowed(branch)) return;
+  bool branch_is_blank = is_blank_string(branch);
+  if (branch_is_blank && !session_is_sysadmin()) return;
+  if (!branch_is_blank && !ensure_member_listing_is_allowed(branch)) return;
   int found = 0;
   id_t ids[64];
   gym_member_t member;
@@ -391,13 +401,34 @@ static void handle_view_members_by_branch()
     for (int i = 0; i < count; i++)
     {
       if (!get_gym_member_by_id(ids[i], &member)) continue;
-      if (!is_blank_string(branch) && strcmp(member.gym_branch, branch) != 0) continue;
+      if (!branch_is_blank && strcmp(member.gym_branch, branch) != 0) continue;
       if (!session_is_sysadmin() && !session_belongs_to_branch(member.gym_branch)) continue;
       print_member_line(member);
       found++;
     }
   }
   if (found == 0) printf("No members found.\n");
+}
+
+static void handle_view_staffs_by_branch()
+{
+  char branch[BRANCH_NAME_BUFFER_SIZE];
+  if (!resolve_target_branch("Enter branch name (empty for all):", branch, BRANCH_NAME_BUFFER_SIZE)) return;
+  if (!ensure_staff_listing_is_allowed(branch)) return;
+  bool branch_is_blank = is_blank_string(branch);
+  int found = 0;
+  int total = get_branch_staff_count();
+  for (int i = 0; i < total; i++)
+  {
+    branch_staff_t staff;
+    if (!get_branch_staff_at(i, &staff)) continue;
+    if (!branch_is_blank && strcmp(staff.gym_branch, branch) != 0) continue;
+    if (!session_is_sysadmin() && !session_belongs_to_branch(staff.gym_branch)) continue;
+    if (session_is_branch_manager() && staff.role != TRAINER) continue;
+    print_staff_line(staff);
+    found++;
+  }
+  if (found == 0) printf("No staff found.\n");
 }
 
 static void handle_view_own_profile()
@@ -555,6 +586,7 @@ static void run_sysadmin_menu()
     printf("16. Report Lost & Found\n");
     printf("17. View Lost & Found\n");
     printf("18. Resolve Lost & Found\n");
+    printf("19. List staffs\n");
     printf(" 0. Logout\n");
     int choice = 0;
     if (!prompt_integer_input("\nChoose option:", &choice)) continue;
@@ -633,6 +665,10 @@ static void run_sysadmin_menu()
       handle_resolve_lost_found();
       run_auto_suspend_sweep();
       break;
+    case 19:
+      handle_view_staffs_by_branch();
+      run_auto_suspend_sweep();
+      break;
     case 0:
       auth_logout();
       printf("Logged out.\n");
@@ -662,6 +698,7 @@ static void run_branch_manager_menu()
     printf("11. Resolve Lost & Found\n");
     printf("12. Report Lost & Found\n");
     printf("13. Create trainer\n");
+    printf("14. List trainers\n");
     printf(" 0. Logout\n");
     int choice = 0;
     if (!prompt_integer_input("\nChoose option:", &choice)) continue;
@@ -718,6 +755,10 @@ static void run_branch_manager_menu()
       break;
     case 13:
       handle_create_staff();
+      run_auto_suspend_sweep();
+      break;
+    case 14:
+      handle_view_staffs_by_branch();
       run_auto_suspend_sweep();
       break;
     case 0:

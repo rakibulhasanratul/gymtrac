@@ -327,6 +327,25 @@ bool update_gym_member_lifecycle(
 bool rename_branch_for_all_users(const char old_branch_name[], const char new_branch_name[]);
 
 /**
+ * Returns the number of branch staff currently loaded in memory.
+ *
+ * @return the staff count
+ */
+int get_branch_staff_count();
+
+/**
+ * Copies the branch staff record at the given index into destination.
+ *
+ * Callers receive a copy, so internal records cannot change through the getter.
+ *
+ * @param index the zero-based index
+ * @param destination receives a copy of the record when found;
+ *                    must point to a valid branch_staff_t
+ * @return true when the index is valid and the record was copied, false otherwise
+ */
+bool get_branch_staff_at(int index, branch_staff_t *destination);
+
+/**
  * Collects the ids of every loaded member carrying the given status.
  *
  * Copies at most destination_capacity ids; members beyond that are skipped.

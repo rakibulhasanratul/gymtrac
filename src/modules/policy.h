@@ -268,4 +268,15 @@ bool ensure_lost_found_view_is_allowed(const char branch_name[]);
  */
 bool ensure_lost_found_report_is_allowed(const char branch_name[]);
 
+/**
+ * Checks whether the current session is allowed to list branch staff.
+ *
+ * Sysadmins may list any branch (empty branch_name means all). Branch
+ * managers may only list trainers of their own branch.
+ *
+ * @param branch_name the branch whose staff are being listed
+ * @return true when the operation is permitted, false otherwise
+ */
+bool ensure_staff_listing_is_allowed(const char branch_name[]);
+
 #endif

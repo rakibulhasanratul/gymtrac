@@ -264,7 +264,7 @@ static void handle_create_staff()
   if (!ensure_branch_name_is_valid(branch)) return;
   if (!prompt_string_input("Enter username:", username, USERNAME_BUFFER_SIZE)) return;
   if (!prompt_string_input("Enter password:", password, USERNAME_BUFFER_SIZE)) return;
-  if (!prompt_integer_input("Choose role: 1. Branch Manager  2. Trainer", &role_choice)) return;
+  if (!prompt_integer_input("Choose role (1. Branch Manager  2. Trainer): ", &role_choice)) return;
   staff_role_t role;
   switch (role_choice)
   {
@@ -552,12 +552,13 @@ static void run_sysadmin_menu()
     printf("13. Digital pay\n");
     printf("14. Cash pay\n");
     printf("15. View payments\n");
-    printf("16. Report L&F\n");
-    printf("17. View L&F\n");
-    printf("18. Resolve L&F\n");
+    printf("16. Report Lost & Found\n");
+    printf("17. View Lost & Found\n");
+    printf("18. Resolve Lost & Found\n");
     printf(" 0. Logout\n");
     int choice = 0;
-    if (!prompt_integer_input("Choose option:", &choice)) continue;
+    if (!prompt_integer_input("\nChoose option:", &choice)) continue;
+    printf("\n");
     switch (choice)
     {
     case 1:
@@ -657,13 +658,14 @@ static void run_branch_manager_menu()
     printf(" 7. List members\n");
     printf(" 8. Cash pay\n");
     printf(" 9. View payments\n");
-    printf("10. View L&F\n");
-    printf("11. Resolve L&F\n");
-    printf("12. Report L&F\n");
+    printf("10. View Lost & Found\n");
+    printf("11. Resolve Lost & Found\n");
+    printf("12. Report Lost & Found\n");
     printf("13. Create trainer\n");
     printf(" 0. Logout\n");
     int choice = 0;
-    if (!prompt_integer_input("Choose option:", &choice)) continue;
+    if (!prompt_integer_input("\nChoose option:", &choice)) continue;
+    printf("\n");
     switch (choice)
     {
     case 1:
@@ -737,11 +739,12 @@ static void run_trainer_menu()
     printf(" 1. List members\n");
     printf(" 2. List payments\n");
     printf(" 3. Cash pay\n");
-    printf(" 4. View L&F\n");
-    printf(" 5. Report L&F\n");
+    printf(" 4. View Lost & Found\n");
+    printf(" 5. Report Lost & Found\n");
     printf(" 0. Logout\n");
     int choice = 0;
-    if (!prompt_integer_input("Choose option:", &choice)) continue;
+    if (!prompt_integer_input("\nChoose option:", &choice)) continue;
+    printf("\n");
     switch (choice)
     {
     case 1:
@@ -784,11 +787,12 @@ static void run_member_menu()
     printf(" 2. Digital pay\n");
     printf(" 3. View payments\n");
     printf(" 4. View suspensions\n");
-    printf(" 5. Report L&F\n");
-    printf(" 6. View L&F\n");
+    printf(" 5. Report Lost & Found\n");
+    printf(" 6. View Lost & Found\n");
     printf(" 0. Logout\n");
     int choice = 0;
-    if (!prompt_integer_input("Choose option:", &choice)) continue;
+    if (!prompt_integer_input("\nChoose option:", &choice)) continue;
+    printf("\n");
     switch (choice)
     {
     case 1:
@@ -869,7 +873,8 @@ void run_main_menu()
     printf(" 2. Register as member\n");
     printf(" 0. Exit\n");
     int choice = 0;
-    if (!prompt_integer_input("Choose option:", &choice)) continue;
+    if (!prompt_integer_input("\nChoose option:", &choice)) continue;
+    printf("\n");
     switch (choice)
     {
     case 1:

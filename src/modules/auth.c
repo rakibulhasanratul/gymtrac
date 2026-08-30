@@ -14,7 +14,7 @@
 #include "user.h"
 
 // Buffer for the mixed salt+password string.
-#define MIXED_BUFFER_SIZE 128
+#define MIXED_BUFFER_SIZE PASSWORD_HASH_BUFFER_SIZE
 
 void hash_password(const char password[], char *destination)
 {

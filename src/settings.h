@@ -4,7 +4,7 @@
 // Buffer sizes for fixed-size char array fields.
 #define FULL_NAME_BUFFER_SIZE 64
 #define USERNAME_BUFFER_SIZE 32
-#define PASSWORD_HASH_BUFFER_SIZE 40 // salt (15 chars) + polynomial hash decimal + null
+#define PASSWORD_HASH_BUFFER_SIZE 128 // salt (15 chars) + polynomial hash decimal + null + overflow buffer
 #define EMAIL_BUFFER_SIZE 64
 #define PHONE_BUFFER_SIZE 11         // phone number pattern: 01XXXXXXXXX
 #define BRANCH_NAME_BUFFER_SIZE 128  // should allow detailed location names
@@ -48,7 +48,7 @@
 // main verifies this is exactly one character
 #define FIELD_DELIMITER_STRING "|"
 #define FIELD_DELIMITER FIELD_DELIMITER_STRING[0]
-#define GYM_BRANCHES_FILE_PATH DATA_DIRECTORY "/branches.txt"
+#define GYM_BRANCHES_FILE_PATH DATA_DIRECTORY "/branches.dat"
 #define SYSADMINS_FILE_PATH DATA_DIRECTORY "/sysadmins.dat"
 #define BRANCH_STAFF_FILE_PATH DATA_DIRECTORY "/branch_staff.dat"
 #define GYM_MEMBERS_FILE_PATH DATA_DIRECTORY "/gym_members.dat"

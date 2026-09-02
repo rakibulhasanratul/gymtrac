@@ -324,7 +324,7 @@ static void handle_register_member()
   if (!ensure_gym_member_creation_is_allowed(branch)) return;
   if (!prompt_string_input("Enter username:", username, USERNAME_BUFFER_SIZE)) return;
   if (!prompt_string_input("Enter password:", password, USERNAME_BUFFER_SIZE)) return;
-  subscription_plan_t plan = {0, 0};
+  subscription_plan_t plan = {DEFAULT_PLAN_AMOUNT, DEFAULT_PLAN_INTERVAL_DAYS};
   char hash[PASSWORD_HASH_BUFFER_SIZE];
   hash_password(password, hash);
   id_t id = create_gym_member(full_name, email, phone, branch, username, hash, plan, MEMBERSHIP_ON_HOLD);

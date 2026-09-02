@@ -22,7 +22,7 @@ Field delimiter is `|` (pipe). Input is sanitized to strip control characters an
 Aliases so structs read uniformly and enum-backed fields stay one byte:
 
 - `id_t` = `unsigned long int`
-- `request_status_t` = `unsigned char` (`REQUEST_REQUESTED` / `REQUEST_APPROVED` / `REQUEST_REJECTED`)
+- `digital_payment_request_t` is a transient carrier for recording a digital payment, not a persisted approval flow
 - `staff_role_t` = `unsigned char` (`TRAINER` / `BRANCH_MANAGER`), stored in `branch_staff_t.role`
 - `user_role_t` = `unsigned char` (`USER_ROLE_SYSADMIN` / `USER_ROLE_BRANCH_MANAGER` / `USER_ROLE_TRAINER` / `USER_ROLE_MEMBER`), used by `session_t`
 - `membership_status_t` = `unsigned char` (`MEMBERSHIP_ON_HOLD` / `MEMBERSHIP_ACTIVE` / `MEMBERSHIP_SUSPENDED` / `MEMBERSHIP_CANCELLED`)
@@ -59,18 +59,9 @@ Branches are not a table. `data/branches.txt` holds one branch name per line (ar
 
 Branch managers and trainers share one table (`branch_staff_t`), so a single staff id is unambiguous across both roles and no `(role, id)` pair is needed. Members are referenced by their own id space (`gym_member_id`). The lost & found module references members by `reported_by_username` instead of an id, because staff only need the name to identify the reporter.
 
-### Requests (approval flows)
+### Requests
 
-| Table | Fields |
-|---|---|
-| `membership_status_change_request_t` | `request_id`, `gym_member_id`, `requested_by_staff_id`, `resolved_by_staff_id`, `reason`, `new_membership_status`, `status`, `created_at` |
-| `subscription_plan_change_request_t` | `request_id`, `gym_member_id`, `new_plan`, `status`, `created_at` |
-| `profile_edit_request_t` | `full_name`, `email`, `phone_number`, `gym_branch`, `username`, `status` |
-
-- `membership_status_change_request_t`: a branch trainer requests a member's status change (approve / suspend / unsuspend / cancel). `new_membership_status` is the target status; `reason` is mandatory for suspend/unsuspend. Only a branch manager resolves it (`resolved_by_staff_id` = manager id); on approval the member's status is set (a suspension also writes a `suspension_record_t`).
-- `subscription_plan_change_request_t`: a member requests switching to a new plan (`new_plan`). Branch staff of the member's branch approve or reject; on approval the member's `plan` is replaced. No resolver id is recorded, the acting staff member is implied by branch scope.
-- `profile_edit_request_t`: a member requests profile changes; the fields hold the desired new values. Branch staff of the member's branch approve or reject; on approval the values are copied into the member record.
-- Common request status (`request_status_t`): `REQUEST_REQUESTED`, `REQUEST_APPROVED`, `REQUEST_REJECTED`.
+No persisted request tables exist in the current build. Digital payments use the transient carrier `digital_payment_request_t` to create a `payment_t`. Membership status changes, plan changes, and profile edits are handled directly by role-permitted operations without a separate request stage.
 
 ### Records
 
@@ -91,17 +82,17 @@ Branch managers and trainers share one table (`branch_staff_t`), so a single sta
 
 ### Data files
 
-`data/branches.txt`, `data/sysadmins.dat`, `data/branch_staff.dat`, `data/gym_members.dat`, `data/payments.dat`, `data/membership_status_change_requests.dat`, `data/subscription_plan_change_requests.dat`, `data/profile_edit_requests.dat`, `data/suspensions.dat`, `data/lost_and_found.dat`.
+`data/branches.txt`, `data/sysadmins.dat`, `data/branch_staff.dat`, `data/gym_members.dat`, `data/payments.dat`, `data/suspensions.dat`, `data/lost_and_found.dat`.
 
 ## Rules & Flows
 
 - Members self-register from the login menu (choose an existing branch, set username/password/name/phone/email) and are created as `MEMBERSHIP_ON_HOLD`. Only the sysadmin can create staff (choosing a role) or branches.
-- A branch manager approves a `MEMBERSHIP_ON_HOLD` member to `MEMBERSHIP_ACTIVE` (directly, or by resolving a trainer's status-change request). Approval assigns the default plan, sets `last_payment_date` = approval date and `due_amount` = plan `payable_amount`; the member is payable again at `last_payment_date + interval_days`.
+- A branch manager approves a `MEMBERSHIP_ON_HOLD` member to `MEMBERSHIP_ACTIVE` directly. Approval assigns the default plan, sets `last_payment_date` = approval date and `due_amount` = plan `payable_amount`; the member is payable again at `last_payment_date + interval_days`.
 - Digital payments are recorded by the member directly; cash payments are handed to a branch trainer who records them directly. Neither flow needs an approval request.
 - Only `PAYMENT_COMPLETED` payments reduce `due_amount` (clamped at 0) and push `last_payment_date` forward to the payment date. The next due date is always `last_payment_date + plan.interval_days`.
 - Auto-suspend: at startup, `MEMBERSHIP_ACTIVE` members whose due date (`last_payment_date + interval_days`) is more than `MAX_UNPAID_DAYS` (90) in the past are suspended with reason "Auto: unpaid dues". Each suspension creates a `suspension_record_t` with its reason and date.
-- Only branch managers suspend or unsuspend members directly or resolve trainer status-change requests. Trainers can only request. Every suspension carries a mandatory `reason`. The sysadmin can perform these operations too.
-- Members request plan changes and profile edits; branch staff approve or reject them. Staff and sysadmin edit their own records directly.
+- Only branch managers suspend or unsuspend members directly. Every suspension carries a mandatory `reason`. The sysadmin can perform these operations too.
+- Members view and update their own profiles directly where permitted; staff and sysadmin edit their own records directly.
 - Per-branch capacity caps: `MAX_MANAGERS_PER_BRANCH` (default 1), `MAX_TRAINERS_PER_BRANCH` (default 5), `MAX_MEMBERS_PER_BRANCH` (default 100); enforced by `branch_manager_count()`, `branch_trainer_count()`, `branch_member_count()` in the user module. Derived global caps (`MAX_BRANCH_MANAGERS`, `MAX_TRAINERS`, `MAX_GYM_MEMBERS`) equal `BRANCH_COUNT_MAX` times the respective per-branch limit and bound the static arrays that store all records.
 - Suspended members can still log in, but get a banner with the reason and are restricted to paying dues, viewing history, and reporting lost/found.
 - Seeded sysadmin: username `admin`, password `admin` (created on first run when no sysadmin exists).
@@ -120,13 +111,7 @@ The system administrator can perform every operation. Branch staff are limited t
 | Record cash payment (handover) | yes | yes | yes | no |
 | View payments | all | own branch | own branch | own only |
 | Approve member (MEMBERSHIP_ON_HOLD to MEMBERSHIP_ACTIVE) | yes | yes | no | no |
-| Request member status change | no (acts directly) | no | yes | no |
-| Resolve status-change requests | yes | yes | no | no |
 | Suspend/unsuspend member directly | yes | yes | no | no |
-| Request plan change | no (acts directly) | no | no | yes |
-| Resolve plan-change requests | yes | yes | yes | no |
-| Request profile edit | no | no | no | yes |
-| Resolve profile-edit requests | yes | yes | yes | no |
 | Report lost/found item | yes | no | no | yes |
 | View + resolve lost/found | all | own branch | own branch | no |
 
@@ -143,7 +128,7 @@ Precise assert-based tests, one file per unit, run via `build/test_runner`:
 - `user`: sysadmin/staff/member create/get, credential helpers, username_exists() across all three tables, branch_manager_count() / branch_trainer_count() / branch_member_count() (per-branch capacity enforcement).
 - `payment`: digital recorded by member, cash recorded by trainer, status handling (only PAYMENT_COMPLETED applies), due amount clamp, last_payment_date update.
 - `member`: self-registration -> MEMBERSHIP_ON_HOLD, MEMBERSHIP_ON_HOLD to MEMBERSHIP_ACTIVE approval (plan assignment, due amount, last_payment_date), suspension records with an open `EMPTY_DATETIME` unsuspension date, auto-suspend sweep against the real clock (tests bracket stamped times between before/after reads).
-- `request`: status-change (trainer -> manager), plan-change, and profile-edit flows.
+- Future request workflows (status-change, plan-change, profile-edit) are out of scope for the current build.
 - `lost_found`: report by username, resolve by staff id.
 
 Tests use a temp data directory set via the `DEFAULT_DATA_DIRECTORY` macro, so they never touch real data.

@@ -51,12 +51,10 @@ There's no background scheduler here. A member only gets suspended the next time
 - Members view their own payment history.
 - A completed payment reduces `due_amount` (clamped at 0) and updates `last_payment_date`; the next due date is `last_payment_date + interval_days`.
 - Dues left unpaid past the due date plus a grace period trigger automatic suspension. A manager unsuspends after the dues are paid. No manager, no unsuspension.
-- Members view their own profiles and submit profile-edit requests (name, phone, email, branch, username). Branch staff approve or reject them; member input ends at submission.
+- Members view their own profiles.
 - `Lost & Found`: members report lost or found items. Branch staff view them and mark them resolved.
-- Suspensions and requests:
+- Suspensions:
   - Only branch managers approve a member (`on_hold` to `active`), suspend, or unsuspend directly. Trainers hold none of this authority.
-  - Branch trainers can only _request_ a member's status change (`membership_status_change_request_t`). Only branch managers resolve those requests.
-  - Members request plan changes (`subscription_plan_change_request_t`) and profile edits (`profile_edit_request_t`); branch staff approve or reject them.
   - Every suspension carries a mandatory `reason`, stored in a dedicated suspension record with its date (and an optional unsuspension date). No reason, no suspension.
 - Deletion rules:
   - A branch stays undeletable while any staff or member is assigned to it (`ensure_branch_has_no_users()` (branch.c:92)).

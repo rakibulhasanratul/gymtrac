@@ -292,29 +292,6 @@ int main()
   test_membership_unsuspension_inactive_session_denies();
   test_membership_unsuspension_unknown_member_id_denies();
 
-  /* policy: status change request (trainer) */
-  test_status_change_request_sysadmin_allows_any();
-  test_status_change_request_trainer_own_branch_allows();
-  test_status_change_request_trainer_other_branch_denies();
-  test_status_change_request_manager_denies();
-  test_status_change_request_member_denies();
-  test_status_change_request_inactive_session_denies();
-  test_status_change_request_unknown_member_id_denies();
-
-  /* policy: plan change request (member) */
-  test_plan_change_request_sysadmin_allows_any();
-  test_plan_change_request_member_self_allows();
-  test_plan_change_request_member_other_denies();
-  test_plan_change_request_trainer_denies();
-  test_plan_change_request_inactive_session_denies();
-
-  /* policy: profile edit request (member) */
-  test_profile_edit_request_sysadmin_allows_any();
-  test_profile_edit_request_member_self_allows();
-  test_profile_edit_request_member_other_denies();
-  test_profile_edit_request_trainer_denies();
-  test_profile_edit_request_inactive_session_denies();
-
   /* policy: digital payment (member self) */
   test_digital_payment_sysadmin_allows_any();
   test_digital_payment_member_self_allows();

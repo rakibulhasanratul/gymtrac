@@ -115,46 +115,6 @@ typedef struct
   payment_status_t status;
 } digital_payment_request_t;
 
-// Lifecycle status of an approval request.
-typedef unsigned char request_status_t;
-#define REQUEST_REQUESTED 0
-#define REQUEST_APPROVED 1
-#define REQUEST_REJECTED 2
-
-// Trainer request to change a member's status, resolved by a manager.
-typedef struct
-{
-  id_t request_id;
-  id_t gym_member_id;
-  id_t requester_staff_id;
-  id_t resolver_staff_id;
-  char reason[REASON_BUFFER_SIZE];
-  membership_status_t new_membership_status;
-  request_status_t status;
-  datetime_t created_at;
-} membership_status_change_request_t;
-
-// Member request to change their plan, resolved by branch staff.
-typedef struct
-{
-  id_t request_id;
-  id_t gym_member_id;
-  subscription_plan_t new_plan;
-  request_status_t status;
-  datetime_t created_at;
-} subscription_plan_change_request_t;
-
-// Member request to edit profile fields, approved or rejected by staff.
-typedef struct
-{
-  char full_name[FULL_NAME_BUFFER_SIZE];
-  char email[EMAIL_BUFFER_SIZE];
-  char phone_number[PHONE_BUFFER_SIZE];
-  char gym_branch[BRANCH_NAME_BUFFER_SIZE];
-  char username[USERNAME_BUFFER_SIZE];
-  request_status_t status;
-} profile_edit_request_t;
-
 // Read-only profile view of a gym member.
 typedef struct
 {

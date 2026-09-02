@@ -35,29 +35,6 @@ bool ensure_membership_unsuspension_is_allowed(id_t gym_member_id)
   return session_belongs_to_branch(member.gym_branch);
 }
 
-bool ensure_status_change_request_is_allowed(id_t gym_member_id)
-{
-  if (session_is_sysadmin()) return true;
-  if (!session_is_trainer()) return false;
-  gym_member_t member;
-  if (!get_gym_member_by_id(gym_member_id, &member)) return false;
-  return session_belongs_to_branch(member.gym_branch);
-}
-
-bool ensure_plan_change_request_is_allowed(id_t gym_member_id)
-{
-  if (session_is_sysadmin()) return true;
-  if (!session_is_member()) return false;
-  return get_user_id_from_session() == gym_member_id;
-}
-
-bool ensure_profile_edit_request_is_allowed(id_t gym_member_id)
-{
-  if (session_is_sysadmin()) return true;
-  if (!session_is_member()) return false;
-  return get_user_id_from_session() == gym_member_id;
-}
-
 bool ensure_digital_payment_is_allowed(id_t gym_member_id)
 {
   if (session_is_sysadmin()) return true;

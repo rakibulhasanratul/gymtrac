@@ -39,42 +39,6 @@ bool ensure_membership_suspension_is_allowed(id_t gym_member_id);
 bool ensure_membership_unsuspension_is_allowed(id_t gym_member_id);
 
 /**
- * Checks whether the current session is allowed to request a status change
- * for a gym member.
- *
- * Sysadmins may request status changes for any member. Branch trainers may
- * only request status changes for members assigned to their own branch.
- *
- * @param gym_member_id the member whose status change is being requested
- * @return true when the operation is permitted, false otherwise
- */
-bool ensure_status_change_request_is_allowed(id_t gym_member_id);
-
-/**
- * Checks whether the current session is allowed to request a plan change
- * for a gym member.
- *
- * Sysadmins may request plan changes for any member. Members may only
- * request plan changes for themselves.
- *
- * @param gym_member_id the member whose plan change is being requested
- * @return true when the operation is permitted, false otherwise
- */
-bool ensure_plan_change_request_is_allowed(id_t gym_member_id);
-
-/**
- * Checks whether the current session is allowed to request a profile edit
- * for a gym member.
- *
- * Sysadmins may request profile edits for any member. Members may only
- * request profile edits for themselves.
- *
- * @param gym_member_id the member whose profile edit is being requested
- * @return true when the operation is permitted, false otherwise
- */
-bool ensure_profile_edit_request_is_allowed(id_t gym_member_id);
-
-/**
  * Checks whether the current session is allowed to record a digital payment
  * for a gym member.
  *

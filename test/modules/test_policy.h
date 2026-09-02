@@ -28,29 +28,6 @@ void test_membership_unsuspension_member_denies();
 void test_membership_unsuspension_inactive_session_denies();
 void test_membership_unsuspension_unknown_member_id_denies();
 
-/* status change request (trainer) */
-void test_status_change_request_sysadmin_allows_any();
-void test_status_change_request_trainer_own_branch_allows();
-void test_status_change_request_trainer_other_branch_denies();
-void test_status_change_request_manager_denies();
-void test_status_change_request_member_denies();
-void test_status_change_request_inactive_session_denies();
-void test_status_change_request_unknown_member_id_denies();
-
-/* plan change request (member) */
-void test_plan_change_request_sysadmin_allows_any();
-void test_plan_change_request_member_self_allows();
-void test_plan_change_request_member_other_denies();
-void test_plan_change_request_trainer_denies();
-void test_plan_change_request_inactive_session_denies();
-
-/* profile edit request (member) */
-void test_profile_edit_request_sysadmin_allows_any();
-void test_profile_edit_request_member_self_allows();
-void test_profile_edit_request_member_other_denies();
-void test_profile_edit_request_trainer_denies();
-void test_profile_edit_request_inactive_session_denies();
-
 /* digital payment (member self) */
 void test_digital_payment_sysadmin_allows_any();
 void test_digital_payment_member_self_allows();

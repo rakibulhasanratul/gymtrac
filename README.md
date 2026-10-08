@@ -1,10 +1,10 @@
 # Gymtrac
 
-`Gymtrac` is a gym management system, a `group project` for the `CSE115L` course at North South University. Expecting fancy engineering? Wrong repo. Written in C against C11 standards, strictly CLI, no GUI.
+`Gymtrac` is a gym management system, a `group project` for the `CSE115L` course at North South University.
 
 > Why am I putting this on GitHub?
 
-This is not the type of project I want to put in my account. But, the entire project is built using AI (OpenCode, model: Big Pickle) and I thought it would be fun to if I share the thing out. Needless to say, I didn't edit any single line of code, for every changes, I did write a prompt. However, this readme and AGENTS.md is human written btw.
+This is not the type of project I want to put in my account. But, the entire project is built using AI (OpenCode, model: Big Pickle) and I thought it would be fun if I share the thing out. Needless to say, I didn't edit any single line of code, for every changes, I did write a prompt. However, this readme and AGENTS.md is human written btw, although grammars are checked (and 'fixed' somewhere by AI). So, expecting fancy engineering? Wrong repo. THIS IS A PURE GARBAGE REPO written in C against C11 standards, strictly CLI, no GUI, EXPLORE IF YOUR life has LESS ENTERTAINMENTS.
 
 
 ## Disclaimer about stupidity
